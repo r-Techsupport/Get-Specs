@@ -97,3 +97,6 @@ Write-Host "Basic SMART: " -NoNewline
 Get-SMART
 }
 Stop-transcript
+
+$FilePath = '.\TechSupport_Speccy.txt'
+Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $FilePath -Uri 'https://share.dev0.sh/upload' -UseBasicParsing
