@@ -1,5 +1,6 @@
 ﻿$admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
+Start-Transcript "TechSupport_Speccy.txt"
 Get-Date
 Write-Host "`n" -NoNewline
 
@@ -95,3 +96,4 @@ function Get-SMART {
 Write-Host "Basic SMART: " -NoNewline
 Get-SMART
 }
+Stop-transcript
