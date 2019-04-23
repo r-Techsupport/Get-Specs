@@ -99,4 +99,6 @@ Get-SMART
 Stop-transcript
 
 $FilePath = '.\TechSupport_Speccy.txt'
-Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $FilePath -Uri 'https://share.dev0.sh/upload' -UseBasicParsing
+$link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $FilePath -Uri 'https://share.dev0.sh/upload' -UseBasicParsing
+
+Write-Host "Share this link:" $link.Content
