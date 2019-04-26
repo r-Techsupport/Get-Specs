@@ -5,7 +5,7 @@
 $admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 
-#Define the function used to inform the user of admin. If the user cancels nothing past line 22 will be run.
+#Define the function used to inform the user of admin. If they choose not to the script will be run without admin.
 if ($admin -eq $False) {
 Function GUIPAUSE ($Message = "Click Yes or No to run the script with or without admin", $Title = "Continue or Cancel") {
     Add-Type -AssemblyName System.Windows.Forms | Out-Null
