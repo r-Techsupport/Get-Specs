@@ -13,7 +13,7 @@ Function GUIPAUSE ($Message = "Click Yes or No to run the script with or without
     $Decision = $MsgBox::Show($Message,$Title,"YesNo", "Information")
     return $Decision
 }
-$adminRequest = GUIPAUSE -Message "This program will request admin so that it can read CPU temperatures and hard drive health, these are Windows limitations. You may press No to run without these tests. Note: They may be required for assistance." -Title "User Information"
+$adminRequest = GUIPAUSE -Message "This program will request admin so that it can read CPU temperatures, these are Windows limitations. You may press No to run without these tests. Note: They may be required for assistance." -Title "User Information"
 }
 
 #If user approves then prompt UAC and restart script
@@ -126,16 +126,11 @@ Write-Host "`n" -NoNewline
 Write-Host "Services: " -NoNewline
 Get-Service | Format-Table
 
-#Get SMART data only if running as admin
-if ($admin -eq $true) {
-function Get-SMART {
-    $smartBase = gwmi -namespace root\wmi -class MSStorageDriver_FailurePredictStatus
-    $smartValue = $smartBase | Select InstanceName, PredictFailure | Format-Table
-    return $smartValue
-}
-Write-Host "Basic SMART: " -NoNewline
-Get-SMART
-}
+#Get disk health and layouts
+Write-Host "Disk layouts:"
+Get-Partition|format-table -auto
+Get-Volume|format-table -auto
+
 Stop-transcript
 
 #Call the outputted file from above and then send it to pastebin server
