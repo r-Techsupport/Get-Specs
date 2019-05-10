@@ -1,35 +1,6 @@
 # TechSupport powershell-specifications script
 # Writen by PipeItToDevNull
 
-#Check if this is being run as admin, this is used to determine if the admin prompt is displayed
-$admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-
-#Define the function used to inform the user of admin. If they choose not to the script will be run without admin.
-if ($admin -eq $False) {
-Function GUIPAUSE ($Message = "Click Yes or No to run the script with or without admin", $Title = "Continue or Cancel") {
-    Add-Type -AssemblyName System.Windows.Forms | Out-Null
-    $MsgBox = [System.Windows.Forms.MessageBox]
-    $Decision = $MsgBox::Show($Message,$Title,"YesNo", "Information")
-    return $Decision
-}
-$adminRequest = GUIPAUSE -Message "This program will request admin so that it can read CPU temperatures, these are Windows limitations. You may press No to run without these tests. Note: They may be required for assistance." -Title "User Information"
-}
-
-#If user approves then prompt UAC and restart script
-if ($adminRequest -like "Yes") {
-    if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-     if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
-      $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
-      Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
-      Exit
-     }
-    }
-}
-
-#Check if this is being run as admin, this is used to determine what hardware to poll
-$admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
 #Start recording output
 Start-Transcript "TechSupport_Specs.txt"
 Get-Date
@@ -130,6 +101,11 @@ Get-Service | Format-Table
 Write-Host "Disk layouts:"
 Get-Partition|format-table -auto
 Get-Volume|format-table -auto
+
+#Get network adapter information
+Write-Host "Network adapters:"
+Get-NetAdapter|format-table -auto
+Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,AddressState,ValidLifetime,PreferredLifetime,PrefixLength,PrefixOrigin
 
 Stop-transcript
 
