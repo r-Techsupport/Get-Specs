@@ -104,8 +104,8 @@ Get-Volume|format-table -auto
 
 #Get network adapter information
 Write-Host "Network adapters:"
-Get-NetAdapter|format-table -auto
-Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,AddressState,ValidLifetime,PreferredLifetime,PrefixLength,PrefixOrigin
+Get-NetAdapter|format-table -auto Name,InterfaceDescription,Status,MacAddress,LinkSpeed
+Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,AddressState,ValidLifetime,PrefixLength,PrefixOrigin
 
 Stop-transcript
 
