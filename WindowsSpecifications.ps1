@@ -96,11 +96,13 @@ Write-Host "`n" -NoNewline
 #Get system services and states
 Write-Host "Services: " -NoNewline
 Get-Service | Format-Table
+Write-Host "`n" -NoNewline
 
 #Get disk health and layouts
 Write-Host "Disk layouts:"
 Get-Partition|format-table -auto
 Get-Volume|format-table -auto
+Write-Host "`n" -NoNewline
 
 #Get network adapter information
 Write-Host "Network adapters:"
