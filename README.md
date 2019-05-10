@@ -1,3 +1,3 @@
-# powershell_scripts
+# techsupport_scripts
 
-personal Powershell scripts used in my environments and for fun
+techsupport scripts for assisting users 
