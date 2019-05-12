@@ -16,6 +16,11 @@ Write-Host "OS: " -NoNewline
 Get-OS
 Write-Host "`n" -NoNewline
 
+#Get list of installed updates
+Write-Host "Installed updates:"
+Get-HotFix |format-table -auto Description,HotFixID,InstalledOn
+Write-Host "`n" -NoNewLine
+
 #Define function to get CPU model
 function Get-CPU{
     $CPUInfo = Get-WmiObject Win32_Processor
