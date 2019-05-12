@@ -100,7 +100,7 @@ Write-Host "`n" -NoNewline
 
 #Get system services and states
 Write-Host "Services: " -NoNewline
-Get-Service | Format-Table
+Get-Service | Format-Table -auto
 Write-Host "`n" -NoNewline
 
 #Get disk health and layouts
