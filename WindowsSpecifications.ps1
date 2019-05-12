@@ -111,8 +111,8 @@ Write-Host "`n" -NoNewline
 
 #Get network adapter information
 Write-Host "Network adapters:"
-Get-NetAdapter|format-table -auto Name,InterfaceDescription,Status,MacAddress,LinkSpeed
-Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,AddressState,ValidLifetime,PrefixLength,PrefixOrigin
+Get-NetAdapter|format-table -auto Name,InterfaceDescription,Status,LinkSpeed
+Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin
 
 Stop-transcript
 
