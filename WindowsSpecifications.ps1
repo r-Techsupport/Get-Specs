@@ -6,14 +6,9 @@ Start-Transcript "TechSupport_Specs.txt"
 Get-Date
 Write-Host "`n" -NoNewline
 
-#Define the function used to determine OS version
-function Get-OS{
-    $OSInfo = Get-WmiObject Win32_OperatingSystem
-    $OS = $OSInfo.Version
-    return $OS
-}
-Write-Host "OS: " -NoNewline
-Get-OS
+#Pull basic OS information
+Write-Host "OS Info: " -NoNewline
+Get-ComputerInfo |format-list TimeZone,WindowsProductName,WindowsVersion,PowerPlatformRole
 Write-Host "`n" -NoNewline
 
 #Get list of installed updates
