@@ -122,7 +122,7 @@ Write-Host "`n" -NoNewline
 
 #Get drivers and devices
 Write-Host "Drivers and device versions:" -NoNewline
-$(gwmi Win32_PnPSignedDriver | select devicename,driverversion)
+gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion
 
 Stop-transcript
 
