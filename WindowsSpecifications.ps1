@@ -7,8 +7,10 @@ Get-Date
 Write-Host "`n" -NoNewline
 
 #Pull basic OS information
-Write-Host "OS Info: " -NoNewline
-Get-ComputerInfo |format-list TimeZone,WindowsProductName,WindowsVersion,PowerPlatformRole
+Write-Host "Edition: " -NoNewline
+$(Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion' ProductName).ProductName
+Write-Host "Build: " -NoNewline
+$(Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
 Write-Host "`n" -NoNewline
 
 #Get list of installed updates
@@ -98,6 +100,16 @@ Write-Host "Services: " -NoNewline
 Get-Service | Format-Table -auto
 Write-Host "`n" -NoNewline
 
+#Get Installed apps
+function Get-InstalledApplications {
+    $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
+    $installedClean = $installedBase.DisplayName
+    return $installedClean
+}
+Write-Host "Installed Apps: "
+Get-InstalledApplications
+Write-Host "`n" -NoNewline
+
 #Get disk health and layouts
 Write-Host "Disk layouts:"
 Get-Partition|format-table -auto
@@ -108,6 +120,11 @@ Write-Host "`n" -NoNewline
 Write-Host "Network adapters:"
 Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed
 Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin
+Write-Host "`n" -NoNewline
+
+#Get drivers and devices
+Write-Host "Drivers and device versions:" -NoNewline
+$(gwmi Win32_PnPSignedDriver | select devicename,driverversion)
 
 Stop-transcript
 
