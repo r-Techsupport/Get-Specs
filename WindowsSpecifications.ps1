@@ -7,10 +7,8 @@ Get-Date
 Write-Host "`n" -NoNewline
 
 #Pull basic OS information
-Write-Host "Edition: " -NoNewline
-$(Get-Item "HKLM:\Software\Microsoft\Windows NT\CurrentVersion").GetValue("ProductName")
-Write-Host "Build: " -NoNewline
-$(Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("ReleaseID")
+Write-Host "Edition:" -NoNewline $(Get-Item "HKLM:\Software\Microsoft\Windows NT\CurrentVersion").GetValue("ProductName")
+Write-Host "Build:" -NoNewline $(Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("ReleaseID")
 Write-Host "`n" -NoNewline
 
 #Get list of installed updates
