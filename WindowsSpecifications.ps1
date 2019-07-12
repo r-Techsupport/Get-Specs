@@ -21,27 +21,9 @@ Write-Host "CPU: " -NoNewline
 Get-CPU
 Write-Host "`n" -NoNewline
 
-#Define function to get temperature of CPU
-function Get-Temperature {
-    $t = Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi" -ErrorAction SilentlyContinue
-    $returntemp = @()
-    if ($t){
-        foreach ($temp in $t.CurrentTemperature) {
-            $currentTempKelvin = $temp / 10
-            $currentTempCelsius = $currentTempKelvin - 273.15
-
-            $currentTempFahrenheit = (9/5) * $currentTempCelsius + 32
-
-            $returntemp += $currentTempCelsius.ToString() + " C : " + $currentTempFahrenheit.ToString() + " F : " + $currentTempKelvin + "K"  
-        }
-    }
-    else {
-        $returntemp = "Not supported"
-        }
-    return $returntemp
-}
-Write-Host "CPU Temperature: " -NoNewline
-Get-Temperature
+#Get RAM info
+Write-Host "RAM: "(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})GB -NoNewline
+Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize
 Write-Host "`n" -NoNewline
 
 #Define function to get motherboard model
