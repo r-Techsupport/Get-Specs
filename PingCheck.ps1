@@ -10,7 +10,7 @@ This is a powerhsell script for logging speed and latenvy over an indefinite per
 -interval <interval in seconds>
 
 .EXAMPLE
-./PingCheck.ps1 -remote dev0.sh -interval 
+./PingCheck.ps1 -remote dev0.sh -interval 5
 
 .NOTES
 No notes at the moment
@@ -23,9 +23,9 @@ https://git.dev0.sh/piper/techsupport_scripts
 param ([string]$remote='1.1.1.1', [decimal]$interval='10')
 
 While ($true) {
-	Write-Host "----------" -ForeGroundColor Green
+	Write-Output "--------------------"
 	Get-Date -Format "%M/%d %H:%m:%s"
 	Test-Connection -ComputerName $remote -Count 1 | Format-Table Address,ResponseTime
-	Write-host "Speed is $($a=Get-Date; Invoke-WebRequest https://dev0.sh/1MiB |Out-Null; "$((10/((Get-Date)-$a).TotalSeconds)*8) Mbps")"
+	Write-Output "Speed is $($a=Get-Date; Invoke-WebRequest https://dev0.sh/1MiB |Out-Null; "$((10/((Get-Date)-$a).TotalSeconds)*8) Mbps")"
 	Start-Sleep -Seconds $interval
 }
