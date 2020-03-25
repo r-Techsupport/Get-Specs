@@ -3,7 +3,7 @@
 <#
 
 .SYNOPSIS
-This is a powerhsell script for logging speed and latency over an indefinite period of time when ran in the foreground. It uses a remote server (1.1.1.1 by default) and an interval (10 seconds) by default
+This is a powerhsell script for logging speed and latency over an indefinite period of time when ran in the foreground. It uses a remote server (1.1.1.1 by default) and an interval (2 seconds) by default
 
 .DESCRIPTION
 -remote <remote server IP or name>
@@ -27,6 +27,8 @@ $gate = $($(Get-NetIPConfiguration).IPv4DefaultGateway).NextHop
 
 # make our file
 Add-Content -Path $env:USERPROFILE\Desktop\PingCheck_$interval.csv  -Value "Time,$gate,$remote,Speed"
+
+Write-Host "All output is being made in $env:USERPROFILE\Desktop\PingCheck_$interval.csv. Do not open the file until you have terminated this script." -Foreground Green
 
 While ($true) {
 	$time = Get-Date -Format "%M/%d %H:%m:%s"
