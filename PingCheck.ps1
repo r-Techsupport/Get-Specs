@@ -28,17 +28,21 @@ $gate = $($(Get-NetIPConfiguration).IPv4DefaultGateway).NextHop
 # make our file
 Add-Content -Path $env:USERPROFILE\Desktop\PingCheck_$interval.csv  -Value "Time,$gate,$remote,Speed"
 
-Write-Host "All output is being made in $env:USERPROFILE\Desktop\PingCheck_$interval.csv. Do not open the file until you have terminated this script." -Foreground Green
+Write-Host "All output is being made in $env:USERPROFILE\Desktop\PingCheck_$interval.csv" 
+Write-Warning "Do not open the file until you have terminated this script."
 
 While ($true) {
 	$time = Get-Date -Format "%M/%d %H:%m:%s"
-	$timeRemote = $(Test-Connection -ComputerName $remote -Count 1).ResponseTime
-	$timeGate = $(Test-Connection -ComputerName $gate -Count 1).ResponseTime
+	$gateJob = Start-Job { $(Test-Connection -ComputerName $using:gate -Count 1).ResponseTime }
+	$remoteJob = Start-Job { $(Test-Connection -ComputerName $using:remote -Count 1).ResponseTime }
 	If ($speedtest){
 			$speed = $($a=Get-Date; Invoke-WebRequest https://dev0.sh/1MiB |Out-Null; "$((10/((Get-Date)-$a).TotalSeconds)*8) Mbps")
 		}Else{
 			$speed = "skipped"
 	}
-	Add-Content -Path $env:USERPROFILE\Desktop\PingCheck_$interval.csv -Value "$time,$timeGate,$timeRemote,$speed"
+	Start-Sleep '1'
+	$timeGate = Receive-Job $gateJob
+	$timeRemote = Receive-Job $remoteJob
+	Add-Content -Path $env:USERPROFILE\Desktop\PingCheck_$interval.csv -Value "$time,$timeGate ms,$timeRemote ms,$speed"
 	Start-Sleep -Seconds $interval
 }
