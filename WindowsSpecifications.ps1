@@ -1,5 +1,16 @@
-# TechSupport powershell-specifications script
-# Writen by PipeItToDevNull
+<#
+.SYNOPSIS
+  Gather and upload specifications of a Windows host to rTechsupport
+.DESCRIPTION
+  Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
+.OUTPUTS Specs
+  '.\TechSupport_Specs.txt'
+.NOTES
+  Version:        .1
+  Author:         PipeItToDevNull
+  Creation Date:  12/29/2020
+  Purpose/Change: Initial script development
+#>
 
 #Start recording output
 Start-Transcript "TechSupport_Specs.txt"
