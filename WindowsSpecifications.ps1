@@ -127,4 +127,4 @@ $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $FileP
 # source pretty wpf box
 . .\new-wpfMessageBox.ps1
 set-clipboard $link.Content
-New-WPFMessageBox -Content "The link is now on your clipboard. Paste into chat to share." -Title "rTechsupport Specs Tool" -TitleBackground Aquamarine
+New-WPFMessageBox -Content "A link to the results is now on your clipboard. Paste into chat to share." -Title "rTechsupport Specs Tool" -TitleBackground Aquamarine
