@@ -47,7 +47,7 @@ function getGPU {
 	Return $1
 }
 function getRAM {
-	$1 = "`n" + "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB'
+	$1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB'
 	$2 = $(Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize)
 	Return $1,$2
 }
