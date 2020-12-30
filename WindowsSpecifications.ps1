@@ -6,7 +6,7 @@
 .OUTPUTS Specs
   '.\TechSupport_Specs.txt'
 .NOTES
-  Version:        .2
+  Version:        .3
   Author:         PipeItToDevNull
   Creation Date:  12/29/2020
   Purpose/Change: Initial script development
