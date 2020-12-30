@@ -6,7 +6,7 @@
 .OUTPUTS Specs
   '.\TechSupport_Specs.txt'
 .NOTES
-  Version:        .1
+  Version:        .2
   Author:         PipeItToDevNull
   Creation Date:  12/29/2020
   Purpose/Change: Initial script development
@@ -14,12 +14,13 @@
 
 # ------------------ #
 $file = 'TechSupport_Specs.txt'
+. .\new-wpfMessageBox.ps1
 # ------------------ #
 
-function startItOut {
+function getDate {
 	Get-Date
 }
-function basicInfo {
+function getbasicInfo {
 	$1 = 'Edition: ' + $(Get-Item "HKLM:Software\Microsoft\Windows NT\CurrentVersion").GetValue("ProductName")
 	$2 = 'Build: ' + $(Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("ReleaseID")
 	Return $1,$2
@@ -100,17 +101,46 @@ function uploadFile {
 	$link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://share.dev0.sh/upload/$null.txt" -UseBasicParsing
 	set-clipboard $link.Content
 }
-function promptUser {
-	. .\new-wpfMessageBox.ps1
-	$Params = @{
-		Content = "Do you want to view or upload the specs?"
-		Title = "rTechsupport "
-		TitleBackground = "DeepSkyBlue"
-		TitleFontSize = 28
+function promptStart {
+		$Params = @{
+		Content = " This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
+		&#10; 
+		&#10;
+Would you like to continue?
+		&#10;
+		&#10;
+		&#10;
+		&#10;
+The source code for this application can be found at https://git.dev0.sh/piper/techsupport_scripts"
+		Title = "rTechsupport Specs Tool"
+		TitleBackground = "DodgerBlue"
+		TitleFontSize = 16
 		TitleFontWeight = "Bold"
 		TitleTextForeground = "White"
 		ContentFontSize = 12
 		ContentFontWeight = "Medium"
+		ContentTextForeground = "Black"
+		ContentBackground = "SlateGray"
+		ButtonType = "none"
+		CustomButtons = "Start","Exit"
+	}
+	New-WPFMessageBox @Params
+	If ($WPFMessageBoxOutput -eq "Exit") {
+		Exit
+	}
+}
+function promptUpload {
+	$Params = @{
+		Content = "Do you want to view or upload the specs?"
+		Title = "rTechsupport Specs Tool"
+		TitleBackground = "DodgerBlue"
+		TitleFontSize = 16
+		TitleFontWeight = "Bold"
+		TitleTextForeground = "White"
+		ContentFontSize = 12
+		ContentFontWeight = "Medium"
+		ContentTextForeground = "Black"
+		ContentBackground = "SlateGray"
 		ButtonType = "none"
 		CustomButtons = "View","Upload"
 	}
@@ -125,8 +155,9 @@ function promptUser {
 }
 
 # ------------------ #
-startItOut > $file
-basicInfo >> $file
+promptStart
+getDate > $file
+getBasicInfo >> $file
 getCPU >> $file
 getMobo >> $file
 getGPU >> $file
@@ -139,8 +170,5 @@ getInstalledApps >> $file
 getDisks >> $file
 getNets >> $file
 getDrivers >> $file
-# ------------------ #
-
-# ------------------ #
-promptUser
+promptUpload
 # ------------------ #
