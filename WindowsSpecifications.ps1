@@ -579,7 +579,9 @@ function getDisks {
 }
 function getSmart {
 	$(cdi_bin\DiskInfo64.exe /CopyExit)
-	Sleep 10
+	while (!(Test-Path 'cdi_bin\DiskInfo.txt')) { 
+		Start-Sleep 1
+	}
 	$1 = "`n" + "SMART: "
 	$2 = $(Get-Content cdi_bin\DiskInfo.txt)
 	Remove-Item -Force -Recurse 'cdi_bin\Smart','cdi_bin\DiskInfo.txt','cdi_bin\DiskInfo.ini'
