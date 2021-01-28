@@ -560,12 +560,6 @@ function getInstalledApps {
 	$2 = $installedBase.DisplayName
 	Return $1,$2
 }
-function getDisks {
-	$1 = "`n" + "Disk layouts: "
-	$2 = $(Get-Partition|format-table -auto)
-	$3 = $(Get-Volume|format-table -auto)
-	Return $1,$2,$3
-}
 function getNets {
 	$1 = "`n" + "Network adapters:"
 	$2 = $(Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed)
@@ -575,6 +569,20 @@ function getNets {
 function getDrivers {
 	$1 = "`n" + "Drivers and device versions: "
 	$2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
+	Return $1,$2
+}
+function getDisks {
+	$1 = "`n" + "Disk layouts: "
+	$2 = $(Get-Partition|format-table -auto)
+	$3 = $(Get-Volume|format-table -auto)
+	Return $1,$2,$3
+}
+function getSmart {
+	$(cdi_bin\DiskInfo64.exe /CopyExit)
+	Sleep 10
+	$1 = "`n" + "SMART: "
+	$2 = $(Get-Content cdi_bin\DiskInfo.txt)
+	Remove-Item -Force -Recurse 'cdi_bin\Smart','cdi_bin\DiskInfo.txt','cdi_bin\DiskInfo.ini'
 	Return $1,$2
 }
 function uploadFile {
@@ -647,8 +655,9 @@ getStartup >> $file
 getProcesses >> $file
 getServices >> $file
 getInstalledApps >> $file
-getDisks >> $file
 getNets >> $file
 getDrivers >> $file
+getDisks >> $file
+getSmart >> $file
 promptUpload
 # ------------------ #
