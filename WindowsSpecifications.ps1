@@ -600,7 +600,7 @@ The source code for this application can be found at https://git.dev0.sh/piper/t
 		ContentFontSize = 12
 		ContentFontWeight = "Medium"
 		ContentTextForeground = "Black"
-		ContentBackground = "SlateGray"
+		ContentBackground = "White"
 		ButtonType = "none"
 		CustomButtons = "Start","Exit"
 	}
@@ -620,7 +620,7 @@ function promptUpload {
 		ContentFontSize = 12
 		ContentFontWeight = "Medium"
 		ContentTextForeground = "Black"
-		ContentBackground = "SlateGray"
+		ContentBackground = "White"
 		ButtonType = "none"
 		CustomButtons = "View","Upload"
 	}
