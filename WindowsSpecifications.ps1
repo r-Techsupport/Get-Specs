@@ -491,7 +491,6 @@ Function New-WPFMessageBox {
     # Display the window
     $null = $window.Dispatcher.InvokeAsync{$window.ShowDialog()}.Wait()
 
-    # For examples for use, see my blog:
 	# SOURCE OF WPF BELOW
     # https://smsagent.wordpress.com/2017/08/24/a-customisable-wpf-messagebox-for-powershell/
     }
