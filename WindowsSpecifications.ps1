@@ -11,11 +11,7 @@
   Creation Date:  12/29/2020
   Purpose/Change: Initial script development
 #>
-
-# ------------------ #
-$file = 'TechSupport_Specs.txt'
-# ------------------ #
-# Real script starts at line 500
+# Real script starts at line 495
 Function New-WPFMessageBox {
 
     # CHANGES
@@ -496,13 +492,60 @@ Function New-WPFMessageBox {
     }
 }
 
+# Declarations
+$file = 'TechSupport_Specs.txt'
+$badSoftware = @(
+	'calibre2',
+	'calibre'
+)
+$badStartup = @(
+	'AutoKMS'
+)
+
+# Bulk data gathering
+## CIM sources
+$cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
+$cimStart = Get-CimInstance Win32_StartupCommand
+$cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
+
+## Win32
+
+
+## Other
+$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.Displayname -notlike $null}
+$services = $(Get-Service | Format-Table -auto)
+
+### Functions
+
 function getDate {
 	Get-Date
 }
 function getbasicInfo {
-	$1 = 'Edition: ' + $(Get-Item "HKLM:Software\Microsoft\Windows NT\CurrentVersion").GetValue("ProductName")
-	$2 = 'Build: ' + $(Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("ReleaseID")
-	Return $1,$2
+	$bootuptime = $cimOs.LastBootUpTime
+	$uptime = $(Get-Date) - $bootuptime
+	$1 = 'Edition: ' + $cimData.Caption
+	$2 = 'Build: ' + $cimData.BuildNumber
+	$3 = 'Install date: ' + $cimData.InstallDate
+	$4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
+	$5 = 'Hostname: ' + $cimData.CSName
+	$6 = 'Domain: ' + $env:USERDOMAIN
+	Return $1,$2,$3,$4,$5,$6
+}
+function getBadInstalledThings {
+	$1 = "`n" + 'Visible issues: ' + $CPU
+	$2 = @()
+	$3 = @()
+	foreach ($soft0 in $badSoftware) { 
+		if ($installedBase.Displayname -contains $soft0) { 
+			$2 += $soft0 
+		} 
+	}
+	foreach ($start0 in $badStartup) { 
+		if ($cimStart.Caption -contains $start0) { 
+			$3 += $start0
+		} 
+	}
+	Return $1,$2,$3
 }
 function getCPU{
     $CPUInfo = Get-WmiObject Win32_Processor
@@ -530,33 +573,72 @@ function getRAM {
 	$2 = $(Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize)
 	Return $1,$2
 }
+function getVars {
+	$1 = "`n" + "System Variables:"
+	$2 = [Environment]::GetEnvironmentVariables("Machine")
+	$3 = "`n" + "User Variables:"
+	$4 = [Environment]::GetEnvironmentVariables("User")
+	Return $1,$2,$3,$4
+}
 function getUpdates {
 	$1 = "`n" + "Installed updates:"
 	$2 = Get-HotFix |format-table -auto Description,HotFixID,InstalledOn
 	Return $1,$2
 }
 function getStartup {
-    $startBase = Get-CimInstance Win32_StartupCommand
     $1 = "Startup Tasks for user: "
-	$2 = $startBase.Caption
+	$2 = $cimStart.Caption
 	Return $1,$2
 }
 function getProcesses {
-    $procBase = Get-Process
-    $procTrash = $procBase.ProcessName
+    $properties=@(
+		@{Name="Name"; 
+			Expression = {$_.name}},
+		@{Name="Count"; 
+			Expression = {(Get-Process -Name $_.Name | Group-Object -Property ProcessName).Count}
+		},
+		@{Name="NPM (M)"; 
+			Expression = {[Math]::Round(($_.NPM / 1MB), 3)}
+		},
+		@{Name="Mem (M)"; 
+			Expression = {
+				$total = 0
+				ForEach ($proc in $(Get-Process -Name $_.Name)) {
+					$total = $total + [Math]::Round(($proc.WS / 1MB), 2)
+				}
+				$total
+			}
+		},
+		@{Name = "CPU"; 
+			Expression = {
+				$total = 0
+				ForEach ($proc in $(Get-Process -Name $_.Name)) {
+					$TotalSec = (New-TimeSpan -Start $proc.StartTime).TotalSeconds
+					$total = $total + [Math]::Round( ($proc.CPU * 100 / $TotalSec), 2)
+				}
+				$total
+			}
+		},
+		@{Name="ProductVersion ";
+			Expression = {$_.ProductVersion}
+		},
+		@{Name="Path";
+			Expression = {$_.Path}
+		}
+	)
     $1 = "`n" + "Running processes: "
-	$2 = $($procTrash | select -Unique)
+	$2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | Format-Table)
 	return $1,$2
 }
 function getServices {
 	$1 = "`n" + "Services: "
-	$2 = $(Get-Service | Format-Table -auto)
+	$2 = $services
 	Return $1,$2
 }
 function getInstalledApps {
-    $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
+	$apps = $installedBase | Select InstallDate,Displayname | Sort-Object InstallDate -desc
     $1 = "Installed Apps: "
-	$2 = $installedBase.DisplayName
+	$2 = $apps
 	Return $1,$2
 }
 function getNets {
@@ -568,6 +650,11 @@ function getNets {
 function getDrivers {
 	$1 = "`n" + "Drivers and device versions: "
 	$2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
+	Return $1,$2
+}
+function getAudio {
+	$1 = "`n" + "Audio devices:"
+	$2 = $cimAudio
 	Return $1,$2
 }
 function getDisks {
@@ -647,10 +734,12 @@ function promptUpload {
 promptStart
 getDate > $file
 getBasicInfo >> $file
+getBadInstalledThings >> $file
 getCPU >> $file
 getMobo >> $file
 getGPU >> $file
 getRAM >> $file
+getVars >> $file
 getUpdates >> $file
 getStartup >> $file
 getProcesses >> $file
@@ -658,7 +747,8 @@ getServices >> $file
 getInstalledApps >> $file
 getNets >> $file
 getDrivers >> $file
+getAudio >> $file
 getDisks >> $file
-getSmart >> $file
+# getSmart >> $file
 promptUpload
 # ------------------ #
