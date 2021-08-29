@@ -495,25 +495,33 @@ Function New-WPFMessageBox {
 # Declarations
 $file = 'TechSupport_Specs.txt'
 $badSoftware = @(
-	'calibre2',
-	'calibre'
+	'Driver Booster'
 )
 $badStartup = @(
-	'AutoKMS'
+	'AutoKMS',
+	'kmspico',
+	'CCleanerSkipUAC',
+	'McAfee Remediation',
+	'IObit Uninstaller Service',
+	'Driver Booster Scheduler',
+	'Driver Easy Scheduled Scan'
 )
-
+$badProcesses = @(
+	'Malwarebytes',
+	'McAfee WebAdvisor',
+	'Norton Security',
+	'Wallpaper Engine Service'
+)
 # Bulk data gathering
 ## CIM sources
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
 $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
 
-## Win32
-
-
 ## Other
 $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.Displayname -notlike $null}
 $services = $(Get-Service | Format-Table -auto)
+$runningProcesses = Get-Process
 
 ### Functions
 
@@ -531,18 +539,23 @@ function getbasicInfo {
 	$6 = 'Domain: ' + $env:USERDOMAIN
 	Return $1,$2,$3,$4,$5,$6
 }
-function getBadInstalledThings {
+function getBadThings {
 	$1 = "`n" + 'Visible issues: ' + $CPU
 	$2 = @()
 	$3 = @()
-	foreach ($soft0 in $badSoftware) { 
-		if ($installedBase.Displayname -contains $soft0) { 
-			$2 += $soft0 
+	foreach ($soft in $badSoftware) { 
+		if ($installedBase.Displayname -contains $soft) { 
+			$2 += $soft
 		} 
 	}
-	foreach ($start0 in $badStartup) { 
-		if ($cimStart.Caption -contains $start0) { 
-			$3 += $start0
+	foreach ($start in $badStartup) { 
+		if ($cimStart.Caption -contains $start) { 
+			$3 += $start
+		} 
+	}
+	foreach ($running in $badProcesses) {
+		if ($runningProcesses.Name -contains $running) {
+			$4 += $running
 		} 
 	}
 	Return $1,$2,$3
@@ -734,7 +747,7 @@ function promptUpload {
 promptStart
 getDate > $file
 getBasicInfo >> $file
-getBadInstalledThings >> $file
+getBadThings >> $file
 getCPU >> $file
 getMobo >> $file
 getGPU >> $file
@@ -749,6 +762,6 @@ getNets >> $file
 getDrivers >> $file
 getAudio >> $file
 getDisks >> $file
-# getSmart >> $file
+getSmart >> $file
 promptUpload
 # ------------------ #
