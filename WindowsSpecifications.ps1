@@ -531,11 +531,11 @@ function getDate {
 function getbasicInfo {
 	$bootuptime = $cimOs.LastBootUpTime
 	$uptime = $(Get-Date) - $bootuptime
-	$1 = 'Edition: ' + $cimData.Caption
-	$2 = 'Build: ' + $cimData.BuildNumber
-	$3 = 'Install date: ' + $cimData.InstallDate
+	$1 = 'Edition: ' + $cimOs.Caption
+	$2 = 'Build: ' + $cimOs.BuildNumber
+	$3 = 'Install date: ' + $cimOs.InstallDate
 	$4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
-	$5 = 'Hostname: ' + $cimData.CSName
+	$5 = 'Hostname: ' + $cimOs.CSName
 	$6 = 'Domain: ' + $env:USERDOMAIN
 	Return $1,$2,$3,$4,$5,$6
 }
