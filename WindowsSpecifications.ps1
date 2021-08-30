@@ -11,7 +11,10 @@
   Creation Date:  12/29/2020
   Purpose/Change: Initial script development
 #>
-# Real script starts at line 495
+
+#Requires RunAsAdministrator
+# Real script starts at line 498
+
 Function New-WPFMessageBox {
 
     # CHANGES
@@ -523,6 +526,40 @@ $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\C
 $services = $(Get-Service | Format-Table -auto)
 $runningProcesses = Get-Process
 
+# Temperatures
+function getTemps {
+	Add-Type -Path .\cdi_bin\OpenHardwareMonitorLib.dll
+	$ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
+	$ohm.CPUEnabled= 1;
+	$ohm.GPUEnabled = 1;
+	$ohm.Open();
+	foreach ($comp in $ohm.Hardware) {
+		if($comp.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
+		$comp.Update()
+			foreach ($sens in $comp.Sensors) {
+				 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
+					$1 = $sens.Value.ToString()
+					#$sens.Identifier for a better name
+				 }
+			}
+		}
+	}
+	foreach ($comp in $ohm.Hardware) {
+		if($comp.HardwareType -ne [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
+		$comp.Update()
+			foreach ($sens in $comp.Sensors) {
+				 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
+					$2 = $sens.Value.ToString()
+					# $sens.Identifier for a better name
+				 }
+			}
+		}
+	}
+	$ohm.Close();
+	Return $1,$2
+}
+$temps = getTemps
+
 ### Functions
 
 function getDate {
@@ -561,9 +598,9 @@ function getBadThings {
 	Return $1,$2,$3
 }
 function getCPU{
-    $CPUInfo = Get-WmiObject Win32_Processor
-    $CPU = $CPUInfo.Name
-	$1 = "`n" + 'CPU: ' + $CPU
+    $cpuInfo = Get-WmiObject Win32_Processor
+    $cpu = $cpuInfo.Name
+	$1 = "`n" + 'CPU: ' + $CPU + $temps[0] + 'C'
 	Return $1
 }
 function getMobo{
@@ -577,8 +614,9 @@ function getMobo{
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
     $GPUname = $GPUbase.Name
+	$GPUtemp = addGetGPUTemp
     $GPU= $GPUname + " at " + $GPUbase.CurrentHorizontalResolution + "x" + $GPUbase.CurrentVerticalResolution
-    $1 = "Graphics Card: " + $GPU
+    $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C'
 	Return $1
 }
 function getRAM {
