@@ -12,7 +12,6 @@
   Purpose/Change: Initial script development
 #>
 
-#Requires RunAsAdministrator
 # Real script starts at line 498
 
 Function New-WPFMessageBox {
@@ -528,7 +527,7 @@ $runningProcesses = Get-Process
 
 # Temperatures
 function getTemps {
-	Add-Type -Path .\cdi_bin\OpenHardwareMonitorLib.dll
+	Add-Type -Path .\files\OpenHardwareMonitorLib.dll
 	$ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
 	$ohm.CPUEnabled= 1;
 	$ohm.GPUEnabled = 1;
@@ -614,7 +613,6 @@ function getMobo{
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
     $GPUname = $GPUbase.Name
-	$GPUtemp = addGetGPUTemp
     $GPU= $GPUname + " at " + $GPUbase.CurrentHorizontalResolution + "x" + $GPUbase.CurrentVerticalResolution
     $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C'
 	Return $1
@@ -715,13 +713,13 @@ function getDisks {
 	Return $1,$2,$3
 }
 function getSmart {
-	$(cdi_bin\DiskInfo64.exe /CopyExit)
-	while (!(Test-Path 'cdi_bin\DiskInfo.txt')) { 
+	$(files\DiskInfo64.exe /CopyExit)
+	while (!(Test-Path 'files\DiskInfo.txt')) { 
 		Start-Sleep 1
 	}
 	$1 = "`n" + "SMART: "
-	$2 = $(Get-Content cdi_bin\DiskInfo.txt)
-	Remove-Item -Force -Recurse 'cdi_bin\Smart','cdi_bin\DiskInfo.txt','cdi_bin\DiskInfo.ini'
+	$2 = $(Get-Content files\DiskInfo.txt)
+	Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
 	Return $1,$2
 }
 function uploadFile {
