@@ -669,6 +669,11 @@ function getStartup {
 	$2 = $cimStart.Caption
 	Return $1,$2
 }
+function getPower {
+	$1 = "`n" + "Powerprofiles:"
+	$2 = powercfg /l
+	Return $1,$2
+}
 function getProcesses {
     $properties=@(
 		@{Name="Name"; 
@@ -822,6 +827,7 @@ getRAM >> $file
 getVars >> $file
 getUpdates >> $file
 getStartup >> $file
+getPower >> $file
 getProcesses >> $file
 getServices >> $file
 getInstalledApps >> $file
