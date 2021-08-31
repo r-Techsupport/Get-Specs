@@ -514,6 +514,20 @@ $badProcesses = @(
 	'Norton Security',
 	'Wallpaper Engine Service'
 )
+# YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
+$badKeys = @(
+	'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds\',
+	'HKLM:\SYSTEM\Setup\LabConfig\',
+	'HKLM:\SYSTEM\Setup\LabConfig\',
+	'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\'
+)
+$badValues = @(
+	'AllowBuildPreview',
+	'BypassTPMCheck',
+	'BypassSecureBootCheck',
+	'NoAutoUpdate'
+)
+
 # Bulk data gathering
 ## CIM sources
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
@@ -579,6 +593,7 @@ function getBadThings {
 	$1 = "`n" + 'Visible issues: ' + $CPU
 	$2 = @()
 	$3 = @()
+	$4 = @()
 	foreach ($soft in $badSoftware) { 
 		if ($installedBase.Displayname -contains $soft) { 
 			$2 += $soft
@@ -595,6 +610,21 @@ function getBadThings {
 		} 
 	}
 	Return $1,$2,$3
+}
+function getReg {
+	$i = 0
+	$returns = @()
+	Foreach ($reg in $badKeys) {
+		If (Test-Path -Path $badKeys[$i]) {
+			$value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
+			$returns += $badKeys[$i] + " is " + $value
+		}
+		# } Else {
+			# Write-Host $badKeys[$i] $badValues[$i] "does not exist"
+		# }
+		$i = $i + 1
+	}
+	Return $returns
 }
 function getCPU{
     $cpuInfo = Get-WmiObject Win32_Processor
@@ -784,6 +814,7 @@ promptStart
 getDate > $file
 getBasicInfo >> $file
 getBadThings >> $file
+getReg >> $file
 getCPU >> $file
 getMobo >> $file
 getGPU >> $file
