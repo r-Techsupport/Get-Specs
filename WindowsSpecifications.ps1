@@ -663,7 +663,7 @@ function getVars {
 }
 function getUpdates {
     $1 = "`n" + "Installed updates:"
-    $2 = Get-HotFix |format-table -auto Description,HotFixID,InstalledOn
+    $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn
     Return $1,$2
 }
 function getStartup {
