@@ -489,7 +489,7 @@ Function New-WPFMessageBox {
     # Display the window
     $null = $window.Dispatcher.InvokeAsync{$window.ShowDialog()}.Wait()
 
-	# SOURCE OF WPF BELOW
+    # SOURCE OF WPF BELOW
     # https://smsagent.wordpress.com/2017/08/24/a-customisable-wpf-messagebox-for-powershell/
     }
 }
@@ -497,35 +497,35 @@ Function New-WPFMessageBox {
 # Declarations
 $file = 'TechSupport_Specs.txt'
 $badSoftware = @(
-	'Driver Booster'
+    'Driver Booster'
 )
 $badStartup = @(
-	'AutoKMS',
-	'kmspico',
-	'CCleanerSkipUAC',
-	'McAfee Remediation',
-	'IObit Uninstaller Service',
-	'Driver Booster Scheduler',
-	'Driver Easy Scheduled Scan'
+    'AutoKMS',
+    'kmspico',
+    'CCleanerSkipUAC',
+    'McAfee Remediation',
+    'IObit Uninstaller Service',
+    'Driver Booster Scheduler',
+    'Driver Easy Scheduled Scan'
 )
 $badProcesses = @(
-	'Malwarebytes',
-	'McAfee WebAdvisor',
-	'Norton Security',
-	'Wallpaper Engine Service'
+    'Malwarebytes',
+    'McAfee WebAdvisor',
+    'Norton Security',
+    'Wallpaper Engine Service'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
-	'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds\',
-	'HKLM:\SYSTEM\Setup\LabConfig\',
-	'HKLM:\SYSTEM\Setup\LabConfig\',
-	'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\'
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds\',
+    'HKLM:\SYSTEM\Setup\LabConfig\',
+    'HKLM:\SYSTEM\Setup\LabConfig\',
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\'
 )
 $badValues = @(
-	'AllowBuildPreview',
-	'BypassTPMCheck',
-	'BypassSecureBootCheck',
-	'NoAutoUpdate'
+    'AllowBuildPreview',
+    'BypassTPMCheck',
+    'BypassSecureBootCheck',
+    'NoAutoUpdate'
 )
 
 # Bulk data gathering
@@ -544,95 +544,95 @@ $runningProcesses = Get-Process
 ### Functions
 
 function getDate {
-	Get-Date
+    Get-Date
 }
 function getbasicInfo {
-	$bootuptime = $cimOs.LastBootUpTime
-	$uptime = $(Get-Date) - $bootuptime
-	$1 = 'Edition: ' + $cimOs.Caption
-	$2 = 'Build: ' + $cimOs.BuildNumber
-	$3 = 'Install date: ' + $cimOs.InstallDate
-	$4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
-	$5 = 'Hostname: ' + $cimOs.CSName
-	$6 = 'Domain: ' + $env:USERDOMAIN
-	$7 = 'AV: ' + $av.DisplayName
-	$8 = 'Firewall: ' + $fw.DisplayName
-	Return $1,$2,$3,$4,$5,$6,$7,$8
+    $bootuptime = $cimOs.LastBootUpTime
+    $uptime = $(Get-Date) - $bootuptime
+    $1 = 'Edition: ' + $cimOs.Caption
+    $2 = 'Build: ' + $cimOs.BuildNumber
+    $3 = 'Install date: ' + $cimOs.InstallDate
+    $4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
+    $5 = 'Hostname: ' + $cimOs.CSName
+    $6 = 'Domain: ' + $env:USERDOMAIN
+    $7 = 'AV: ' + $av.DisplayName
+    $8 = 'Firewall: ' + $fw.DisplayName
+    Return $1,$2,$3,$4,$5,$6,$7,$8
 }
 function getBadThings {
-	$1 = "`n" + 'Visible issues: ' + $CPU
-	$2 = @()
-	$3 = @()
-	$4 = @()
-	foreach ($soft in $badSoftware) { 
-		if ($installedBase.DisplayName -contains $soft) { 
-			$2 += $soft
-		} 
-	}
-	foreach ($start in $badStartup) { 
-		if ($cimStart.Caption -contains $start) { 
-			$3 += $start
-		} 
-	}
-	foreach ($running in $badProcesses) {
-		if ($runningProcesses.Name -contains $running) {
-			$4 += $running
-		} 
-	}
-	Return $1,$2,$3
+    $1 = "`n" + 'Visible issues: ' + $CPU
+    $2 = @()
+    $3 = @()
+    $4 = @()
+    foreach ($soft in $badSoftware) { 
+        if ($installedBase.DisplayName -contains $soft) { 
+            $2 += $soft
+        } 
+    }
+    foreach ($start in $badStartup) { 
+        if ($cimStart.Caption -contains $start) { 
+            $3 += $start
+        } 
+    }
+    foreach ($running in $badProcesses) {
+        if ($runningProcesses.Name -contains $running) {
+            $4 += $running
+        } 
+    }
+    Return $1,$2,$3
 }
 function getReg {
-	$i = 0
-	$returns = @()
-	Foreach ($reg in $badKeys) {
-		If (Test-Path -Path $badKeys[$i]) {
-			$value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-			$returns += $badKeys[$i] + " is " + $value
-		}
-		# } Else {
-			# Write-Host $badKeys[$i] $badValues[$i] "does not exist"
-		# }
-		$i = $i + 1
-	}
-	Return $returns
+    $i = 0
+    $returns = @()
+    Foreach ($reg in $badKeys) {
+        If (Test-Path -Path $badKeys[$i]) {
+            $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
+            $returns += $badKeys[$i] + " is " + $value
+        }
+        # } Else {
+            # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
+        # }
+        $i = $i + 1
+    }
+    Return $returns
 }
 function getTemps {
-	Add-Type -Path .\files\OpenHardwareMonitorLib.dll
-	$ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
-	$ohm.CPUEnabled= 1;
-	$ohm.GPUEnabled = 1;
-	$ohm.Open();
-	foreach ($comp in $ohm.Hardware) {
-		if($comp.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
-		$comp.Update()
-			foreach ($sens in $comp.Sensors) {
-				 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-					$1 = $sens.Value.ToString()
-					#$sens.Identifier for a better name
-				 }
-			}
-		}
-	}
-	foreach ($comp in $ohm.Hardware) {
-		if($comp.HardwareType -ne [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
-		$comp.Update()
-			foreach ($sens in $comp.Sensors) {
-				 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-					$2 = $sens.Value.ToString()
-					# $sens.Identifier for a better name
-				 }
-			}
-		}
-	}
-	$ohm.Close();
-	Return $1,$2
+    Add-Type -Path .\files\OpenHardwareMonitorLib.dll
+    $ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
+    $ohm.CPUEnabled= 1;
+    $ohm.GPUEnabled = 1;
+    $ohm.Open();
+    foreach ($comp in $ohm.Hardware) {
+        if($comp.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
+        $comp.Update()
+            foreach ($sens in $comp.Sensors) {
+                 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
+                    $1 = $sens.Value.ToString()
+                    #$sens.Identifier for a better name
+                 }
+            }
+        }
+    }
+    foreach ($comp in $ohm.Hardware) {
+        if($comp.HardwareType -ne [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
+        $comp.Update()
+            foreach ($sens in $comp.Sensors) {
+                 if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
+                    $2 = $sens.Value.ToString()
+                    # $sens.Identifier for a better name
+                 }
+            }
+        }
+    }
+    $ohm.Close();
+    Return $1,$2
 }
 $temps = getTemps
 function getCPU{
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-	$1 = "`n" + 'CPU: ' + $CPU + $temps[0] + 'C'
-	Return $1
+    $1 = "`n" + 'CPU: ' + $CPU + $temps[0] + 'C'
+    Return $1
 }
 function getMobo{
     $moboBase = Get-WmiObject Win32_BaseBoard
@@ -640,189 +640,189 @@ function getMobo{
     $moboMod = $moboBase.product
     $mobo = $moboMan + " | " + $moboMod
     $1 = "Motherboard: " + $mobo
-	Return $1
+    Return $1
 }
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
     $GPUname = $GPUbase.Name
     $GPU= $GPUname + " at " + $GPUbase.CurrentHorizontalResolution + "x" + $GPUbase.CurrentVerticalResolution
     $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C'
-	Return $1
+    Return $1
 }
 function getRAM {
-	$1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB'
-	$2 = $(Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize)
-	Return $1,$2
+    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB'
+    $2 = $(Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize)
+    Return $1,$2
 }
 function getVars {
-	$1 = "`n" + "System Variables:"
-	$2 = [Environment]::GetEnvironmentVariables("Machine")
-	$3 = "`n" + "User Variables:"
-	$4 = [Environment]::GetEnvironmentVariables("User")
-	Return $1,$2,$3,$4
+    $1 = "`n" + "System Variables:"
+    $2 = [Environment]::GetEnvironmentVariables("Machine")
+    $3 = "`n" + "User Variables:"
+    $4 = [Environment]::GetEnvironmentVariables("User")
+    Return $1,$2,$3,$4
 }
 function getUpdates {
-	$1 = "`n" + "Installed updates:"
-	$2 = Get-HotFix |format-table -auto Description,HotFixID,InstalledOn
-	Return $1,$2
+    $1 = "`n" + "Installed updates:"
+    $2 = Get-HotFix |format-table -auto Description,HotFixID,InstalledOn
+    Return $1,$2
 }
 function getStartup {
     $1 = "Startup Tasks for user: "
-	$2 = $cimStart.Caption
-	Return $1,$2
+    $2 = $cimStart.Caption
+    Return $1,$2
 }
 function getPower {
-	$1 = "`n" + "Powerprofiles:"
-	$2 = powercfg /l
-	Return $1,$2
+    $1 = "`n" + "Powerprofiles:"
+    $2 = powercfg /l
+    Return $1,$2
 }
 function getRamUsage {
-	$1 = "`n"
+    $1 = "`n"
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
     $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
     $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB"
-	Return $1,$2
+    Return $1,$2
 }
 function getProcesses {
     $properties=@(
-		@{Name="Name"; 
-			Expression = {$_.name}},
-		@{Name="Count"; 
-			Expression = {(Get-Process -Name $_.Name | Group-Object -Property ProcessName).Count}
-		},
-		@{Name="NPM (M)"; 
-			Expression = {[Math]::Round(($_.NPM / 1MB), 3)}
-		},
-		@{Name="Mem (M)"; 
-			Expression = {
-				$total = 0
-				ForEach ($proc in $(Get-Process -Name $_.Name)) {
-					$total = $total + [Math]::Round(($proc.WS / 1MB), 2)
-				}
-				$total
-			}
-		},
-		@{Name = "CPU"; 
-			Expression = {
-				$total = 0
-				ForEach ($proc in $(Get-Process -Name $_.Name)) {
-					$TotalSec = (New-TimeSpan -Start $proc.StartTime).TotalSeconds
-					$total = $total + [Math]::Round( ($proc.CPU * 100 / $TotalSec), 2)
-				}
-				$total
-			}
-		},
-		@{Name="ProductVersion ";
-			Expression = {$_.ProductVersion}
-		},
-		@{Name="Path";
-			Expression = {$_.Path}
-		}
-	)
+        @{Name="Name"; 
+            Expression = {$_.name}},
+        @{Name="Count"; 
+            Expression = {(Get-Process -Name $_.Name | Group-Object -Property ProcessName).Count}
+        },
+        @{Name="NPM (M)"; 
+            Expression = {[Math]::Round(($_.NPM / 1MB), 3)}
+        },
+        @{Name="Mem (M)"; 
+            Expression = {
+                $total = 0
+                ForEach ($proc in $(Get-Process -Name $_.Name)) {
+                    $total = $total + [Math]::Round(($proc.WS / 1MB), 2)
+                }
+                $total
+            }
+        },
+        @{Name = "CPU"; 
+            Expression = {
+                $total = 0
+                ForEach ($proc in $(Get-Process -Name $_.Name)) {
+                    $TotalSec = (New-TimeSpan -Start $proc.StartTime).TotalSeconds
+                    $total = $total + [Math]::Round( ($proc.CPU * 100 / $TotalSec), 2)
+                }
+                $total
+            }
+        },
+        @{Name="ProductVersion ";
+            Expression = {$_.ProductVersion}
+        },
+        @{Name="Path";
+            Expression = {$_.Path}
+        }
+    )
     $1 = "`n" + "Running processes: "
-	$2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | Format-Table)
-	return $1,$2
+    $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | Format-Table)
+    return $1,$2
 }
 function getServices {
-	$1 = "`n" + "Services: "
-	$2 = $services
-	Return $1,$2
+    $1 = "`n" + "Services: "
+    $2 = $services
+    Return $1,$2
 }
 function getInstalledApps {
-	$apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
+    $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
     $1 = "Installed Apps: "
-	$2 = $apps
-	Return $1,$2
+    $2 = $apps
+    Return $1,$2
 }
 function getNets {
-	$1 = "`n" + "Network adapters:"
-	$2 = $(Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed)
-	$3 = $(Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin)
-	Return $1,$2,$3
+    $1 = "`n" + "Network adapters:"
+    $2 = $(Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed)
+    $3 = $(Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin)
+    Return $1,$2,$3
 }
 function getDrivers {
-	$1 = "`n" + "Drivers and device versions: "
-	$2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
-	Return $1,$2
+    $1 = "`n" + "Drivers and device versions: "
+    $2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
+    Return $1,$2
 }
 function getAudio {
-	$1 = "`n" + "Audio devices:"
-	$2 = $cimAudio
-	Return $1,$2
+    $1 = "`n" + "Audio devices:"
+    $2 = $cimAudio
+    Return $1,$2
 }
 function getDisks {
-	$1 = "`n" + "Disk layouts: "
-	$2 = $(Get-Partition|format-table -auto)
-	$3 = $(Get-Volume|format-table -auto)
-	Return $1,$2,$3
+    $1 = "`n" + "Disk layouts: "
+    $2 = $(Get-Partition|format-table -auto)
+    $3 = $(Get-Volume|format-table -auto)
+    Return $1,$2,$3
 }
 function getSmart {
-	$(files\DiskInfo64.exe /CopyExit)
-	while (!(Test-Path 'files\DiskInfo.txt')) { 
-		Start-Sleep 1
-	}
-	$1 = "`n" + "SMART: "
-	$2 = $(Get-Content files\DiskInfo.txt)
-	Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
-	Return $1,$2
+    $(files\DiskInfo64.exe /CopyExit)
+    while (!(Test-Path 'files\DiskInfo.txt')) { 
+        Start-Sleep 1
+    }
+    $1 = "`n" + "SMART: "
+    $2 = $(Get-Content files\DiskInfo.txt)
+    Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
+    Return $1,$2
 }
 function uploadFile {
-	$link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://share.dev0.sh/upload/$null.txt" -UseBasicParsing
-	set-clipboard $link.Content
+    $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://share.dev0.sh/upload/$null.txt" -UseBasicParsing
+    set-clipboard $link.Content
 }
 function promptStart {
-		$Params = @{
-		Content = "&#10;
+        $Params = @{
+        Content = "&#10;
 This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
-		&#10; 
-		&#10;
+        &#10; 
+        &#10;
 Would you like to continue?
-		&#10;
-		&#10;
-		&#10;
-		&#10;
+        &#10;
+        &#10;
+        &#10;
+        &#10;
 The source code for this application can be found at https://git.dev0.sh/piper/WindowsSpecifications"
-		Title = "rTechsupport Specs Tool"
-		TitleBackground = "DodgerBlue"
-		TitleFontSize = 16
-		TitleFontWeight = "Bold"
-		TitleTextForeground = "White"
-		ContentFontSize = 12
-		ContentFontWeight = "Medium"
-		ContentTextForeground = "Black"
-		ContentBackground = "White"
-		ButtonType = "none"
-		CustomButtons = "Start","Exit"
-	}
-	New-WPFMessageBox @Params
-	If ($WPFMessageBoxOutput -eq "Exit") {
-		Exit
-	}
+        Title = "rTechsupport Specs Tool"
+        TitleBackground = "DodgerBlue"
+        TitleFontSize = 16
+        TitleFontWeight = "Bold"
+        TitleTextForeground = "White"
+        ContentFontSize = 12
+        ContentFontWeight = "Medium"
+        ContentTextForeground = "Black"
+        ContentBackground = "White"
+        ButtonType = "none"
+        CustomButtons = "Start","Exit"
+    }
+    New-WPFMessageBox @Params
+    If ($WPFMessageBoxOutput -eq "Exit") {
+        Exit
+    }
 }
 function promptUpload {
-	$Params = @{
-		Content = "Do you want to view or upload the specs?"
-		Title = "rTechsupport Specs Tool"
-		TitleBackground = "DodgerBlue"
-		TitleFontSize = 16
-		TitleFontWeight = "Bold"
-		TitleTextForeground = "White"
-		ContentFontSize = 12
-		ContentFontWeight = "Medium"
-		ContentTextForeground = "Black"
-		ContentBackground = "White"
-		ButtonType = "none"
-		CustomButtons = "View","Upload"
-	}
-	New-WPFMessageBox @Params
-	If ($WPFMessageBoxOutput -eq "View") {
-		Invoke-Item $file
-	}
-	ElseIf ($WPFMessageBoxOutput -eq "Upload") {
-		uploadFile
-		New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
-	}
+    $Params = @{
+        Content = "Do you want to view or upload the specs?"
+        Title = "rTechsupport Specs Tool"
+        TitleBackground = "DodgerBlue"
+        TitleFontSize = 16
+        TitleFontWeight = "Bold"
+        TitleTextForeground = "White"
+        ContentFontSize = 12
+        ContentFontWeight = "Medium"
+        ContentTextForeground = "Black"
+        ContentBackground = "White"
+        ButtonType = "none"
+        CustomButtons = "View","Upload"
+    }
+    New-WPFMessageBox @Params
+    If ($WPFMessageBoxOutput -eq "View") {
+        Invoke-Item $file
+    }
+    ElseIf ($WPFMessageBoxOutput -eq "Upload") {
+        uploadFile
+        New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
+    }
 }
 
 # ------------------ #
