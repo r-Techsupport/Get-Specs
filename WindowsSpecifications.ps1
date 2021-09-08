@@ -533,13 +533,69 @@ $badValues = @(
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
 $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
+$av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+$fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 
 ## Other
-$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.Displayname -notlike $null}
+$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
 $services = $(Get-Service | Format-Table -auto)
 $runningProcesses = Get-Process
 
-# Temperatures
+### Functions
+
+function getDate {
+	Get-Date
+}
+function getbasicInfo {
+	$bootuptime = $cimOs.LastBootUpTime
+	$uptime = $(Get-Date) - $bootuptime
+	$1 = 'Edition: ' + $cimOs.Caption
+	$2 = 'Build: ' + $cimOs.BuildNumber
+	$3 = 'Install date: ' + $cimOs.InstallDate
+	$4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
+	$5 = 'Hostname: ' + $cimOs.CSName
+	$6 = 'Domain: ' + $env:USERDOMAIN
+	$7 = 'AV: ' + $av.DisplayName
+	$8 = 'Firewall: ' + $fw.DisplayName
+	Return $1,$2,$3,$4,$5,$6,$7,$8
+}
+function getBadThings {
+	$1 = "`n" + 'Visible issues: ' + $CPU
+	$2 = @()
+	$3 = @()
+	$4 = @()
+	foreach ($soft in $badSoftware) { 
+		if ($installedBase.DisplayName -contains $soft) { 
+			$2 += $soft
+		} 
+	}
+	foreach ($start in $badStartup) { 
+		if ($cimStart.Caption -contains $start) { 
+			$3 += $start
+		} 
+	}
+	foreach ($running in $badProcesses) {
+		if ($runningProcesses.Name -contains $running) {
+			$4 += $running
+		} 
+	}
+	Return $1,$2,$3
+}
+function getReg {
+	$i = 0
+	$returns = @()
+	Foreach ($reg in $badKeys) {
+		If (Test-Path -Path $badKeys[$i]) {
+			$value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
+			$returns += $badKeys[$i] + " is " + $value
+		}
+		# } Else {
+			# Write-Host $badKeys[$i] $badValues[$i] "does not exist"
+		# }
+		$i = $i + 1
+	}
+	Return $returns
+}
 function getTemps {
 	Add-Type -Path .\files\OpenHardwareMonitorLib.dll
 	$ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
@@ -572,60 +628,6 @@ function getTemps {
 	Return $1,$2
 }
 $temps = getTemps
-
-### Functions
-
-function getDate {
-	Get-Date
-}
-function getbasicInfo {
-	$bootuptime = $cimOs.LastBootUpTime
-	$uptime = $(Get-Date) - $bootuptime
-	$1 = 'Edition: ' + $cimOs.Caption
-	$2 = 'Build: ' + $cimOs.BuildNumber
-	$3 = 'Install date: ' + $cimOs.InstallDate
-	$4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
-	$5 = 'Hostname: ' + $cimOs.CSName
-	$6 = 'Domain: ' + $env:USERDOMAIN
-	Return $1,$2,$3,$4,$5,$6
-}
-function getBadThings {
-	$1 = "`n" + 'Visible issues: ' + $CPU
-	$2 = @()
-	$3 = @()
-	$4 = @()
-	foreach ($soft in $badSoftware) { 
-		if ($installedBase.Displayname -contains $soft) { 
-			$2 += $soft
-		} 
-	}
-	foreach ($start in $badStartup) { 
-		if ($cimStart.Caption -contains $start) { 
-			$3 += $start
-		} 
-	}
-	foreach ($running in $badProcesses) {
-		if ($runningProcesses.Name -contains $running) {
-			$4 += $running
-		} 
-	}
-	Return $1,$2,$3
-}
-function getReg {
-	$i = 0
-	$returns = @()
-	Foreach ($reg in $badKeys) {
-		If (Test-Path -Path $badKeys[$i]) {
-			$value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-			$returns += $badKeys[$i] + " is " + $value
-		}
-		# } Else {
-			# Write-Host $badKeys[$i] $badValues[$i] "does not exist"
-		# }
-		$i = $i + 1
-	}
-	Return $returns
-}
 function getCPU{
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
@@ -674,6 +676,14 @@ function getPower {
 	$2 = powercfg /l
 	Return $1,$2
 }
+function getRamUsage {
+	$1 = "`n"
+    $mem =  Get-WmiObject -Class WIN32_OperatingSystem
+    $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
+    $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
+    $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB"
+	Return $1,$2
+}
 function getProcesses {
     $properties=@(
 		@{Name="Name"; 
@@ -720,7 +730,7 @@ function getServices {
 	Return $1,$2
 }
 function getInstalledApps {
-	$apps = $installedBase | Select InstallDate,Displayname | Sort-Object InstallDate -desc
+	$apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
     $1 = "Installed Apps: "
 	$2 = $apps
 	Return $1,$2
@@ -763,7 +773,8 @@ function uploadFile {
 }
 function promptStart {
 		$Params = @{
-		Content = " This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
+		Content = "&#10;
+This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
 		&#10; 
 		&#10;
 Would you like to continue?
@@ -771,7 +782,7 @@ Would you like to continue?
 		&#10;
 		&#10;
 		&#10;
-The source code for this application can be found at https://git.dev0.sh/piper/techsupport_scripts"
+The source code for this application can be found at https://git.dev0.sh/piper/WindowsSpecifications"
 		Title = "rTechsupport Specs Tool"
 		TitleBackground = "DodgerBlue"
 		TitleFontSize = 16
@@ -828,6 +839,7 @@ getVars >> $file
 getUpdates >> $file
 getStartup >> $file
 getPower >> $file
+getRamUsage >> $file
 getProcesses >> $file
 getServices >> $file
 getInstalledApps >> $file
