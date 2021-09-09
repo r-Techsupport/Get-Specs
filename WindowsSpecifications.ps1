@@ -494,6 +494,37 @@ Function New-WPFMessageBox {
     }
 }
 
+# Run the basic checks before doing anything
+function promptFileIssue {
+    If (Test-Path ./files) {
+        } Else {
+        $Params = @{
+            Content = "&#10;
+    The files directory is missing. This most likely means you did not extract the zip file properly.
+            &#10; 
+            &#10;
+    Right click the zip file and choose 'Extract All' then run the new exe.
+            &#10;"
+            Title = "rTechsupport WindowsSpecifications"
+            TitleBackground = "Crimson"
+            TitleFontSize = 16
+            TitleFontWeight = "Bold"
+            TitleTextForeground = "White"
+            ContentFontSize = 12
+            ContentFontWeight = "Medium"
+            ContentTextForeground = "Black"
+            ContentBackground = "White"
+            ButtonType = "none"
+            CustomButtons = "Exit"
+        }
+        New-WPFMessageBox @Params
+        If ($WPFMessageBoxOutput -eq "Exit") {
+            Exit
+        }
+    }
+}
+promptFileIssue
+
 # Declarations
 $file = 'TechSupport_Specs.txt'
 $badSoftware = @(
@@ -596,9 +627,8 @@ function getSecureInfo {
     $2 = 'AV: ' + $av.DisplayName
     $3 = 'Firewall: ' + $fw.DisplayName
     $4 = "Secureboot: " + $(Confirm-SecureBootUEFI)
-    $5 = "TPM:"
-    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
-    Return $1,$2,$3,$4,$5,$6
+    $5 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
+    Return $1,$2,$3,$4,$5
 }
 function getTemps {
     Add-Type -Path .\files\OpenHardwareMonitorLib.dll
