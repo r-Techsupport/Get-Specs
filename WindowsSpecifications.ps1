@@ -495,10 +495,10 @@ function promptFileIssue {
         } Else {
         $Params = @{
             Content = "&#10;
-    The files directory is missing. This most likely means you did not extract the zip file properly.
+The files directory is missing. This most likely means you did not extract the zip file properly.
             &#10; 
             &#10;
-    Right click the zip file and choose 'Extract All' then run the new exe.
+Right click the zip file and choose 'Extract All' then run the new exe.
             &#10;"
             Title = "rTechsupport WindowsSpecifications"
             TitleBackground = "Crimson"
@@ -832,7 +832,9 @@ The source code for this application can be found at https://git.dev0.sh/piper/W
 }
 function promptUpload {
     $Params = @{
-        Content = "Do you want to view or upload the specs?"
+        Content = "Do you want to view or upload the specs?
+        &#10;
+Uploaded results are deleted after 24 hours"
         Title = "rTechsupport Specs Tool"
         TitleBackground = "DodgerBlue"
         TitleFontSize = 16
