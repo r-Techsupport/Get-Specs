@@ -5,11 +5,6 @@
   Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
 .OUTPUTS Specs
   '.\TechSupport_Specs.txt'
-.NOTES
-  Version:        .3
-  Author:         PipeItToDevNull
-  Creation Date:  12/29/2020
-  Purpose/Change: Initial script development
 #>
 
 # Real script starts at line 498
