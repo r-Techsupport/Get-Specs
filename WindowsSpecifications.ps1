@@ -555,12 +555,10 @@ function getbasicInfo {
     $4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
     $5 = 'Hostname: ' + $cimOs.CSName
     $6 = 'Domain: ' + $env:USERDOMAIN
-    $7 = 'AV: ' + $av.DisplayName
-    $8 = 'Firewall: ' + $fw.DisplayName
-    Return $1,$2,$3,$4,$5,$6,$7,$8
+    Return $1,$2,$3,$4,$5,$6
 }
 function getBadThings {
-    $1 = "`n" + 'Visible issues: ' + $CPU
+    $1 = "`n" + 'Visible issues: '
     $2 = @()
     $3 = @()
     $4 = @()
@@ -595,6 +593,15 @@ function getReg {
         $i = $i + 1
     }
     Return $returns
+}
+function getSecureInfo {
+    $1 = "`n" + "Security Information"
+    $2 = 'AV: ' + $av.DisplayName
+    $3 = 'Firewall: ' + $fw.DisplayName
+    $4 = "Secureboot: " + $(Confirm-SecureBootUEFI)
+    $5 = "TPM:"
+    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
+    Return $1,$2,$3,$4,$5,$6
 }
 function getTemps {
     Add-Type -Path .\files\OpenHardwareMonitorLib.dll
@@ -631,7 +638,7 @@ $temps = getTemps
 function getCPU{
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-    $1 = "`n" + 'CPU: ' + $CPU + $temps[0] + 'C'
+    $1 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C'
     Return $1
 }
 function getMobo{
@@ -831,6 +838,7 @@ getDate > $file
 getBasicInfo >> $file
 getBadThings >> $file
 getReg >> $file
+getSecureInfo >> $file
 getCPU >> $file
 getMobo >> $file
 getGPU >> $file
