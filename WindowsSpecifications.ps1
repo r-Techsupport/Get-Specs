@@ -558,10 +558,11 @@ function getbasicInfo {
     Return $1,$2,$3,$4,$5,$6
 }
 function getBadThings {
-    $1 = "`n" + 'Visible issues: '
+    $1 = "`n" + 'Visible issues '
     $2 = @()
     $3 = @()
     $4 = @()
+    $5 = @()
     foreach ($soft in $badSoftware) { 
         if ($installedBase.DisplayName -contains $soft) { 
             $2 += $soft
@@ -577,22 +578,18 @@ function getBadThings {
             $4 += $running
         } 
     }
-    Return $1,$2,$3
-}
-function getReg {
     $i = 0
-    $returns = @()
     Foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            $returns += $badKeys[$i] + " is " + $value
+            $5 += $badKeys[$i] + " is " + $value
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
         # }
         $i = $i + 1
     }
-    Return $returns
+    Return $1,$2,$3,$4,$5
 }
 function getSecureInfo {
     $1 = "`n" + "Security Information"
@@ -662,24 +659,24 @@ function getRAM {
     Return $1,$2
 }
 function getVars {
-    $1 = "`n" + "System Variables:"
+    $1 = "`n" + "System Variables"
     $2 = [Environment]::GetEnvironmentVariables("Machine")
-    $3 = "`n" + "User Variables:"
+    $3 = "`n" + "User Variables"
     $4 = [Environment]::GetEnvironmentVariables("User")
     Return $1,$2,$3,$4
 }
 function getUpdates {
-    $1 = "`n" + "Installed updates:"
+    $1 = "`n" + "Installed updates"
     $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn
     Return $1,$2
 }
 function getStartup {
-    $1 = "Startup Tasks for user: "
+    $1 = "Startup Tasks for user"
     $2 = $cimStart.Caption
     Return $1,$2
 }
 function getPower {
-    $1 = "`n" + "Powerprofiles:"
+    $1 = "`n" + "Powerprofiles"
     $2 = powercfg /l
     Return $1,$2
 }
@@ -727,39 +724,39 @@ function getProcesses {
             Expression = {$_.Path}
         }
     )
-    $1 = "`n" + "Running processes: "
+    $1 = "`n" + "Running processes"
     $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | Format-Table)
     return $1,$2
 }
 function getServices {
-    $1 = "`n" + "Services: "
+    $1 = "`n" + "Services"
     $2 = $services
     Return $1,$2
 }
 function getInstalledApps {
     $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
-    $1 = "Installed Apps: "
+    $1 = "Installed Apps"
     $2 = $apps
     Return $1,$2
 }
 function getNets {
-    $1 = "`n" + "Network adapters:"
+    $1 = "`n" + "Network adapters"
     $2 = $(Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed)
     $3 = $(Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin)
     Return $1,$2,$3
 }
 function getDrivers {
-    $1 = "`n" + "Drivers and device versions: "
+    $1 = "`n" + "Drivers and device versions"
     $2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
     Return $1,$2
 }
 function getAudio {
-    $1 = "`n" + "Audio devices:"
+    $1 = "`n" + "Audio devices"
     $2 = $cimAudio
     Return $1,$2
 }
 function getDisks {
-    $1 = "`n" + "Disk layouts: "
+    $1 = "`n" + "Disk layouts"
     $2 = $(Get-Partition|format-table -auto)
     $3 = $(Get-Volume|format-table -auto)
     Return $1,$2,$3
@@ -769,7 +766,7 @@ function getSmart {
     while (!(Test-Path 'files\DiskInfo.txt')) { 
         Start-Sleep 1
     }
-    $1 = "`n" + "SMART: "
+    $1 = "`n" + "SMART"
     $2 = $(Get-Content files\DiskInfo.txt)
     Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
     Return $1,$2
@@ -837,7 +834,6 @@ promptStart
 getDate > $file
 getBasicInfo >> $file
 getBadThings >> $file
-getReg >> $file
 getSecureInfo >> $file
 getCPU >> $file
 getMobo >> $file
