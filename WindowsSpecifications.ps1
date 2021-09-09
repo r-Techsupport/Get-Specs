@@ -621,9 +621,10 @@ function getSecureInfo {
     $1 = "`n" + "Security Information"
     $2 = 'AV: ' + $av.DisplayName
     $3 = 'Firewall: ' + $fw.DisplayName
-    $4 = "Secureboot: " + $(Confirm-SecureBootUEFI)
-    $5 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
-    Return $1,$2,$3,$4,$5
+    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
+    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI)
+    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
+    Return $1,$2,$3,$4,$5,$6
 }
 function getTemps {
     Add-Type -Path .\files\OpenHardwareMonitorLib.dll
