@@ -575,12 +575,12 @@ function getDate {
 function getbasicInfo {
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
-    $1 = 'Edition: ' + $cimOs.Caption
-    $2 = 'Build: ' + $cimOs.BuildNumber
-    $3 = 'Install date: ' + $cimOs.InstallDate
-    $4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
-    $5 = 'Hostname: ' + $cimOs.CSName
-    $6 = 'Domain: ' + $env:USERDOMAIN
+    $1 = 'Edition: ' + $cimOs.Caption + '<br>'
+    $2 = 'Build: ' + $cimOs.BuildNumber + '<br>'
+    $3 = 'Install date: ' + $cimOs.InstallDate + '<br>'
+    $4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes" + '<br>'
+    $5 = 'Hostname: ' + $cimOs.CSName + '<br>'
+    $6 = 'Domain: ' + $env:USERDOMAIN + '<br>'
     Return $1,$2,$3,$4,$5,$6
 }
 function getBadThings {
@@ -619,11 +619,11 @@ function getBadThings {
 }
 function getSecureInfo {
     $1 = "`n" + "Security Information"
-    $2 = 'AV: ' + $av.DisplayName
-    $3 = 'Firewall: ' + $fw.DisplayName
-    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
-    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI)
-    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated)
+    $2 = 'AV: ' + $av.DisplayName + '<br>'
+    $3 = 'Firewall: ' + $fw.DisplayName + '<br>'
+    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + '<br>'
+    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) + '<br>'
+    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated | ConvertTo-Html -Fragment)
     Return $1,$2,$3,$4,$5,$6
 }
 function getTemps {
@@ -637,7 +637,7 @@ function getTemps {
         $comp.Update()
             foreach ($sens in $comp.Sensors) {
                  if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-                    $1 = $sens.Value.ToString()
+                    $1 = $sens.Value.ToString() + '<br>'
                     #$sens.Identifier for a better name
                  }
             }
@@ -648,7 +648,7 @@ function getTemps {
         $comp.Update()
             foreach ($sens in $comp.Sensors) {
                  if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-                    $2 = $sens.Value.ToString()
+                    $2 = $sens.Value.ToString() + '<br>'
                     # $sens.Identifier for a better name
                  }
             }
@@ -661,7 +661,7 @@ $temps = getTemps
 function getCPU{
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-    $1 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C'
+    $1 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + '<br>'
     Return $1
 }
 function getMobo{
@@ -669,19 +669,19 @@ function getMobo{
     $moboMan = $moboBase.manufacturer
     $moboMod = $moboBase.product
     $mobo = $moboMan + " | " + $moboMod
-    $1 = "Motherboard: " + $mobo
+    $1 = "Motherboard: " + $mobo + '<br>'
     Return $1
 }
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
     $GPUname = $GPUbase.Name
     $GPU= $GPUname + " at " + $GPUbase.CurrentHorizontalResolution + "x" + $GPUbase.CurrentVerticalResolution
-    $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C'
+    $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C' + '<br>'
     Return $1
 }
 function getRAM {
-    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB'
-    $2 = $(Get-WmiObject win32_physicalmemory | Format-Table Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber -autosize)
+    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' + '<br>'
+    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber | ConvertTo-Html -Fragment)
     Return $1,$2
 }
 function getVars {
