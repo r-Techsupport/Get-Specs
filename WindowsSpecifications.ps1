@@ -835,7 +835,7 @@ function getSmart {
     Return $1,$2
 }
 function uploadFile {
-    $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://share.dev0.sh/upload/$null.txt" -UseBasicParsing
+    $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://rtech.support/upload/$null.html" -UseBasicParsing
     set-clipboard $link.Content
 }
 function promptStart {
