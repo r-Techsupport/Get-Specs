@@ -570,14 +570,14 @@ $runningProcesses = Get-Process
 ### Functions
 
 function header {
-$1 = "
-<!DOCTYPE html>
+$1 = "<!DOCTYPE html>
 <html>
 <head>
 <style>
 body {
     background-color: #383c4a;
     color: White;
+    margin-left: 30px;
 }
 h2 {
     color: #87ab63;
@@ -820,8 +820,8 @@ function getAudio {
 }
 function getDisks {
     $1 = "`n" + "<h2>Disk layouts</h2>"
-    $2 = $(Get-Partition| ConvertTo-Html -Fragment) + '<br>'
-    $3 = $(Get-Volume| ConvertTo-Html -Fragment)
+    $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) + '<br>'
+    $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
     Return $1,$2,$3
 }
 function getSmart {
@@ -835,8 +835,9 @@ function getSmart {
     Return $1,$2
 }
 function uploadFile {
-    $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://rtech.support/upload/$null.html" -UseBasicParsing
-    set-clipboard $link.Content
+    $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://paste.rtech.support/upload/$null.html" -UseBasicParsing
+    $linkProper = $link.Content -Replace "support","support/selif"
+    set-clipboard $linkProper
 }
 function promptStart {
         $Params = @{
@@ -896,27 +897,27 @@ Uploaded results are deleted after 24 hours"
 
 # ------------------ #
 promptStart
-header > $file
-getDate >> $file
-getBasicInfo >> $file
-getBadThings >> $file
-getSecureInfo >> $file
-getCPU >> $file
-getMobo >> $file
-getGPU >> $file
-getRAM >> $file
-getVars >> $file
-getUpdates >> $file
-getStartup >> $file
-getPower >> $file
-getRamUsage >> $file
-getProcesses >> $file
-getServices >> $file
-getInstalledApps >> $file
-getNets >> $file
-getDrivers >> $file
-getAudio >> $file
-getDisks >> $file
-getSmart >> $file
+header | Out-File -Encoding ascii $file
+getDate | Out-File -Append -Encoding ascii $file
+getBasicInfo | Out-File -Append -Encoding ascii $file
+getBadThings | Out-File -Append -Encoding ascii $file
+getSecureInfo | Out-File -Append -Encoding ascii $file
+getCPU | Out-File -Append -Encoding ascii $file
+getMobo | Out-File -Append -Encoding ascii $file
+getGPU | Out-File -Append -Encoding ascii $file
+getRAM | Out-File -Append -Encoding ascii $file
+getVars | Out-File -Append -Encoding ascii $file
+getUpdates | Out-File -Append -Encoding ascii $file
+getStartup | Out-File -Append -Encoding ascii $file
+getPower | Out-File -Append -Encoding ascii $file
+getRamUsage | Out-File -Append -Encoding ascii $file
+getProcesses | Out-File -Append -Encoding ascii $file
+getServices | Out-File -Append -Encoding ascii $file
+getInstalledApps | Out-File -Append -Encoding ascii $file
+getNets | Out-File -Append -Encoding ascii $file
+getDrivers | Out-File -Append -Encoding ascii $file
+getAudio | Out-File -Append -Encoding ascii $file
+getDisks | Out-File -Append -Encoding ascii $file
+getSmart | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
