@@ -521,7 +521,7 @@ Right click the zip file and choose 'Extract All' then run the new exe.
 promptFileIssue
 
 # Declarations
-$file = 'TechSupport_Specs.txt'
+$file = 'TechSupport_Specs.html'
 $badSoftware = @(
     'Driver Booster'
 )
@@ -564,51 +564,87 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 
 ## Other
 $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
-$services = $(Get-Service | Format-Table -auto)
+$services = $(Get-Service)
 $runningProcesses = Get-Process
 
 ### Functions
+
+function header {
+$1 = "
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    background-color: #383c4a;
+    color: White;
+}
+h2 {
+    color: #87ab63;
+}
+table {
+  font-family: arial, sans-serif;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #2A2E3A;
+}
+</style>
+<body>
+<pre>
+"
+Return $1
+}
 
 function getDate {
     Get-Date
 }
 function getbasicInfo {
+    $1 = "`n" + '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
-    $1 = 'Edition: ' + $cimOs.Caption + '<br>'
-    $2 = 'Build: ' + $cimOs.BuildNumber + '<br>'
-    $3 = 'Install date: ' + $cimOs.InstallDate + '<br>'
-    $4 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes" + '<br>'
-    $5 = 'Hostname: ' + $cimOs.CSName + '<br>'
-    $6 = 'Domain: ' + $env:USERDOMAIN + '<br>'
-    Return $1,$2,$3,$4,$5,$6
+    $2 = 'Edition: ' + $cimOs.Caption + '<br>'
+    $3 = 'Build: ' + $cimOs.BuildNumber + '<br>'
+    $4 = 'Install date: ' + $cimOs.InstallDate + '<br>'
+    $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes" + '<br>'
+    $6 = 'Hostname: ' + $cimOs.CSName + '<br>'
+    $7 = 'Domain: ' + $env:USERDOMAIN + '<br>'
+    Return $1,$2,$3,$4,$5,$6,$7
 }
 function getBadThings {
-    $1 = "`n" + 'Visible issues '
+    $1 = "`n" + '<h2>Visible issues</h2>'
     $2 = @()
     $3 = @()
     $4 = @()
     $5 = @()
     foreach ($soft in $badSoftware) { 
         if ($installedBase.DisplayName -contains $soft) { 
-            $2 += $soft
+            $2 += $soft + '<br>'
         } 
     }
     foreach ($start in $badStartup) { 
         if ($cimStart.Caption -contains $start) { 
-            $3 += $start
+            $3 += $start + '<br>'
         } 
     }
     foreach ($running in $badProcesses) {
         if ($runningProcesses.Name -contains $running) {
-            $4 += $running
+            $4 += $running + '<br>'
         } 
     }
     $i = 0
     Foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            $5 += $badKeys[$i] + " is " + $value
+            $5 += $badKeys[$i] + " is " + $value + '<br>'
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
@@ -618,7 +654,7 @@ function getBadThings {
     Return $1,$2,$3,$4,$5
 }
 function getSecureInfo {
-    $1 = "`n" + "Security Information"
+    $1 = "`n" + "<h2>Security Information</h2>"
     $2 = 'AV: ' + $av.DisplayName + '<br>'
     $3 = 'Firewall: ' + $fw.DisplayName + '<br>'
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + '<br>'
@@ -659,10 +695,11 @@ function getTemps {
 }
 $temps = getTemps
 function getCPU{
+    $1 = "`n" + "<h2>Hardware Basics</h2>"
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-    $1 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + '<br>'
-    Return $1
+    $2 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + '<br>'
+    Return $1,$2
 }
 function getMobo{
     $moboBase = Get-WmiObject Win32_BaseBoard
@@ -685,33 +722,33 @@ function getRAM {
     Return $1,$2
 }
 function getVars {
-    $1 = "`n" + "System Variables"
+    $1 = "`n" + "<h2>System Variables</h2>"
     $2 = [Environment]::GetEnvironmentVariables("Machine")
-    $3 = "`n" + "User Variables"
+    $3 = "`n" + "<h2>User Variables</h2>"
     $4 = [Environment]::GetEnvironmentVariables("User")
     Return $1,$2,$3,$4
 }
 function getUpdates {
-    $1 = "`n" + "Installed updates"
-    $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn
+    $1 = "`n" + "<h2>Installed updates</h2>"
+    $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getStartup {
-    $1 = "Startup Tasks for user"
-    $2 = $cimStart.Caption
+    $1 = "<h2>Startup Tasks for user</h2>"
+    $2 = $cimStart.Caption + '<br>'
     Return $1,$2
 }
 function getPower {
-    $1 = "`n" + "Powerprofiles"
+    $1 = "`n" + "<h2>Powerprofiles</h2>"
     $2 = powercfg /l
     Return $1,$2
 }
 function getRamUsage {
-    $1 = "`n"
+    $1 = "`n" + "<h2>Running Processes</h2>"
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
     $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
-    $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB"
+    $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB" + '<br>'
     Return $1,$2
 }
 function getProcesses {
@@ -750,41 +787,41 @@ function getProcesses {
             Expression = {$_.Path}
         }
     )
-    $1 = "`n" + "Running processes"
-    $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | Format-Table)
+    $1 = "`n"
+    $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment)
     return $1,$2
 }
 function getServices {
-    $1 = "`n" + "Services"
-    $2 = $services
+    $1 = "`n" + "<h2>Services</h2>"
+    $2 = $services | Select Status,DisplayName | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getInstalledApps {
     $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
-    $1 = "Installed Apps"
-    $2 = $apps
+    $1 = "`n" + "<h2>Installed Apps</h2>"
+    $2 = $apps | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getNets {
-    $1 = "`n" + "Network adapters"
-    $2 = $(Get-NetAdapter|format-list Name,InterfaceDescription,Status,LinkSpeed)
-    $3 = $(Get-NetIPAddress|format-table -auto IpAddress,InterfaceAlias,PrefixOrigin)
+    $1 = "`n" + "<h2>Network Configuration</h2>"
+    $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) + '<br>'
+    $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
     Return $1,$2,$3
 }
 function getDrivers {
-    $1 = "`n" + "Drivers and device versions"
-    $2 = $(gwmi Win32_PnPSignedDriver | format-table -auto devicename,driverversion)
+    $1 = "`n" + "<h2>Drivers and device versions</h2>"
+    $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
     Return $1,$2
 }
 function getAudio {
-    $1 = "`n" + "Audio devices"
-    $2 = $cimAudio
+    $1 = "`n" + "<h2>Audio devices</h2>"
+    $2 = $cimAudio | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getDisks {
-    $1 = "`n" + "Disk layouts"
-    $2 = $(Get-Partition|format-table -auto)
-    $3 = $(Get-Volume|format-table -auto)
+    $1 = "`n" + "<h2>Disk layouts</h2>"
+    $2 = $(Get-Partition| ConvertTo-Html -Fragment) + '<br>'
+    $3 = $(Get-Volume| ConvertTo-Html -Fragment)
     Return $1,$2,$3
 }
 function getSmart {
@@ -792,7 +829,7 @@ function getSmart {
     while (!(Test-Path 'files\DiskInfo.txt')) { 
         Start-Sleep 1
     }
-    $1 = "`n" + "SMART"
+    $1 = "`n" + "<h2>SMART</h2>"
     $2 = $(Get-Content files\DiskInfo.txt)
     Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
     Return $1,$2
@@ -859,7 +896,8 @@ Uploaded results are deleted after 24 hours"
 
 # ------------------ #
 promptStart
-getDate > $file
+header > $file
+getDate >> $file
 getBasicInfo >> $file
 getBadThings >> $file
 getSecureInfo >> $file
