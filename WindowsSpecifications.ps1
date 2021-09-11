@@ -554,20 +554,6 @@ $badValues = @(
     'NoAutoUpdate'
 )
 
-# Bulk data gathering
-## CIM sources
-$cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
-$cimStart = Get-CimInstance Win32_StartupCommand
-$cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
-$cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
-$av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
-$fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
-
-## Other
-$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
-$services = $(Get-Service)
-$runningProcesses = Get-Process
-
 ### Functions
 
 function header {
@@ -609,7 +595,7 @@ function getDate {
     Get-Date
 }
 function getbasicInfo {
-    $1 = "`n" + '<h2>System Information</h2>'
+    $1 = '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
     $2 = 'Edition: ' + $cimOs.Caption + '<br>'
@@ -621,7 +607,7 @@ function getbasicInfo {
     Return $1,$2,$3,$4,$5,$6,$7
 }
 function getBadThings {
-    $1 = "`n" + '<h2>Visible issues</h2>'
+    $1 = '<h2>Visible issues</h2>'
     $2 = @()
     $3 = @()
     $4 = @()
@@ -655,12 +641,12 @@ function getBadThings {
     Return $1,$2,$3,$4,$5
 }
 function getLicensing {
-    $1 = "`n" + "<h2>Licensing</h2>"
+    $1 = "<h2>Licensing</h2>"
     $2 = $cimLics | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getSecureInfo {
-    $1 = "`n" + "<h2>Security Information</h2>"
+    $1 = "<h2>Security Information</h2>"
     $2 = 'AV: ' + $av.DisplayName + '<br>'
     $3 = 'Firewall: ' + $fw.DisplayName + '<br>'
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + '<br>'
@@ -701,7 +687,7 @@ function getTemps {
 }
 $temps = getTemps
 function getCPU{
-    $1 = "`n" + "<h2>Hardware Basics</h2>"
+    $1 = "<h2>Hardware Basics</h2>"
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
     $2 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + '<br>'
@@ -728,29 +714,29 @@ function getRAM {
     Return $1,$2
 }
 function getVars {
-    $1 = "`n" + "<h2>System Variables</h2>"
+    $1 = "<h2>System Variables</h2>"
     $2 = [Environment]::GetEnvironmentVariables("Machine")
-    $3 = "`n" + "<h2>User Variables</h2>"
+    $3 = "<h2>User Variables</h2>"
     $4 = [Environment]::GetEnvironmentVariables("User")
     Return $1,$2,$3,$4
 }
 function getUpdates {
-    $1 = "`n" + "<h2>Installed updates</h2>"
+    $1 = "<h2>Installed updates</h2>"
     $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getStartup {
     $1 = "<h2>Startup Tasks for user</h2>"
-    $2 = $cimStart.Caption + '<br>'
+    $2 = $cimStart.Caption
     Return $1,$2
 }
 function getPower {
-    $1 = "`n" + "<h2>Powerprofiles</h2>"
+    $1 = "<h2>Powerprofiles</h2>"
     $2 = powercfg /l
     Return $1,$2
 }
 function getRamUsage {
-    $1 = "`n" + "<h2>Running Processes</h2>"
+    $1 = "<h2>Running Processes</h2>"
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
     $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
@@ -798,7 +784,7 @@ function getProcesses {
     return $1,$2
 }
 function getServices {
-    $1 = "`n" + "<h2>Services</h2>"
+    $1 = "<h2>Services</h2>"
     $2 = $services | Select Status,DisplayName | ConvertTo-Html -Fragment
     Return $1,$2
 }
@@ -809,7 +795,7 @@ function getInstalledApps {
     Return $1,$2
 }
 function getNets {
-    $1 = "`n" + "<h2>Network Configuration</h2>"
+    $1 = "<h2>Network Configuration</h2>"
     $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) + '<br>'
     $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
     Return $1,$2,$3
@@ -820,12 +806,12 @@ function getDrivers {
     Return $1,$2
 }
 function getAudio {
-    $1 = "`n" + "<h2>Audio devices</h2>"
+    $1 = "<h2>Audio devices</h2>"
     $2 = $cimAudio | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getDisks {
-    $1 = "`n" + "<h2>Disk layouts</h2>"
+    $1 = "<h2>Disk layouts</h2>"
     $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) + '<br>'
     $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
     Return $1,$2,$3
@@ -835,7 +821,7 @@ function getSmart {
     while (!(Test-Path 'files\DiskInfo.txt')) { 
         Start-Sleep 1
     }
-    $1 = "`n" + "<h2>SMART</h2>"
+    $1 = "<h2>SMART</h2>"
     $2 = $(Get-Content files\DiskInfo.txt)
     Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
     Return $1,$2
@@ -903,6 +889,22 @@ Uploaded results are deleted after 24 hours"
 
 # ------------------ #
 promptStart
+
+# Bulk data gathering
+## CIM sources
+$cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
+$cimStart = Get-CimInstance Win32_StartupCommand
+$cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
+$cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
+$av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+$fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
+
+## Other
+$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
+$services = $(Get-Service)
+$runningProcesses = Get-Process
+
+# Write da file
 header | Out-File -Encoding ascii $file
 getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
