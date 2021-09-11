@@ -559,6 +559,7 @@ $badValues = @(
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
 $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
+$cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
 $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 
@@ -652,6 +653,11 @@ function getBadThings {
         $i = $i + 1
     }
     Return $1,$2,$3,$4,$5
+}
+function getLicensing {
+    $1 = "`n" + "<h2>Licensing</h2>"
+    $2 = $cimLics | ConvertTo-Html -Fragment
+    Return $1,$2
 }
 function getSecureInfo {
     $1 = "`n" + "<h2>Security Information</h2>"
@@ -901,6 +907,7 @@ header | Out-File -Encoding ascii $file
 getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
 getBadThings | Out-File -Append -Encoding ascii $file
+getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
 getCPU | Out-File -Append -Encoding ascii $file
 getMobo | Out-File -Append -Encoding ascii $file
