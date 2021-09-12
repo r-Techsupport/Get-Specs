@@ -553,7 +553,10 @@ $badValues = @(
     'BypassSecureBootCheck',
     'NoAutoUpdate'
 )
-
+$badHostnames = @(
+    'ATLASOS-DESKTOP',
+    'Revision-PC'
+)
 ### Functions
 
 function header {
@@ -628,7 +631,7 @@ function getBadThings {
         } 
     }
     $i = 0
-    Foreach ($reg in $badKeys) {
+    foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
             $5 += $badKeys[$i] + " is " + $value + '<br>'
@@ -638,7 +641,12 @@ function getBadThings {
         # }
         $i = $i + 1
     }
-    Return $1,$2,$3,$4,$5
+    foreach ($name in $badHostnames) {
+        if ($cimOs.CSName -contains $name) {
+            $6 += $name + '<br>'
+        } 
+    }
+    Return $1,$2,$3,$4,$5,$6
 }
 function getLicensing {
     $1 = "<h2>Licensing</h2>"
