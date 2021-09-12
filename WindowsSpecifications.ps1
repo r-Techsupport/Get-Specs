@@ -639,12 +639,12 @@ function getBadThings {
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
-        # }
+        # }[
         $i = $i + 1
     }
     foreach ($name in $badHostnames) {
         if ($cimOs.CSName -contains $name) {
-            $6 += "Modified OS: " $name + '<br>'
+            $6 += "Modified OS: " + $name + '<br>'
         } 
     }
     Return $1,$2,$3,$4,$5,$6
@@ -712,9 +712,7 @@ function getMobo{
 }
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
-    $GPUname = $GPUbase.Name
-    $GPU= $GPUname + " at " + $GPUbase.CurrentHorizontalResolution + "x" + $GPUbase.CurrentVerticalResolution
-    $1 = "Graphics Card: " + $GPU + " " + $temps[1]+ 'C' + '<br>'
+    $1 = "Graphics Card: " + $GPUbase.Name + " " + $temps[1]+ 'C' + '<br>'
     Return $1
 }
 function getRAM {
