@@ -538,7 +538,8 @@ $badProcesses = @(
     'Malwarebytes',
     'McAfee WebAdvisor',
     'Norton Security',
-    'Wallpaper Engine Service'
+    'Wallpaper Engine Service',
+    'Service_KMS.exe'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
@@ -643,7 +644,7 @@ function getBadThings {
     }
     foreach ($name in $badHostnames) {
         if ($cimOs.CSName -contains $name) {
-            $6 += $name + '<br>'
+            $6 += "Modified OS: " $name + '<br>'
         } 
     }
     Return $1,$2,$3,$4,$5,$6
