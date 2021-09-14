@@ -594,6 +594,28 @@ tr:nth-child(even) {
 "
 Return $1
 }
+function table {
+$1 = '<h2>Sections</h2>
+<div style="line-height:0">
+<p><a href="#Lics">Licensing</a></p>
+<p><a href="#SecInfo">Security Information</a></p>
+<p><a href="#HW">Hardware Basics</a></p>
+<p><a href="#SysVar">System Variables</a></p>
+<p><a href="#UserVar">User Variables</a></p>
+<p><a href="#hotfixes">Installed updates</a></p>
+<p><a href="#StartupTasks">Startup Tasks</a></p>
+<p><a href="#Power">Powerprofiles</a></p>
+<p><a href="#RunningProcs">Running Processes</a></p>
+<p><a href="#Services">Services</a></p>
+<p><a href="#InstalledApps">Installed Applications</a></p>
+<p><a href="#NetConfig">Network Configuration</a></p>
+<p><a href="#Drivers">Drivers and device versions</a></p>
+<p><a href="#Audio">Audio Devices</a></p>
+<p><a href="#Disks">Disk Layouts</a></p>
+<p><a href="#SMART">SMART</a></p>
+</div>'
+Return $1
+}
 
 function getDate {
     Get-Date
@@ -650,12 +672,12 @@ function getBadThings {
     Return $1,$2,$3,$4,$5,$6
 }
 function getLicensing {
-    $1 = "<h2>Licensing</h2>"
+    $1 = "<h2 id='Lics'> Licensing</h2>"
     $2 = $cimLics | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getSecureInfo {
-    $1 = "<h2>Security Information</h2>"
+    $1 = "<h2 id='#SecInfo'>Security Information</h2>"
     $2 = 'AV: ' + $av.DisplayName + '<br>'
     $3 = 'Firewall: ' + $fw.DisplayName + '<br>'
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + '<br>'
@@ -696,7 +718,7 @@ function getTemps {
 }
 $temps = getTemps
 function getCPU{
-    $1 = "<h2>Hardware Basics</h2>"
+    $1 = "<h2 id='#hw'>Hardware Basics</h2>"
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
     $2 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + '<br>'
@@ -721,29 +743,29 @@ function getRAM {
     Return $1,$2
 }
 function getVars {
-    $1 = "<h2>System Variables</h2>"
+    $1 = "<h2 id='#SysVar'>System Variables</h2>"
     $2 = [Environment]::GetEnvironmentVariables("Machine")
-    $3 = "<h2>User Variables</h2>"
+    $3 = "<h2 id='$UserVar'>User Variables</h2>"
     $4 = [Environment]::GetEnvironmentVariables("User")
     Return $1,$2,$3,$4
 }
 function getUpdates {
-    $1 = "<h2>Installed updates</h2>"
+    $1 = "<h2 id='#hotfixes'>Installed updates</h2>"
     $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getStartup {
-    $1 = "<h2>Startup Tasks for user</h2>"
+    $1 = "<h2 id='#StartupTasks'>Startup Tasks for user</h2>"
     $2 = $cimStart.Caption
     Return $1,$2
 }
 function getPower {
-    $1 = "<h2>Powerprofiles</h2>"
+    $1 = "<h2 id='#power'>Powerprofiles</h2>"
     $2 = powercfg /l
     Return $1,$2
 }
 function getRamUsage {
-    $1 = "<h2>Running Processes</h2>"
+    $1 = "<h2 id='#RunningProcs'>Running Processes</h2>"
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
     $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
@@ -791,34 +813,34 @@ function getProcesses {
     return $1,$2
 }
 function getServices {
-    $1 = "<h2>Services</h2>"
+    $1 = "<h2 id='#Services'>Services</h2>"
     $2 = $services | Select Status,DisplayName | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getInstalledApps {
     $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
-    $1 = "`n" + "<h2>Installed Apps</h2>"
+    $1 = "`n" + "<h2 id='#InstalledApps'>Installed Apps</h2>"
     $2 = $apps | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getNets {
-    $1 = "<h2>Network Configuration</h2>"
+    $1 = "<h2 id='#NetConfig'>Network Configuration</h2>"
     $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) + '<br>'
     $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
     Return $1,$2,$3
 }
 function getDrivers {
-    $1 = "`n" + "<h2>Drivers and device versions</h2>"
+    $1 = "`n" + "<h2 id='#Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
     Return $1,$2
 }
 function getAudio {
-    $1 = "<h2>Audio devices</h2>"
+    $1 = "<h2 id='#Audio'>Audio devices</h2>"
     $2 = $cimAudio | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getDisks {
-    $1 = "<h2>Disk layouts</h2>"
+    $1 = "<h2 id='#Disks'>Disk layouts</h2>"
     $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) + '<br>'
     $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
     Return $1,$2,$3
@@ -828,7 +850,7 @@ function getSmart {
     while (!(Test-Path 'files\DiskInfo.txt')) { 
         Start-Sleep 1
     }
-    $1 = "<h2>SMART</h2>"
+    $1 = "<h2 id='#SMART'>SMART</h2>"
     $2 = $(Get-Content files\DiskInfo.txt)
     Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
     Return $1,$2
@@ -916,6 +938,7 @@ header | Out-File -Encoding ascii $file
 getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
 getBadThings | Out-File -Append -Encoding ascii $file
+table | Out-File -Append -Encoding ascii $file
 getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
 getCPU | Out-File -Append -Encoding ascii $file
