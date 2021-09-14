@@ -532,7 +532,8 @@ $badStartup = @(
     'McAfee Remediation',
     'IObit Uninstaller Service',
     'Driver Booster Scheduler',
-    'Driver Easy Scheduled Scan'
+    'Driver Easy Scheduled Scan',
+    'KMS_VL_ALL'
 )
 $badProcesses = @(
     'Malwarebytes',
