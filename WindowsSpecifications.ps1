@@ -630,6 +630,7 @@ function getDate {
     Get-Date
 }
 function getbasicInfo {
+    Write-Host 'Getting basic information...'
     $1 = '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
@@ -639,9 +640,11 @@ function getbasicInfo {
     $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes" + ''
     $6 = 'Hostname: ' + $cimOs.CSName + ''
     $7 = 'Domain: ' + $env:USERDOMAIN + ''
+    Write-Host 'Got basic information'
     Return $1,$2,$3,$4,$5,$6,$7
 }
 function getBadThings {
+    Write-Host 'Checking for issues...'
     $1 = '<h2>Visible issues</h2>'
     $2 = @()
     $3 = @()
@@ -678,20 +681,25 @@ function getBadThings {
             $6 += "Modified OS: " + $name + ''
         } 
     }
+    Write-Host 'Checked for issues'
     Return $1,$2,$3,$4,$5,$6
 }
 function getLicensing {
+    Write-Host 'Getting license information...'
     $1 = "<h2 id='Lics'> Licensing</h2>"
     $2 = $cimLics | ConvertTo-Html -Fragment
+    Write-Host 'Got license information'
     Return $1,$2
 }
 function getSecureInfo {
+    Write-Host 'Getting security information...'
     $1 = "<h2 id='SecInfo'>Security Information</h2>"
     $2 = 'AV: ' + $av.DisplayName + ''
     $3 = 'Firewall: ' + $fw.DisplayName + ''
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + ''
     $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) + ''
     $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated | ConvertTo-Html -Fragment)
+    Write-Host 'Got security information'
     Return $1,$2,$3,$4,$5,$6
 }
 function getTemps {
@@ -727,10 +735,11 @@ function getTemps {
 }
 $temps = getTemps
 function getCPU{
+    Write-Host 'Getting hardware information...'
     $1 = "<h2 id='hw'>Hardware Basics</h2>"
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-    $2 = "`n" + 'CPU: ' + $cpu + $temps[0] + 'C' + ''
+    $2 = 'CPU: ' + $cpu + $temps[0] + 'C' + ''
     Return $1,$2
 }
 function getMobo{
@@ -749,31 +758,41 @@ function getGPU {
 function getRAM {
     $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' + ''
     $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber | ConvertTo-Html -Fragment)
+    Write-Host 'Got hardware information'
     Return $1,$2
 }
 function getVars {
+    Write-Host 'Getting variables...'
     $1 = "<h2 id='SysVar'>System Variables</h2>"
     $2 = [Environment]::GetEnvironmentVariables("Machine")
     $3 = "<h2 id='UserVar'>User Variables</h2>"
     $4 = [Environment]::GetEnvironmentVariables("User")
+    Write-Host 'Got variables'
     Return $1,$2,$3,$4
 }
 function getUpdates {
+    Write-Host 'Getting applied hotfixes...'
     $1 = "<h2 id='hotfixes'>Installed updates</h2>"
     $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
+    Write-Host 'Got applied hotfixes'
     Return $1,$2
 }
 function getStartup {
+    Write-Host 'Getting startup tasks...'
     $1 = "<h2 id='StartupTasks'>Startup Tasks for user</h2>"
     $2 = $cimStart.Caption
+    Write-Host 'Got startup tasks'
     Return $1,$2
 }
 function getPower {
+    Write-Host 'Getting power profiles...'
     $1 = "<h2 id='Power'>Powerprofiles</h2>"
     $2 = powercfg /l
+    Write-Host 'Got power profiles'
     Return $1,$2
 }
 function getRamUsage {
+    Write-Host 'Getting running processes...'
     $1 = "<h2 id='RunningProcs'>Running Processes</h2>"
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
@@ -819,42 +838,56 @@ function getProcesses {
     )
     $1 = "`n"
     $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment)
+    Write-Host 'Got processes'
     return $1,$2
 }
 function getServices {
+    Write-Host 'Getting services...'
     $1 = "<h2 id='Services'>Services</h2>"
     $2 = $services | Select Status,DisplayName | ConvertTo-Html -Fragment
+    Write-Host 'Got services'
     Return $1,$2
 }
 function getInstalledApps {
+    Write-Host 'Getting installed apps...'
     $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
-    $1 = "`n" + "<h2 id='InstalledApps'>Installed Apps</h2>"
+    $1 = "<h2 id='InstalledApps'>Installed Apps</h2>"
     $2 = $apps | ConvertTo-Html -Fragment
+    Write-Host 'Got installed apps'
     Return $1,$2
 }
 function getNets {
+    Write-Host 'Getting network configurations...'
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
     $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) + ''
     $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
+    Write-Host 'Got network configurations'
     Return $1,$2,$3
 }
 function getDrivers {
-    $1 = "`n" + "<h2 id='Drivers'>Drivers and device versions</h2>"
+    Write-Host 'Getting driver information...'
+    $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
+    Write-Host 'Got driver information'
     Return $1,$2
 }
 function getAudio {
+    Write-Host 'Getting audio devices...'
     $1 = "<h2 id='Audio'>Audio devices</h2>"
     $2 = $cimAudio | ConvertTo-Html -Fragment
+    Write-Host 'Got audio devices'
     Return $1,$2
 }
 function getDisks {
+    Write-Host 'Getting disk layouts...'
     $1 = "<h2 id='Disks'>Disk layouts</h2>"
     $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) + ''
     $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
+    Write-Host 'Got disk layouts'
     Return $1,$2,$3
 }
 function getSmart {
+    Write-Host 'Getting SMART data...'
     $(files\DiskInfo64.exe /CopyExit)
     while (!(Test-Path 'files\DiskInfo.txt')) { 
         Start-Sleep 1
@@ -862,6 +895,7 @@ function getSmart {
     $1 = "<h2 id='SMART'>SMART</h2>"
     $2 = $(Get-Content files\DiskInfo.txt)
     Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini'
+    Write-Host 'Got SMART'
     Return $1,$2
 }
 function uploadFile {
@@ -929,6 +963,7 @@ Uploaded results are deleted after 24 hours"
 promptStart
 
 # Bulk data gathering
+Write-Host 'Gathering main data...'
 ## CIM sources
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
@@ -941,6 +976,7 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
 $services = $(Get-Service)
 $runningProcesses = Get-Process
+Write-Host 'Got main data'
 
 # Write da file
 header | Out-File -Encoding ascii $file
