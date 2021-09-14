@@ -683,8 +683,14 @@ function getBadThings {
             $6 += "Modified OS: " + $name
         } 
     }
+    $c = $volumes | ? { $_.DriveLetter -eq 'C' }
+    $cAllowable = $c.Size - $c.Size * .20
+    $cConsumed = $c.Size - $c.SizeRemaining
+    If ($cConsumed -gt $cAllowable) {
+        $7 = "Less than 20% left on C"
+    }
     Write-Host 'Checked for issues'
-    Return $1,$2,$3,$4,$5,$6
+    Return $1,$2,$3,$4,$5,$6,$7
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -884,7 +890,7 @@ function getDisks {
     Write-Host 'Getting disk layouts...'
     $1 = "<h2 id='Disks'>Disk layouts</h2>"
     $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) 
-    $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
+    $3 = $volumes | Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment
     Write-Host 'Got disk layouts'
     Return $1,$2,$3
 }
@@ -979,6 +985,7 @@ $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName wi
 $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
 $services = $(Get-Service)
 $runningProcesses = Get-Process
+$volumes = Get-Volume
 Write-Host 'Got main data'
 
 # Write da file
