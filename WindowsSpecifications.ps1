@@ -699,7 +699,7 @@ function getSecureInfo {
     $3 = 'Firewall: ' + $fw.DisplayName 
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
     $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) 
-    $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated | ConvertTo-Html -Fragment)
+    $6 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
     Write-Host 'Got security information'
     Return $1,$2,$3,$4,$5,$6
 }
@@ -972,6 +972,7 @@ $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
 $cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
 $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
+$tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 
 ## Other
 $installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
@@ -1003,6 +1004,6 @@ getNets | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
-# getSmart | Out-File -Append -Encoding ascii $file
+getSmart | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
