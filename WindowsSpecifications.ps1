@@ -634,14 +634,15 @@ function getbasicInfo {
     $1 = '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
-    $2 = 'Edition: ' + $cimOs.Caption + ''
-    $3 = 'Build: ' + $cimOs.BuildNumber + ''
-    $4 = 'Install date: ' + $cimOs.InstallDate + ''
-    $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes" + ''
-    $6 = 'Hostname: ' + $cimOs.CSName + ''
-    $7 = 'Domain: ' + $env:USERDOMAIN + ''
+    $2 = 'Edition: ' + $cimOs.Caption
+    $3 = 'Build: ' + $cimOs.BuildNumber
+    $4 = 'Install date: ' + $cimOs.InstallDate
+    $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
+    $6 = 'Hostname: ' + $cimOs.CSName
+    $7 = 'Domain: ' + $env:USERDOMAIN
+    $8 = 'Boot mode: ' + $env:firmware_type
     Write-Host 'Got basic information'
-    Return $1,$2,$3,$4,$5,$6,$7
+    Return $1,$2,$3,$4,$5,$6,$7,$8
 }
 function getBadThings {
     Write-Host 'Checking for issues...'
@@ -652,24 +653,24 @@ function getBadThings {
     $5 = @()
     foreach ($soft in $badSoftware) { 
         if ($installedBase.DisplayName -contains $soft) { 
-            $2 += $soft + ''
+            $2 += $soft 
         } 
     }
     foreach ($start in $badStartup) { 
         if ($cimStart.Caption -contains $start) { 
-            $3 += $start + ''
+            $3 += $start 
         } 
     }
     foreach ($running in $badProcesses) {
         if ($runningProcesses.Name -contains $running) {
-            $4 += $running + ''
+            $4 += $running 
         } 
     }
     $i = 0
     foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            $5 += $badKeys[$i] + " is " + $value + ''
+            $5 += $badKeys[$i] + " is " + $value
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
@@ -678,7 +679,7 @@ function getBadThings {
     }
     foreach ($name in $badHostnames) {
         if ($cimOs.CSName -contains $name) {
-            $6 += "Modified OS: " + $name + ''
+            $6 += "Modified OS: " + $name
         } 
     }
     Write-Host 'Checked for issues'
@@ -694,10 +695,10 @@ function getLicensing {
 function getSecureInfo {
     Write-Host 'Getting security information...'
     $1 = "<h2 id='SecInfo'>Security Information</h2>"
-    $2 = 'AV: ' + $av.DisplayName + ''
-    $3 = 'Firewall: ' + $fw.DisplayName + ''
-    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA + ''
-    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) + ''
+    $2 = 'AV: ' + $av.DisplayName 
+    $3 = 'Firewall: ' + $fw.DisplayName 
+    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
+    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) 
     $6 = $(Get-TPM | Select TPMPresent,TPMReadey,TPMEnabled,TPMActivated | ConvertTo-Html -Fragment)
     Write-Host 'Got security information'
     Return $1,$2,$3,$4,$5,$6
@@ -713,7 +714,7 @@ function getTemps {
         $comp.Update()
             foreach ($sens in $comp.Sensors) {
                  if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-                    $1 = $sens.Value.ToString() + ''
+                    $1 = $sens.Value.ToString()
                     #$sens.Identifier for a better name
                  }
             }
@@ -724,7 +725,7 @@ function getTemps {
         $comp.Update()
             foreach ($sens in $comp.Sensors) {
                  if ($sens.SensorType -eq [OpenHardwareMonitor.Hardware.SensorType]::Temperature) {
-                    $2 = $sens.Value.ToString() + ''
+                    $2 = $sens.Value.ToString() 
                     # $sens.Identifier for a better name
                  }
             }
@@ -739,7 +740,7 @@ function getCPU{
     $1 = "<h2 id='hw'>Hardware Basics</h2>"
     $cpuInfo = Get-WmiObject Win32_Processor
     $cpu = $cpuInfo.Name
-    $2 = 'CPU: ' + $cpu + $temps[0] + 'C' + ''
+    $2 = 'CPU: ' + $cpu + $temps[0] + 'C' 
     Return $1,$2
 }
 function getMobo{
@@ -747,16 +748,16 @@ function getMobo{
     $moboMan = $moboBase.manufacturer
     $moboMod = $moboBase.product
     $mobo = $moboMan + " | " + $moboMod
-    $1 = "Motherboard: " + $mobo + ''
+    $1 = "Motherboard: " + $mobo 
     Return $1
 }
 function getGPU {
     $GPUbase = Get-WmiObject Win32_VideoController
-    $1 = "Graphics Card: " + $GPUbase.Name + " " + $temps[1]+ 'C' + ''
+    $1 = "Graphics Card: " + $GPUbase.Name + " " + $temps[1]+ 'C' 
     Return $1
 }
 function getRAM {
-    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' + ''
+    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' 
     $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information'
     Return $1,$2
@@ -797,7 +798,7 @@ function getRamUsage {
     $mem =  Get-WmiObject -Class WIN32_OperatingSystem
     $memUsed = [Math]::Round($($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory)/1048576,2)
     $memTotal = Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}
-    $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB" + ''
+    $2 = "Total RAM usage: " + $memUsed + "/" + $memTotal + " GB" 
     Return $1,$2
 }
 function getProcesses {
@@ -859,7 +860,7 @@ function getInstalledApps {
 function getNets {
     Write-Host 'Getting network configurations...'
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
-    $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) + ''
+    $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) 
     $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
     Write-Host 'Got network configurations'
     Return $1,$2,$3
@@ -881,7 +882,7 @@ function getAudio {
 function getDisks {
     Write-Host 'Getting disk layouts...'
     $1 = "<h2 id='Disks'>Disk layouts</h2>"
-    $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) + ''
+    $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) 
     $3 = $(Get-Volume| Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment)
     Write-Host 'Got disk layouts'
     Return $1,$2,$3
@@ -1002,6 +1003,6 @@ getNets | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
-getSmart | Out-File -Append -Encoding ascii $file
+# getSmart | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
