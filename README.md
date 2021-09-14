@@ -16,6 +16,12 @@ This script gathers:
 * Hostname
 * Domain
 
+### Security Information
+* AV product
+* Firewall product
+* UAC Status
+* SecureBoot Status
+
 ### Hardware
 * CPU model and temperature
 * Motherboard brand and model
