@@ -555,6 +555,12 @@ $badValues = @(
     'BypassSecureBootCheck',
     'NoAutoUpdate'
 )
+$badRegExp = @(
+    'Insider builds are set to: ',
+    'Windows 11 TPM bypass set to: ',
+    'Windows 11 SecureBoot bypass set to: ',
+    'Windows auto update is set to: '
+)
 $badHostnames = @(
     'ATLASOS-DESKTOP',
     'Revision-PC'
@@ -671,7 +677,7 @@ function getBadThings {
     foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            $5 += $badKeys[$i] + " is " + $value
+            $5 += $badRegExp[$i] + $value
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
