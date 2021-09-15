@@ -673,15 +673,13 @@ function getbasicInfo {
     $uptime = $(Get-Date) - $bootuptime
     $2 = 'Edition: ' + $cimOs.Caption
     $i = 0
+    $3 = 'Version is unknown. Build: ' + $cimOS.BuildNumber
     foreach ($b in $builds) {
-    if ($cimOS.BuildNumber -eq $builds[$i]) {
-        $3 = 'Version: ' + $versions[$i]
-    } Else {
-        $3 = 'Version unknown. Build: ' + $cimOS.BuildNumber
+        if ($cimOS.BuildNumber -eq $builds[$i]) {
+            $3 = 'Version: ' + $versions[$i]
+        }
+        $i = $i + 1
     }
-    $i = $i + 1
-    }
-    $3 = 'Build: ' + $cimOs.BuildNumber
     $4 = 'Install date: ' + $cimOs.InstallDate
     $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
     $6 = 'Hostname: ' + $cimOs.CSName
