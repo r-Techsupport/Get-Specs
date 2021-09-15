@@ -565,6 +565,36 @@ $badHostnames = @(
     'ATLASOS-DESKTOP',
     'Revision-PC'
 )
+$builds = @(
+    '10240',
+    '10586',
+    '14393',
+    '15063',
+    '16299',
+    '17017',
+    '17134',
+    '17763',
+    '18362',
+    '18363',
+    '19041',
+    '19042',
+    '19043'
+)
+$versions = @(
+    '1507',
+    '1511',
+    '1607',
+    '1703',
+    '1709',
+    '1803',
+    '1803',
+    '1809',
+    '1903',
+    '1909',
+    '2004',
+    '20H2',
+    '21H1'
+)
 ### Functions
 
 function header {
@@ -642,6 +672,15 @@ function getbasicInfo {
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
     $2 = 'Edition: ' + $cimOs.Caption
+    $i = 0
+    foreach ($b in $builds) {
+    if ($cimOS.BuildNumber -eq $builds[$i]) {
+        $3 = 'Version: ' + $versions[$i]
+    } Else {
+        $3 = 'Version unknown. Build: ' + $cimOS.BuildNumber
+    }
+    $i = $i + 1
+    }
     $3 = 'Build: ' + $cimOs.BuildNumber
     $4 = 'Install date: ' + $cimOs.InstallDate
     $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
