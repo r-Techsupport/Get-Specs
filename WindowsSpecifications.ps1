@@ -1213,6 +1213,7 @@ Uploaded results are deleted after 24 hours"
 
 # ------------------ #
 promptStart
+# ------------------ #
 
 # Bulk data gathering
 Write-Host 'Gathering main data...'
@@ -1234,6 +1235,7 @@ $runningProcesses = Get-Process
 $volumes = Get-Volume
 Write-Host 'Got main data'
 
+# ------------------ #
 # Write da file
 header | Out-File -Encoding ascii $file
 getDate | Out-File -Append -Encoding ascii $file
