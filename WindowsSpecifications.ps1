@@ -987,6 +987,12 @@ function getSmart {
     Write-Host 'Got SMART'
     Return $1,$2
 }
+function getTimer {
+    $timer.Stop()
+    $1 = 'Runtime'
+    $2 = $timer.Elapsed | Select Minutes,Seconds | ConvertTo-Html -Fragment
+    Return $1,$2
+}
 function uploadFile {
     $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://paste.rtech.support/upload/$null.html" -UseBasicParsing
     $linkProper = $link.Content -Replace "support","support/selif"
@@ -1050,6 +1056,7 @@ Uploaded results are deleted after 24 hours"
 
 # ------------------ #
 promptStart
+$timer = [diagnostics.stopwatch]::StartNew()
 # ------------------ #
 
 # Bulk data gathering
@@ -1098,5 +1105,6 @@ getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
 getSmart | Out-File -Append -Encoding ascii $file
+getTimer | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
