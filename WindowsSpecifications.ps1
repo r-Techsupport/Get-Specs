@@ -887,22 +887,26 @@ function getBadThings {
     $3 = @()
     $4 = @()
     $5 = @()
+    # bad software 
     $i = 0
     $t = $badSoftware.Count
     while ($i -lt $t) {
         $2 += $(@($installedBase.DisplayName) -like $badSoftware[$i])
         $i = $i + 1
     }
+    # bad startups
     foreach ($start in $badStartup) { 
         if ($cimStart.Caption -contains $start) { 
             $3 += $start 
         }
     }
+    # bad processes
     foreach ($running in $badProcesses) {
         if ($runningProcesses.Name -contains $running) {
             $4 += "Process: " + $running 
         } 
     }
+    # bad registry values
     $i = 0
     foreach ($reg in $badKeys) {
         If (Test-Path -Path $badKeys[$i]) {
@@ -914,15 +918,18 @@ function getBadThings {
         # }[
         $i = $i + 1
     }
+    # bad hostnames
     if ($badHostnames -contains $cimOS.CSName) {
         $6 = "Modified OS: " + $cimOS.CSName
     }
+    # bad diskspace
     $c = $volumes | ? { $_.DriveLetter -eq 'C' }
     $cAllowable = $c.Size - $c.Size * .20
     $cConsumed = $c.Size - $c.SizeRemaining
     If ($cConsumed -gt $cAllowable) {
         $7 = "Less than 20% left on C"
     }
+    # bad productKeys
     If ($masKeys -contains $cimLics.PartialProductKey) {
         $8 = "MAS detected"
     }
