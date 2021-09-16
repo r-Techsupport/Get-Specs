@@ -523,24 +523,26 @@ promptFileIssue
 # Declarations
 $file = 'TechSupport_Specs.html'
 $badSoftware = @(
-    'Driver Booster'
+    'Driver Booster*',
+    'iTop*',
+    'Driver Easy*',
+    'Roblox*',
+    'ccleaner',
+    'Malwarebytes'
 )
 $badStartup = @(
     'AutoKMS',
     'kmspico',
-    'CCleanerSkipUAC',
     'McAfee Remediation',
-    'IObit Uninstaller Service',
-    'Driver Booster Scheduler',
-    'Driver Easy Scheduled Scan',
     'KMS_VL_ALL'
 )
 $badProcesses = @(
-    'Malwarebytes',
+    'MBAMService',
     'McAfee WebAdvisor',
     'Norton Security',
     'Wallpaper Engine Service',
-    'Service_KMS.exe'
+    'Service_KMS.exe',
+    'iTopVPN'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
@@ -885,19 +887,20 @@ function getBadThings {
     $3 = @()
     $4 = @()
     $5 = @()
-    foreach ($soft in $badSoftware) { 
-        if ($installedBase.DisplayName -contains $soft) { 
-            $2 += $soft 
-        } 
+    $i = 0
+    $t = $badSoftware.Count
+    while ($i -lt $t) {
+        $2 += $(@($installedBase.DisplayName) -like $badSoftware[$i])
+        $i = $i + 1
     }
     foreach ($start in $badStartup) { 
         if ($cimStart.Caption -contains $start) { 
             $3 += $start 
-        } 
+        }
     }
     foreach ($running in $badProcesses) {
         if ($runningProcesses.Name -contains $running) {
-            $4 += $running 
+            $4 += "Process: " + $running 
         } 
     }
     $i = 0
@@ -911,10 +914,8 @@ function getBadThings {
         # }[
         $i = $i + 1
     }
-    foreach ($name in $badHostnames) {
-        if ($cimOs.CSName -contains $name) {
-            $6 += "Modified OS: " + $name
-        } 
+    if ($badHostnames -contains $cimOS.CSName) {
+        $6 = "Modified OS: " + $cimOS.CSName
     }
     $c = $volumes | ? { $_.DriveLetter -eq 'C' }
     $cAllowable = $c.Size - $c.Size * .20
@@ -1218,7 +1219,9 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 
 ## Other
-$installedBase = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
+$installedBase0 = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
+$installedBase1 = Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
+$installedBase = $installedBase0 + $installedBase1
 $services = $(Get-Service)
 $runningProcesses = Get-Process
 $volumes = Get-Volume
