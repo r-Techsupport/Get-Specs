@@ -985,8 +985,12 @@ function getBadThings {
     If ($masKeys -contains $(getFullKey)) {
         $8 = "MAS detected"
     }
+    # bad dns suffixes
+    If ('utopia.net' -in $dns.SuffixSearchList) {
+        $9 = "Utopia malware"
+    }
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -1299,6 +1303,7 @@ $installedBase = $installedBase0 + $installedBase1
 $services = $(Get-Service)
 $runningProcesses = Get-Process
 $volumes = Get-Volume
+$dns = Get-DnsClientGlobalSetting
 Write-Host 'Got main data' -ForegroundColor Green
 
 # ------------------ #
