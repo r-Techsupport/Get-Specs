@@ -987,7 +987,11 @@ function getBadThings {
     }
     # bad dns suffixes
     If ('utopia.net' -in $dns.SuffixSearchList) {
+<<<<<<< HEAD
         $9 = "Utopia malware, router is infected"
+=======
+        $9 = "Utopia malware"
+>>>>>>> 1381cb1e677ba844def2ef08b2a986dfe62830f8
     }
     Write-Host 'Checked for issues' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9
