@@ -264,9 +264,12 @@ function getBadThings {
     # bad registry values
     $i = 0
     foreach ($reg in $badKeys) {
+        $value = $null
         If (Test-Path -Path $badKeys[$i]) {
             $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            $5 += $badRegExp[$i] + $value
+            If ($value -ne $null) {  
+                $5 += $badRegExp[$i] + $value
+            }
         }
         # } Else {
             # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
@@ -448,7 +451,7 @@ function getProcesses {
         }
     )
     $1 = "`n"
-    $2 = $(Get-Process | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment)
+    $2 = $runningProcesses | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment
     Write-Host 'Got processes' -ForegroundColor Green
     return $1,$2
 }
