@@ -19,7 +19,7 @@ Right click the zip file and choose 'Extract All' then run the new exe."
 promptFileIssue
 
 # source our other ps1 files
-. files\*.ps1
+. files\wpf.ps1
 
 # Declarations
 $file = 'TechSupport_Specs.html'
