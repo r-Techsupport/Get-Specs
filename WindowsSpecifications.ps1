@@ -192,46 +192,45 @@ function getbasicInfo {
     Write-Host 'Got basic information' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8
 }
-Function getFullKey {
-    $KeyOutput=""
-    $KeyOffset = 52
-     
+function getFullKey {
+    $keyOutput=""
+    $keyOffset = 52
+
     $IsWin10 = ([System.Math]::Truncate($key[66] / 6)) -band 1
-    $key[66] = ($Key[66] -band 0xF7) -bor (($IsWin10 -band 2) * 4)
-    $i = 24 
+    $key[66] = ($key[66] -band 0xF7) -bor (($IsWin10 -band 2) * 4)
+    $i = 24
     $maps = "BCDFGHJKMPQRTVWXY2346789"
-    Do {
+    do {
         $current= 0
         $j = 14
-        Do {
-           $current = $current* 256
-           $current = $Key[$j + $KeyOffset] + $Current
-           $Key[$j + $KeyOffset] = [System.Math]::Truncate($Current / 24 )
-           $Current=$Current % 24
-           $j--
-        } 
+        do {
+            $current = $current* 256
+            $current = $key[$j + $keyOffset] + $current
+            $key[$j + $keyOffset] = [System.Math]::Truncate($current / 24 )
+            $current=$current % 24
+            $j--
+        }
         while ($j -ge 0)
-            $i-- 
-            $KeyOutput = $Maps.Substring($Current, 1) + $KeyOutput
+            $i--
+            $keyOutput = $maps.Substring($current, 1) + $keyOutput
             $last = $current
     } while ($i -ge 0)
-      
-    If ($IsWin10 -eq 1) {
-        $keypart1 = $KeyOutput.Substring(1,$last)
-        $insert = "N"
-        $KeyOutput = $KeyOutput.Replace($keypart1, $keypart1 + $insert)
-        if ($Last -eq 0) {  $KeyOutput = $insert + $KeyOutput }
+
+    if ($IsWin10 -eq 1) {
+        $keypart1 = $keyOutput.Substring(1, $last)
+        $keypart2 = $keyOutput.Substring($last + 1, $keyOutput.Length - ($last + 1));
+        $keyOutput = $keypart1 + "N" + $keypart2;
     }
-  
-    if ($keyOutput.Length -eq 26) {
+
+    if ($keyOutput.Length -eq 25) {
         $1 = [String]::Format("{0}-{1}-{2}-{3}-{4}",
-            $KeyOutput.Substring(1, 5),
-            $KeyOutput.Substring(6, 5),
-            $KeyOutput.Substring(11,5),
-            $KeyOutput.Substring(16,5),
-            $KeyOutput.Substring(21,5))
+            $keyOutput.Substring(0, 5),
+            $keyOutput.Substring(5, 5),
+            $keyOutput.Substring(10,5),
+            $keyOutput.Substring(15,5),
+            $keyOutput.Substring(20,5))
     } else {
-        $KeyOutput
+        $keyOutput
     }
     return $1
 }
