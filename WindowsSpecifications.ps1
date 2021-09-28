@@ -50,19 +50,22 @@ $badKeys = @(
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds\',
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SYSTEM\Setup\LabConfig\',
-    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\'
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
+    'HKLM:\SYSTEM\Setup\Status\'
 )
 $badValues = @(
     'AllowBuildPreview',
     'BypassTPMCheck',
     'BypassSecureBootCheck',
-    'NoAutoUpdate'
+    'NoAutoUpdate',
+    'AuditBoot'
 )
 $badRegExp = @(
     'Insider builds are set to: ',
     'Windows 11 TPM bypass set to: ',
     'Windows 11 SecureBoot bypass set to: ',
-    'Windows auto update is set to: '
+    'Windows auto update is set to: ',
+    'Audit Boot is set to: '
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
