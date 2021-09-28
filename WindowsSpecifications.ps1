@@ -189,8 +189,9 @@ function getbasicInfo {
     $6 = 'Hostname: ' + $cimOs.CSName
     $7 = 'Domain: ' + $env:USERDOMAIN
     $8 = 'Boot mode: ' + $env:firmware_type
+    $9 = 'Boot state: ' + $bootupState
     Write-Host 'Got basic information' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9
 }
 function getFullKey {
     $keyOutput=""
@@ -601,6 +602,7 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 
 ## Other
+$bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
 $key = $(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' | Select-Object -ExpandProperty 'DigitalProductId')
 $installedBase0 = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
 $installedBase1 = Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | ? {$_.DisplayName -notlike $null}
