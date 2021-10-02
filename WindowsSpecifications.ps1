@@ -506,19 +506,10 @@ function getDisks {
 function getSmart {
     Write-Host 'Getting SMART data...'
     $1 = "<h2 id='SMART'>SMART</h2>"
-    $to = new-timespan -Seconds 30
-    $sw = [diagnostics.stopwatch]::StartNew()
-    $(files\DiskInfo64.exe /CopyExit)
-    While ($sw.elapsed -lt $to){
-        if (Test-Path 'files\DiskInfo.txt'){
-            $2 = $(Get-Content files\DiskInfo.txt)
-        } Else {
-            Start-Sleep -Seconds 1
-            $2 = "Timed out after 30 seconds. Verify disk health manually with CDI."
-        }
-    }
-    Remove-Item -Force -Recurse 'files\Smart','files\DiskInfo.txt','files\DiskInfo.ini' -ErrorAction SilentlyContinue
+    $smart = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
+    $2 = $smart | Select 'Drive Letter','Model','Health Status' 
     Write-Host 'Got SMART' -ForegroundColor Green
+    cd ..
     Return $1,$2
 }
 function getTimer {
