@@ -317,9 +317,10 @@ function getSecureInfo {
     $3 = 'Firewall: ' + $fw.DisplayName 
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
     $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) 
-    $6 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    $6 = "TPM: "
+    $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
     Write-Host 'Got security information' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6
+    Return $1,$2,$3,$4,$5,$6,$7
 }
 function getTemps {
     Add-Type -Path .\files\OpenHardwareMonitorLib.dll
