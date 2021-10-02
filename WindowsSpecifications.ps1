@@ -506,8 +506,7 @@ function getDisks {
 function getSmart {
     Write-Host 'Getting SMART data...'
     $1 = "<h2 id='SMART'>SMART</h2>"
-    $smart = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
-    $2 = $smart | Select 'Drive Letter','Model','Health Status' 
+    $2 = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
     Write-Host 'Got SMART' -ForegroundColor Green
     cd ..
     Return $1,$2
