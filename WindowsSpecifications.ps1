@@ -509,7 +509,13 @@ function getDisks {
 function getSmart {
     Write-Host 'Getting SMART data...'
     $1 = "<h2 id='SMART'>SMART</h2>"
-    $2 = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
+    $smart = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
+    $2 = @()
+    $n = 0
+    ForEach ($i in $smart) {
+        $2 += $smart[$n] | Select Model, 'Health Status', 'Drive Letter', 'Disk Size', 'Rotation Rate', Interface, 'Transfer Mode', 'Power On Hours', 'Power On Count', 'Reallocated Sectors Count', 'Reallocation Event Count', 'Current Pending Sector Count', 'Uncorrectable Sector Count', 'Uncorrectable Error Count', 'UltraDMA CRC Error Count', 'CRC Error Count', 'SATA R-Errors (CRC) Error Count' | ConvertTo-Html -Fragment -As List
+        $n = $n + 1
+    }
     Write-Host 'Got SMART' -ForegroundColor Green
     cd ..
     Return $1,$2
