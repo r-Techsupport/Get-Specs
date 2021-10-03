@@ -60,6 +60,13 @@ $badValues = @(
     'NoAutoUpdate',
     'AuditBoot'
 )
+$badData = @(
+    '1',
+    '1',
+    '1',
+    '1',
+    '1'
+)
 $badRegExp = @(
     'Insider builds are set to: ',
     'Windows 11 TPM bypass set to: ',
@@ -271,14 +278,11 @@ function getBadThings {
     foreach ($reg in $badKeys) {
         $value = $null
         If (Test-Path -Path $badKeys[$i]) {
-            $value = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
-            If ($value -ne $null) {  
-                $5 += $badRegExp[$i] + $value
+            $data = Get-ItemProperty -Path $badKeys[$i] -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $badValues[$i] -ErrorAction SilentlyContinue
+        If ($data -eq $badData[$i]) {
+                $5 += $badRegExp[$i] + $data
             }
         }
-        # } Else {
-            # Write-Host $badKeys[$i] $badValues[$i] "does not exist"
-        # }[
         $i = $i + 1
     }
     # bad hostnames
