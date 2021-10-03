@@ -297,9 +297,9 @@ function getBadThings {
         $7 = "Less than 20% left on C"
     }
     # bad productKeys
-    If ($masKeys -contains $(getFullKey)) {
-        $8 = "MAS detected"
-    }
+    # If ($masKeys -contains $(getFullKey)) {
+        # $8 = "MAS detected"
+    # }
     # bad dns suffixes
     If ('utopia.net' -in $dns.SuffixSearchList) {
         $9 = "Utopia malware, router is infected"
