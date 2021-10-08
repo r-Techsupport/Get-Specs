@@ -637,7 +637,7 @@ $osBuild = 'Version is unknown. Build: ' + $cimOS.BuildNumber
 foreach ($b in $builds) {
     if ($cimOS.BuildNumber -eq $builds[$i]) {
         $osBuild = 'Version: ' + $versions[$i]
-        if ($eolDates[$i] -lt $(Get-Date)) {
+        if ((Get-Date $eolDates[$i]) -lt (Get-Date)) {
             $eol = $true
             $eolOn = $eolDates[$i]
         }
