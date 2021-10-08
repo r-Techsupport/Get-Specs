@@ -631,6 +631,8 @@ $dns = Get-DnsClientGlobalSetting
 
 ## Build info
 $i = 0
+$eol = $true
+$eolON = "Unknown"
 $osBuild = 'Version is unknown. Build: ' + $cimOS.BuildNumber
 foreach ($b in $builds) {
     if ($cimOS.BuildNumber -eq $builds[$i]) {
