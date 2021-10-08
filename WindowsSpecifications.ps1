@@ -109,7 +109,7 @@ $versions = @(
     '21H1',
     '21H2'
 )
-$eol = @(
+$eolDates = @(
     '2017-05-17',
     '2017-10-10',
     '2018-04-10',
@@ -203,15 +203,8 @@ function getbasicInfo {
     $1 = '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
     $uptime = $(Get-Date) - $bootuptime
-    $2 = 'Edition: ' + $cimOs.Caption
-    $i = 0
-    $3 = 'Version is unknown. Build: ' + $cimOS.BuildNumber
-    foreach ($b in $builds) {
-        if ($cimOS.BuildNumber -eq $builds[$i]) {
-            $3 = 'Version: ' + $versions[$i]
-        }
-        $i = $i + 1
-    }
+    $2 = 'Edition: ' + $cimOs.Caption 
+    $3 = $osBuild
     $4 = 'Install date: ' + $cimOs.InstallDate
     $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
     $6 = 'Hostname: ' + $cimOs.CSName
@@ -320,8 +313,10 @@ function getBadThings {
     If ('utopia.net' -in $dns.SuffixSearchList) {
         $9 = "Utopia malware, router is infected"
     }
+    If ($eol) {
+        $10 = "OS was EOL on " + $eolOn + " Build is " $osBuild
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -633,6 +628,20 @@ $services = $(Get-Service)
 $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
+
+## Build info
+$i = 0
+$osBuild = 'Version is unknown. Build: ' + $cimOS.BuildNumber
+foreach ($b in $builds) {
+    if ($cimOS.BuildNumber -eq $builds[$i]) {
+        $osBuild = 'Version: ' + $versions[$i]
+        if ($eolDates[$i] -lt $(Get-Date)) {
+            $eol = $true
+            $eolOn = $eolDates[$i]
+        }
+    }
+    $i = $i + 1
+}
 Write-Host 'Got main data' -ForegroundColor Green
 
 # ------------------ #
