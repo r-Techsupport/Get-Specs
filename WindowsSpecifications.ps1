@@ -496,6 +496,7 @@ function getNets {
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
     $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) 
     $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
+    $4 = $dns.SuffixSearchList | ConvertTo-Html -Fragment
     Write-Host 'Got network configurations' -ForegroundColor Green
     Return $1,$2,$3
 }
