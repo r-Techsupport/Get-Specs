@@ -314,7 +314,8 @@ function getBadThings {
         $9 = "Utopia malware, router is infected"
     }
     If ($eol) {
-        $10 = "OS was EOL on " + $eolOn + " Build is " $osBuild
+        $10 = "OS was EOL on " + $eolOn + " Build is " + $osBuild
+    }
     Write-Host 'Checked for issues' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
 }
