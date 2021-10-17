@@ -4,7 +4,7 @@
 .DESCRIPTION
   Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
 .OUTPUTS Specs
-  '.\TechSupport_Specs.txt'
+  '.\TechSupport_Specs.html'
 #>
 
 # Run the basic checks before doing anything
@@ -632,7 +632,7 @@ $dns = Get-DnsClientGlobalSetting
 
 ## Build info
 $i = 0
-$eol = $true
+$eol = $false
 $eolON = "Unknown"
 $osBuild = 'Version is unknown. Build: ' + $cimOS.BuildNumber
 foreach ($b in $builds) {
