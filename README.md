@@ -1,6 +1,7 @@
-# Windows Specifications Script
+# Get-Specs Script
+## Get Windows Specifications
 
-This repo contains the PS1 and files needed to run the Windows Specifications application made for rTechsupport
+This repo contains the PS1 and files needed to run the Get-Specs application made for rTechsupport
 
 The PS1 or EXE must be run as admin to gather SMART, and to gather temperatures. 
 
