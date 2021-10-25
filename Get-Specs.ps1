@@ -316,8 +316,27 @@ function getBadThings {
     If ($eol) {
         $10 = "OS was EOL on " + $eolOn + " Build is " + $osBuild
     }
+    # bad smart things
+    $11 = @()
+    Foreach ($disk in $smart) {
+        If ($disk.'Reallocated Sectors Count' -gt 0) {
+            $11 += "Reallocated sector on" + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated·Sectors·Count' 
+        }
+        If ($disk.'Current Pending Sector Count' -gt 0) {
+            $11 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+        }
+        If ($disk.'Uncorrectable Sector Count' -gt 0) {
+            $11 += "Uncorrectable·Sector·Count on" + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'UncorrectableSector·Count'
+        }
+        If ($disk.'Power Cycle Count' -gt 0) {
+            $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Power Cycle Count'
+        }
+        If ($disk.'Reported Uncorrectable Errors' -gt 0) {
+            $11 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+        }
+    }
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -523,17 +542,11 @@ function getDisks {
     Return $1,$2,$3
 }
 function getSmart {
-    Write-Host 'Getting SMART data...'
     $1 = "<h2 id='SMART'>SMART</h2>"
-    $smart = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
     $2 = @()
-    $n = 0
     ForEach ($i in $smart) {
-        $2 += $smart[$n] | ConvertTo-Html -Fragment -As List
-        $n = $n + 1
+        $2 += $i | ConvertTo-Html -Fragment -As List
     }
-    Write-Host 'Got SMART' -ForegroundColor Green
-    cd ..
     Return $1,$2
 }
 function getTimer {
@@ -558,7 +571,7 @@ Would you like to continue?
         &#10;
         &#10;
         &#10;
-The source code for this application can be found at https://git.dev0.sh/piper/WindowsSpecifications"
+The source code for this application can be found at https://github.com/PipeItToDevNull/Get-Specs"
         Title = "rTechsupport Specs Tool"
         TitleBackground = "DodgerBlue"
         TitleFontSize = 16
@@ -646,6 +659,12 @@ foreach ($b in $builds) {
     $i = $i + 1
 }
 Write-Host 'Got main data' -ForegroundColor Green
+
+# get smart now so we can parse it for bad things
+Write-Host 'Getting SMART data...'
+$smart = .\files\Get-Smart\Get-Smart.ps1 -cdiPath '.\files\DiskInfo64.exe'
+cd ..
+Write-Host 'Got SMART' -ForegroundColor Green
 
 # ------------------ #
 # Write da file
