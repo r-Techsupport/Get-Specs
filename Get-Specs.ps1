@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Gather and upload specifications of a Windows host to rTechsupport
+ Gather and upload specifications of a Windows host to rTechsupport
 .DESCRIPTION
   Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
 .OUTPUTS Specs
@@ -328,8 +328,8 @@ function getBadThings {
         If ($disk.'Uncorrectable Sector Count' -gt 0) {
             $11 += "Uncorrectable·Sector·Count on" + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'UncorrectableSector·Count'
         }
-        If ($disk.'Power Cycle Count' -gt 0) {
-            $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Power Cycle Count'
+        If ($disk.'Command Timeout' -gt 0) {
+            $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
         }
         If ($disk.'Reported Uncorrectable Errors' -gt 0) {
             $11 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
