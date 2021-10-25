@@ -529,7 +529,7 @@ function getSmart {
     $2 = @()
     $n = 0
     ForEach ($i in $smart) {
-        $2 += $smart[$n] | Select Model, 'Health Status', 'Drive Letter', 'Disk Size', 'Rotation Rate', Interface, 'Transfer Mode', 'Power On Hours', 'Power On Count', 'Reallocated Sectors Count', 'Reallocation Event Count', 'Current Pending Sector Count', 'Uncorrectable Sector Count', 'Uncorrectable Error Count', 'UltraDMA CRC Error Count', 'CRC Error Count', 'SATA R-Errors (CRC) Error Count' | ConvertTo-Html -Fragment -As List
+        $2 += $smart[$n] | ConvertTo-Html -Fragment -As List
         $n = $n + 1
     }
     Write-Host 'Got SMART' -ForegroundColor Green
