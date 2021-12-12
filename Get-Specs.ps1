@@ -129,8 +129,6 @@ $eolDates = @(
     '2023-10-10'
 )
 
-$masKeys = Get-Content .\files\keys
-
 ### Functions
 
 function header {
