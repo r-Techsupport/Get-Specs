@@ -199,7 +199,10 @@ Return $1
 }
 
 function getDate {
-    Get-Date
+    $1 = "Local: " + $(Get-Date)
+    $2 = "UTC: " + $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), 'Greenwich Standard Time'))
+    $3 = "Version: " + $version
+    Return $1,$2,$3
 }
 function getbasicInfo {
     Write-Host 'Getting basic information...'
