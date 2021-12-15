@@ -364,7 +364,14 @@ function getSecureInfo {
     Return $1,$2,$3,$4,$5,$6,$7
 }
 function getTemps {
-    Add-Type -Path .\files\OpenHardwareMonitorLib.dll -ErrorAction SilentlyContinue
+    Try {
+        Add-Type -Path .\files\OpenHardwareMonitorLib.dll -ErrorAction SilentlyContinue
+    }
+    catch {
+        $1 = ' OHMF'
+        $2 = ' OHMF'
+        return $1,$2
+    }
     $ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
     $ohm.CPUEnabled= 1;
     $ohm.GPUEnabled = 1;
@@ -466,15 +473,15 @@ function getProcesses {
         @{Name="Name"; 
             Expression = {$_.name}},
         @{Name="Count"; 
-            Expression = {(Get-Process -Name $_.Name | Group-Object -Property ProcessName).Count}
+            Expression = {(Get-Process -Name $_.Name -ErrorAction SilentlyContinue | Group-Object -Property ProcessName).Count}
         },
         @{Name="NPM (M)"; 
             Expression = {[Math]::Round(($_.NPM / 1MB), 3)}
         },
         @{Name="Mem (M)"; 
             Expression = {
-                $total = 0
-                ForEach ($proc in $(Get-Process -Name $_.Name)) {
+                $totar = 0
+                ForEach ($proc in $(Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
                     $total = $total + [Math]::Round(($proc.WS / 1MB), 2)
                 }
                 $total
@@ -483,7 +490,7 @@ function getProcesses {
         @{Name = "CPU"; 
             Expression = {
                 $total = 0
-                ForEach ($proc in $(Get-Process -Name $_.Name)) {
+                ForEach ($proc in $(Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
                     $TotalSec = (New-TimeSpan -Start $proc.StartTime).TotalSeconds
                     $total = $total + [Math]::Round( ($proc.CPU * 100 / $TotalSec), 2)
                 }
