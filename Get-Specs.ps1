@@ -364,7 +364,7 @@ function getSecureInfo {
     Return $1,$2,$3,$4,$5,$6,$7
 }
 function getTemps {
-    Add-Type -Path .\files\OpenHardwareMonitorLib.dll
+    Add-Type -Path .\files\OpenHardwareMonitorLib.dll -ErrorAction SilentlyContinue
     $ohm = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
     $ohm.CPUEnabled= 1;
     $ohm.GPUEnabled = 1;
