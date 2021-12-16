@@ -19,7 +19,7 @@ Right click the zip file and choose 'Extract All' then run the new exe."
 promptFileIssue
 
 # VERSION
-$version = '1.0.1'
+$version = '1.0.2'
 
 # set execution policy to allow all our children to run
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
@@ -326,13 +326,13 @@ function getBadThings {
     $11 = @()
     Foreach ($disk in $smart) {
         If ($disk.'Reallocated Sectors Count' -gt 0) {
-            $11 += "Reallocated sector on" + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated·Sectors·Count' 
+            $11 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
         }
         If ($disk.'Current Pending Sector Count' -gt 0) {
             $11 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
         }
         If ($disk.'Uncorrectable Sector Count' -gt 0) {
-            $11 += "Uncorrectable·Sector·Count on" + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'UncorrectableSector·Count'
+            $11 += "Uncorrectable·Sector·Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'UncorrectableSector·Count'
         }
         If ($disk.'Command Timeout' -gt 0) {
             $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
