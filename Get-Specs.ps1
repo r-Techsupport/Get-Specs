@@ -335,7 +335,7 @@ function getBadThings {
             $11 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
         }
         If ($disk.'Uncorrectable Sector Count' -gt 0) {
-            $11 += "Uncorrectable·Sector·Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'UncorrectableSector·Count'
+            $11 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
         }
         If ($disk.'Command Timeout' -gt 0) {
             $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
