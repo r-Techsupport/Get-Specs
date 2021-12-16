@@ -2,7 +2,7 @@
 .SYNOPSIS
  Gather and upload specifications of a Windows host to rTechsupport
 .DESCRIPTION
-  Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
+ Use various native powershell and wmic functions to gather verbose information on a system to assist troubleshooting
 .OUTPUTS Specs
   '.\TechSupport_Specs.html'
 #>
@@ -97,7 +97,8 @@ $builds = @(
     '19041',
     '19042',
     '19043',
-    '19044'
+    '19044',
+    '22000'
 )
 $versions = @(
     '1507',
@@ -112,6 +113,7 @@ $versions = @(
     '2004',
     '20H2',
     '21H1',
+    '21H2',
     '21H2'
 )
 $eolDates = @(
@@ -127,6 +129,7 @@ $eolDates = @(
     '2021-12-14',
     '2022-05-10',
     '2022-12-13',
+    '2023-10-10',
     '2023-10-10'
 )
 
