@@ -35,7 +35,8 @@ $badSoftware = @(
     'Driver Easy*',
     'Roblox*',
     'ccleaner',
-    'Malwarebytes'
+    'Malwarebytes',
+    'Wallpaper Engine'
 )
 $badStartup = @(
     'AutoKMS',
