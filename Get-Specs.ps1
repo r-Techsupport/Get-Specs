@@ -42,7 +42,8 @@ $badStartup = @(
     'AutoKMS',
     'kmspico',
     'McAfee Remediation',
-    'KMS_VL_ALL'
+    'KMS_VL_ALL',
+    'WallpaperEngine'
 )
 $badProcesses = @(
     'MBAMService',
@@ -50,7 +51,8 @@ $badProcesses = @(
     'Norton Security',
     'Wallpaper Engine Service',
     'Service_KMS.exe',
-    'iTopVPN'
+    'iTopVPN',
+    'wallpaper32'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
