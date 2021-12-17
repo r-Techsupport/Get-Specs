@@ -447,7 +447,7 @@ function getVars {
 function getUpdates {
     Write-Host 'Getting applied hotfixes...'
     $1 = "<h2 id='hotfixes'>Installed updates</h2>"
-    $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
+    $2 = Get-HotFix | Sort-Object -Property InstalledOn -Descending -ErrorAction SilentlyContinue | Select Description,HotFixID,InstalledOn | ConvertTo-Html -Fragment
     Write-Host 'Got applied hotfixes' -ForegroundColor Green
     Return $1,$2
 }
