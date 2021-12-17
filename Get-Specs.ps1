@@ -363,7 +363,7 @@ function getSecureInfo {
     $2 = 'AV: ' + $av.DisplayName 
     $3 = 'Firewall: ' + $fw.DisplayName 
     $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
-    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI) 
+    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue) 
     $6 = "TPM: "
     $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
     Write-Host 'Got security information' -ForegroundColor Green
