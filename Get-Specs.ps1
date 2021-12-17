@@ -329,22 +329,25 @@ function getBadThings {
         $10 = "OS was EOL on " + $eolOn + " Build is " + $osBuild
     }
     # bad smart things
-    $11 = @()
+    If (-Not $smart) {
+       $11 = "SMART timeout. Manually run Crystal Disk Info to determine your failed disk(s)" 
+    }
+    $12 = @()
     Foreach ($disk in $smart) {
         If ($disk.'Reallocated Sectors Count' -gt 0) {
-            $11 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
+            $12 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
         }
         If ($disk.'Current Pending Sector Count' -gt 0) {
-            $11 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+            $12 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
         }
         If ($disk.'Uncorrectable Sector Count' -gt 0) {
-            $11 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
+            $12 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
         }
         If ($disk.'Command Timeout' -gt 0) {
-            $11 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
+            $12 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
         }
         If ($disk.'Reported Uncorrectable Errors' -gt 0) {
-            $11 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+            $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
         }
     }
     Write-Host 'Checked for issues' -ForegroundColor Green
