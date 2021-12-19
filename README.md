@@ -3,6 +3,8 @@
 
 This repo contains the PS1 and files needed to run the Get-Specs application made for rTechsupport
 
+`Loader.ps1` is used to call `Get-Specs.ps1` and is compiled into an .exe using `compile.ps1`
+
 The PS1 or EXE must be run as admin to gather SMART, and to gather temperatures. 
 
 This script gathers:
