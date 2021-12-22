@@ -1,5 +1,5 @@
 # set execution policy to allow all our children to run
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
 
 # Run the basic checks before doing anything
 function promptFileIssue {
