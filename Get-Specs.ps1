@@ -6,20 +6,8 @@
 .OUTPUTS Specs
   '.\TechSupport_Specs.html'
 #>
-# Run the basic checks before doing anything
-function promptFileIssue {
-    If (Test-Path ./files) {
-        } Else {
-            msg.exe * "The files directory is missing. This most likely means you did not extract the zip file properly. 
-            
-Right click the zip file and choose 'Extract All' then run the new exe."
-            Throw
-    }
-}
-promptFileIssue
-
 # VERSION
-$version = '1.2.0'
+$version = '1.2.1'
 
 # source our other ps1 files
 . files\wpf.ps1
