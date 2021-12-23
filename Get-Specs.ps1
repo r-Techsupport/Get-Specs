@@ -336,7 +336,7 @@ function getBadThings {
         }
     }
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
 }
 function getLicensing {
     Write-Host 'Getting license information...'
