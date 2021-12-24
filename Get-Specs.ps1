@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.2.1'
+$version = '1.2.3'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -597,6 +597,7 @@ The source code for this application can be found at https://github.com/PipeItTo
     }
 }
 function promptUpload {
+    Write-Host "Completed. Check for another prompt offering to view or upload the results."
     $Params = @{
         Content = "Do you want to view or upload the specs?
         &#10;
