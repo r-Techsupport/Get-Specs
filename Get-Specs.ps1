@@ -340,7 +340,7 @@ function getBadThings {
 }
 function getLicensing {
     Write-Host 'Getting license information...'
-    $1 = "<h2 id='Lics'> Licensing</h2>"
+    $1 = "<h2 id='Lics'>Licensing</h2>"
     $2 = $cimLics | ConvertTo-Html -Fragment
     Write-Host 'Got license information' -ForegroundColor Green
     Return $1,$2
