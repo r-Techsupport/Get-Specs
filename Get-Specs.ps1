@@ -128,6 +128,10 @@ $1 = "<!DOCTYPE html>
 <html>
 <head>
 <style>
+* {
+    font-family: verdana !important;
+    font-size: 12px;
+}
 body {
     background-color: #383c4a;
     color: White;
@@ -426,9 +430,19 @@ function getRAM {
 function getVars {
     Write-Host 'Getting variables...'
     $1 = "<h2 id='SysVar'>System Variables</h2>"
-    $2 = [Environment]::GetEnvironmentVariables("Machine")
+    $varsMachine = [Environment]::GetEnvironmentVariables("Machine")
+    $varObjMachine = New-Object PSObject
+    ForEach ($var in $varsMachine.Keys) {
+        Add-Member -InputObject $varObjMachine -MemberType NoteProperty -Name $var -Value $varsMachine.$var
+    }
+    $2 = $varObjMachine | ConvertTo-Html -Fragment -As List
     $3 = "<h2 id='UserVar'>User Variables</h2>"
-    $4 = [Environment]::GetEnvironmentVariables("User")
+    $varsUser = [Environment]::GetEnvironmentVariables("User")
+    $varObjUser = New-Object PSObject
+    ForEach ($var in $varsUser.Keys) {
+        Add-Member -InputObject $varObjUser -MemberType NoteProperty -Name $var -Value $varsUser.$var
+    }
+    $4 = $varObjUser | ConvertTo-Html -Fragment -As List
     Write-Host 'Got variables' -ForegroundColor Green
     Return $1,$2,$3,$4
 }
