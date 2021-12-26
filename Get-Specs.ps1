@@ -581,6 +581,7 @@ function uploadFile {
     $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://paste.rtech.support/upload/$null.html" -UseBasicParsing
     $linkProper = $link.Content -Replace "support","support/selif"
     set-clipboard $linkProper
+    Start-Process $linkProper
 }
 function promptStart {
         $Params = @{
@@ -636,7 +637,6 @@ Uploaded results are deleted after 24 hours"
     ElseIf ($WPFMessageBoxOutput -eq "Upload") {
         uploadFile
         New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
-        Invoke-Item $file
     }
 }
 
