@@ -622,6 +622,7 @@ Uploaded results are deleted after 24 hours"
     ElseIf ($WPFMessageBoxOutput -eq "Upload") {
         uploadFile
         New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
+        Invoke-Item $file
     }
 }
 
