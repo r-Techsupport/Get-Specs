@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.2.2'
+$version = '1.2.3'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -128,6 +128,10 @@ $1 = "<!DOCTYPE html>
 <html>
 <head>
 <style>
+* {
+    font-family: verdana !important;
+    font-size: 12px;
+}
 body {
     background-color: #383c4a;
     color: White;
@@ -160,14 +164,31 @@ td, th {
 tr:nth-child(even) {
   background-color: #2A2E3A;
 }
+#topbutton{
+  opacity: 80%;
+  width: 5%;
+  padding-top: -3%;
+  background-color: #ccc;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 24px;
+  color: #87ab63;
+}
 </style>
 <body>
 <pre>
+<a href='#top'><div id='topbutton'>
+TOP
+</div></a>
 "
 Return $1
 }
 function table {
-$1 = '<h2>Sections</h2>
+$1 = '<a name="top"></a>
+<h2>Sections</h2>
 <div style="line-height:0">
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
@@ -340,7 +361,7 @@ function getBadThings {
 }
 function getLicensing {
     Write-Host 'Getting license information...'
-    $1 = "<h2 id='Lics'> Licensing</h2>"
+    $1 = "<h2 id='Lics'>Licensing</h2>"
     $2 = $cimLics | ConvertTo-Html -Fragment
     Write-Host 'Got license information' -ForegroundColor Green
     Return $1,$2
@@ -396,39 +417,68 @@ function getTemps {
     Return $1,$2
 }
 $temps = getTemps
-function getCPU{
-    Write-Host 'Getting hardware information...'
+function getHardware {
+    Write-Host 'Getting harwdware information...'
     $1 = "<h2 id='hw'>Hardware Basics</h2>"
-    $cpuInfo = Get-WmiObject Win32_Processor
-    $cpu = $cpuInfo.Name
-    $2 = 'CPU: ' + $cpu + $temps[0] + 'C' 
+    $cpu = Get-WmiObject Win32_Processor
+    $mobo = Get-WmiObject Win32_BaseBoard
+    $gpu = Get-WmiObject Win32_VideoController
+
+    $hwArray = @()
+    #$hwArray += $cpuObject, $moboObject, $gpuObject
+
+    $cpuObject = New-Object PSobject
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
+    $hwArray += $cpuObject
+
+    $moboObject = New-Object PSObject
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
+    $hwArray += $moboObject
+
+    $i = 0
+    foreach ($g in $gpu) {
+        $gpuObject = New-Object PSObject
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+        $hwArray += $gpuObject
+        $i = $i + 1
+    }
+
+    $2 = $hwArray | ConvertTo-Html -Fragment -as list
+
     Return $1,$2
 }
-function getMobo{
-    $moboBase = Get-WmiObject Win32_BaseBoard
-    $moboMan = $moboBase.manufacturer
-    $moboMod = $moboBase.product
-    $mobo = $moboMan + " | " + $moboMod
-    $1 = "Motherboard: " + $mobo 
-    Return $1
-}
-function getGPU {
-    $GPUbase = Get-WmiObject Win32_VideoController
-    $1 = "Graphics Card: " + $GPUbase.Name + " " + $temps[1]+ 'C' 
-    Return $1
-}
 function getRAM {
-    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' 
-    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber | ConvertTo-Html -Fragment)
+    $totalRam = $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})
+    $ramObject = New-Object PSObject
+    Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "Total" -Value $totalRam
+    Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "RAM" -Value "GB"
+    $1 = $ramObject | ConvertTo-Html -Fragment
+
+    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
 function getVars {
     Write-Host 'Getting variables...'
     $1 = "<h2 id='SysVar'>System Variables</h2>"
-    $2 = [Environment]::GetEnvironmentVariables("Machine")
+    $varsMachine = [Environment]::GetEnvironmentVariables("Machine")
+    $varObjMachine = New-Object PSObject
+    ForEach ($var in $varsMachine.Keys) {
+        Add-Member -InputObject $varObjMachine -MemberType NoteProperty -Name $var -Value $varsMachine.$var
+    }
+    $2 = $varObjMachine | ConvertTo-Html -Fragment -As List
     $3 = "<h2 id='UserVar'>User Variables</h2>"
-    $4 = [Environment]::GetEnvironmentVariables("User")
+    $varsUser = [Environment]::GetEnvironmentVariables("User")
+    $varObjUser = New-Object PSObject
+    ForEach ($var in $varsUser.Keys) {
+        Add-Member -InputObject $varObjUser -MemberType NoteProperty -Name $var -Value $varsUser.$var
+    }
+    $4 = $varObjUser | ConvertTo-Html -Fragment -As List
     Write-Host 'Got variables' -ForegroundColor Green
     Return $1,$2,$3,$4
 }
@@ -506,7 +556,8 @@ function getProcesses {
 function getServices {
     Write-Host 'Getting services...'
     $1 = "<h2 id='Services'>Services</h2>"
-    $2 = $services | Select Status,DisplayName | ConvertTo-Html -Fragment
+    $servicesTable = $services | Select Status,DisplayName | Sort -Property DisplayName | ConvertTo-Html -Fragment
+    $2 = $servicesTable -replace "<td>Stopped</td>", "<td style='color:#ab6387'>Stopped</td>" -replace "<td>Running</td>", "<td style='color:#87ab63'>Running</td>"
     Write-Host 'Got services' -ForegroundColor Green
     Return $1,$2
 }
@@ -566,6 +617,7 @@ function uploadFile {
     $link = Invoke-WebRequest -ContentType 'text/plain' -Method 'PUT' -InFile $file -Uri "https://paste.rtech.support/upload/$null.html" -UseBasicParsing
     $linkProper = $link.Content -Replace "support","support/selif"
     set-clipboard $linkProper
+    Start-Process $linkProper
 }
 function promptStart {
         $Params = @{
@@ -597,6 +649,7 @@ The source code for this application can be found at https://github.com/PipeItTo
     }
 }
 function promptUpload {
+    Write-Host "Completed. Check for another prompt offering to view or upload the results."
     $Params = @{
         Content = "Do you want to view or upload the specs?
         &#10;
@@ -682,9 +735,7 @@ getBadThings | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
 getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
-getCPU | Out-File -Append -Encoding ascii $file
-getMobo | Out-File -Append -Encoding ascii $file
-getGPU | Out-File -Append -Encoding ascii $file
+getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
