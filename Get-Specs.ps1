@@ -417,30 +417,49 @@ function getTemps {
     Return $1,$2
 }
 $temps = getTemps
-function getCPU{
-    Write-Host 'Getting hardware information...'
+function getHardware {
+    Write-Host 'Getting harwdware information...'
     $1 = "<h2 id='hw'>Hardware Basics</h2>"
-    $cpuInfo = Get-WmiObject Win32_Processor
-    $cpu = $cpuInfo.Name
-    $2 = 'CPU: ' + $cpu + $temps[0] + 'C' 
+    $cpu = Get-WmiObject Win32_Processor
+    $mobo = Get-WmiObject Win32_BaseBoard
+    $gpu = Get-WmiObject Win32_VideoController
+
+    $hwArray = @()
+    #$hwArray += $cpuObject, $moboObject, $gpuObject
+
+    $cpuObject = New-Object PSobject
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
+    $hwArray += $cpuObject
+
+    $moboObject = New-Object PSObject
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
+    $hwArray += $moboObject
+
+    $i = 0
+    foreach ($g in $gpu) {
+        $gpuObject = New-Object PSObject
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+        $hwArray += $gpuObject
+        $i = $i + 1
+    }
+
+    $2 = $hwArray | ConvertTo-Html -Fragment -as list
+
     Return $1,$2
 }
-function getMobo{
-    $moboBase = Get-WmiObject Win32_BaseBoard
-    $moboMan = $moboBase.manufacturer
-    $moboMod = $moboBase.product
-    $mobo = $moboMan + " | " + $moboMod
-    $1 = "Motherboard: " + $mobo 
-    Return $1
-}
-function getGPU {
-    $GPUbase = Get-WmiObject Win32_VideoController
-    $1 = "Graphics Card: " + $GPUbase.Name + " " + $temps[1]+ 'C' 
-    Return $1
-}
 function getRAM {
-    $1 = "RAM: " + $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)}) + 'GB' 
-    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber | ConvertTo-Html -Fragment)
+    $totalRam = $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})
+    $ramObject = New-Object PSObject
+    Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "Total" -Value $totalRam
+    Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "RAM" -Value "GB"
+    $1 = $ramObject | ConvertTo-Html -Fragment
+
+    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
@@ -716,9 +735,7 @@ getBadThings | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
 getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
-getCPU | Out-File -Append -Encoding ascii $file
-getMobo | Out-File -Append -Encoding ascii $file
-getGPU | Out-File -Append -Encoding ascii $file
+getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
