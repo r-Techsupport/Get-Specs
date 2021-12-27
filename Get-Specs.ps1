@@ -164,14 +164,31 @@ td, th {
 tr:nth-child(even) {
   background-color: #2A2E3A;
 }
+#topbutton{
+  opacity: 80%;
+  width: 5%;
+  padding-top: -3%;
+  background-color: #ccc;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 24px;
+  color: #87ab63;
+}
 </style>
 <body>
 <pre>
+<a href='#top'><div id='topbutton'>
+TOP
+</div></a>
 "
 Return $1
 }
 function table {
-$1 = '<h2>Sections</h2>
+$1 = '<a name="top"></a>
+<h2>Sections</h2>
 <div style="line-height:0">
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
