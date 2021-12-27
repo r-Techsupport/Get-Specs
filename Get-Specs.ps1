@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.2.3'
+$version = '1.2.4'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -428,12 +428,14 @@ function getHardware {
     #$hwArray += $cpuObject, $moboObject, $gpuObject
 
     $cpuObject = New-Object PSobject
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Part" -Value "CPU"
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
     $hwArray += $cpuObject
 
     $moboObject = New-Object PSObject
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Part" -Value "Motherboard"
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
     $hwArray += $moboObject
@@ -441,6 +443,7 @@ function getHardware {
     $i = 0
     foreach ($g in $gpu) {
         $gpuObject = New-Object PSObject
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
