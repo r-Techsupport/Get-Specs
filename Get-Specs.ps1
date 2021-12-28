@@ -389,8 +389,12 @@ function getSecureInfo {
     Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
     $2 = $secObject | ConvertTo-Html -Fragment -As List
 
-    $6 = "TPM: "
-    $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    $6 = "<h2 id='TPM'>TPM</h2>"
+    If ($tpm -eq $NULL) {
+        $7 = 'TPM not detected'
+        } Else {
+        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    }
     Write-Host 'Got security information' -ForegroundColor Green
     Return $1,$2,$6,$7
 }
