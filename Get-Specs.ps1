@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.2.3'
+$version = '1.3.0'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -369,14 +369,34 @@ function getLicensing {
 function getSecureInfo {
     Write-Host 'Getting security information...'
     $1 = "<h2 id='SecInfo'>Security Information</h2>"
-    $2 = 'AV: ' + $av.DisplayName 
-    $3 = 'Firewall: ' + $fw.DisplayName 
-    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
-    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue) 
-    $6 = "TPM: "
-    $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+
+    $secObject = New-Object PSObject
+    # Add AVs
+    $i = 0
+    ForEach ($a in $av) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
+        $i++
+    }
+    # Add FW and assume its defender if there is no entry (default)
+    If ($fw.DisplayName -eq $NULL) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
+        } Else {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
+    }
+    # Add UAC
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
+    # Add Secureboot
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
+    $2 = $secObject | ConvertTo-Html -Fragment -As List
+
+    $6 = "<h2 id='TPM'>TPM</h2>"
+    If ($tpm -eq $NULL) {
+        $7 = 'TPM not detected'
+        } Else {
+        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    }
     Write-Host 'Got security information' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7
+    Return $1,$2,$6,$7
 }
 function getTemps {
     Try {
@@ -425,15 +445,16 @@ function getHardware {
     $gpu = Get-WmiObject Win32_VideoController
 
     $hwArray = @()
-    #$hwArray += $cpuObject, $moboObject, $gpuObject
 
     $cpuObject = New-Object PSobject
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Part" -Value "CPU"
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
     $hwArray += $cpuObject
 
     $moboObject = New-Object PSObject
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Part" -Value "Motherboard"
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
     $hwArray += $moboObject
@@ -441,6 +462,7 @@ function getHardware {
     $i = 0
     foreach ($g in $gpu) {
         $gpuObject = New-Object PSObject
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
@@ -448,7 +470,7 @@ function getHardware {
         $i = $i + 1
     }
 
-    $2 = $hwArray | ConvertTo-Html -Fragment -as list
+    $2 = $hwArray | ConvertTo-Html -Fragment
 
     Return $1,$2
 }
@@ -572,10 +594,36 @@ function getInstalledApps {
 function getNets {
     Write-Host 'Getting network configurations...'
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
-    $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) 
-    $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
+    # make an object for each adatper and then add them to an array
+    $netArray = @()
+    ForEach ($int in Get-NetAdapter) {
+        $intObject = New-Object PSObject 
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc
+
+        $i = 0
+        $ips = $(Get-NetIPAddress -InterfaceIndex $int.IfIndex)
+        ForEach ($ip in $ips) { 
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin
+            $i++
+        }
+
+        $dnsS = $(Get-DnsClientServerAddress -InterfaceIndex $int.IfIndex)
+        ForEach ($dns in $dnsS) {
+            $i = 0
+            ForEach ($d in $dns.ServerAddresses) {
+                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d
+                $i++
+            }
+        }
+        $netArray += $intObject
+    }
+    $2 = $netArray | ConvertTo-Html -Fragment -As List
     Write-Host 'Got network configurations' -ForegroundColor Green
-    Return $1,$2,$3
+    Return $1,$2
 }
 function getDrivers {
     Write-Host 'Getting driver information...'
