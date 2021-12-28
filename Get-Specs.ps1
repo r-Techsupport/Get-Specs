@@ -470,7 +470,7 @@ function getHardware {
         $i = $i + 1
     }
 
-    $2 = $hwArray | ConvertTo-Html -Fragment -as list
+    $2 = $hwArray | ConvertTo-Html -Fragment
 
     Return $1,$2
 }
