@@ -594,10 +594,36 @@ function getInstalledApps {
 function getNets {
     Write-Host 'Getting network configurations...'
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
-    $2 = $(Get-NetAdapter|Select Name,InterfaceDescription,Status,LinkSpeed | ConvertTo-Html -Fragment) 
-    $3 = $(Get-NetIPAddress|Select IpAddress,InterfaceAlias,PrefixOrigin | ConvertTo-Html -Fragment)
+    # make an object for each adatper and then add them to an array
+    $netArray = @()
+    ForEach ($int in Get-NetAdapter) {
+        $intObject = New-Object PSObject 
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc
+
+        $i = 0
+        $ips = $(Get-NetIPAddress -InterfaceIndex $int.IfIndex)
+        ForEach ($ip in $ips) { 
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin
+            $i++
+        }
+
+        $dnsS = $(Get-DnsClientServerAddress -InterfaceIndex $int.IfIndex)
+        ForEach ($dns in $dnsS) {
+            $i = 0
+            ForEach ($d in $dns.ServerAddresses) {
+                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d
+                $i++
+            }
+        }
+        $netArray += $intObject
+    }
+    $2 = $netArray | ConvertTo-Html -Fragment -As List
     Write-Host 'Got network configurations' -ForegroundColor Green
-    Return $1,$2,$3
+    Return $1,$2
 }
 function getDrivers {
     Write-Host 'Getting driver information...'
