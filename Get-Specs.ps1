@@ -369,14 +369,30 @@ function getLicensing {
 function getSecureInfo {
     Write-Host 'Getting security information...'
     $1 = "<h2 id='SecInfo'>Security Information</h2>"
-    $2 = 'AV: ' + $av.DisplayName 
-    $3 = 'Firewall: ' + $fw.DisplayName 
-    $4 = "UAC: " + $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA 
-    $5 = "Secureboot: " + $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue) 
+
+    $secObject = New-Object PSObject
+    # Add AVs
+    $i = 0
+    ForEach ($a in $av) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
+        $i++
+    }
+    # Add FW and assume its defender if there is no entry (default)
+    If ($fw.DisplayName -eq $NULL) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
+        } Else {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
+    }
+    # Add UAC
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
+    # Add Secureboot
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
+    $2 = $secObject | ConvertTo-Html -Fragment -As List
+
     $6 = "TPM: "
     $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
     Write-Host 'Got security information' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7
+    Return $1,$2,$6,$7
 }
 function getTemps {
     Try {
@@ -425,7 +441,6 @@ function getHardware {
     $gpu = Get-WmiObject Win32_VideoController
 
     $hwArray = @()
-    #$hwArray += $cpuObject, $moboObject, $gpuObject
 
     $cpuObject = New-Object PSobject
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Part" -Value "CPU"
