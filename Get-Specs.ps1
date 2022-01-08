@@ -74,6 +74,16 @@ $badHostnames = @(
     'ATLASOS-DESKTOP',
     'Revision-PC'
 )
+$badAdapters = @(
+    'LogMeIn Hamachi Virtual Ethernet Adapter',
+    'TAP-Windows Adapter V9',
+    'TunnelBear Adapter V9',
+    'Windscribe VPN',
+    'VPN Client Adapter - VPN',
+    'NordLynx Tunnel',
+    'TAP-NordVPN Windows Adapter V9',
+    'Private Internet Access Network Adapter'
+)
 $builds = @(
     '10240',
     '10586',
@@ -358,8 +368,14 @@ function getBadThings {
             $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
         }
     }
+    $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
+    foreach ($adapter in $badAdapters) { 
+        If ($cAdapters.IfDesc -contains $adapter) { 
+            $13 += "VPN $adapter is connected"
+        }
+    }
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -598,7 +614,7 @@ function getNets {
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"
     # make an object for each adatper and then add them to an array
     $netArray = @()
-    ForEach ($int in Get-NetAdapter) {
+    ForEach ($int in $netAdapters) {
         $intObject = New-Object PSObject 
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState
@@ -607,7 +623,7 @@ function getNets {
 
         $i = 0
         $ips = $(Get-NetIPAddress -InterfaceIndex $int.IfIndex)
-        ForEach ($ip in $ips) { 
+        ForEach ($ip in $ips) {
             Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress
             Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin
             $i++
@@ -752,6 +768,7 @@ $services = $(Get-Service)
 $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
+$netAdapters = Get-NetADapter
 
 ## Build info
 $i = 0
