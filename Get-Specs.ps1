@@ -21,7 +21,9 @@ $badSoftware = @(
     'Roblox*',
     'ccleaner',
     'Malwarebytes',
-    'Wallpaper Engine'
+    'Wallpaper Engine',
+    'Voxal Voice Changer',
+    'Clownfish Voice Changer'
 )
 $badStartup = @(
     'AutoKMS',
