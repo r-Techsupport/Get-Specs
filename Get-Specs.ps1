@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.0'
+$version = '1.3.1'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -585,7 +585,7 @@ function getServices {
 }
 function getInstalledApps {
     Write-Host 'Getting installed apps...'
-    $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object InstallDate -desc
+    $apps = $installedBase | Select InstallDate,DisplayName | Sort-Object DisplayName
     $1 = "<h2 id='InstalledApps'>Installed Apps</h2>"
     $2 = $apps | ConvertTo-Html -Fragment
     Write-Host 'Got installed apps' -ForegroundColor Green
