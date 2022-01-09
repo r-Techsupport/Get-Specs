@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.1'
+$version = '1.3.2'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -23,7 +23,8 @@ $badSoftware = @(
     'Malwarebytes',
     'Wallpaper Engine',
     'Voxal Voice Changer',
-    'Clownfish Voice Changer'
+    'Clownfish Voice Changer',
+    'Voicemod'
 )
 $badStartup = @(
     'AutoKMS',
