@@ -76,14 +76,17 @@ $badHostnames = @(
     'Revision-PC'
 )
 $badAdapters = @(
-    'LogMeIn Hamachi Virtual Ethernet Adapter',
-    'TAP-Windows Adapter V9',
+    '*TAP*',
+    '*TUN*',
+    '*VPN*',
+    '*Hamachi*',
+    '*Tunnel*',
+    '*Nord*',
+    '*SurfShark*',
     'TunnelBear Adapter V9',
-    'Windscribe VPN',
-    'VPN Client Adapter - VPN',
-    'NordLynx Tunnel',
-    'TAP-NordVPN Windows Adapter V9',
-    'Private Internet Access Network Adapter'
+    'Private Internet Access Network Adapter',
+    'ZeroTier Virtual Port',
+    'Kaspersky Security Data Escort Adapter'
 )
 $builds = @(
     '10240',
@@ -371,8 +374,8 @@ function getBadThings {
     }
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
     foreach ($adapter in $badAdapters) { 
-        If ($cAdapters.IfDesc -contains $adapter) { 
-            $13 += "VPN $adapter is connected"
+        If ($cAdapters.IfDesc -Like $adapter) { 
+            $13 = "VPN is connected"
         }
     }
     Write-Host 'Checked for issues' -ForegroundColor Green
