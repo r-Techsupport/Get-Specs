@@ -88,6 +88,9 @@ $badAdapters = @(
     'ZeroTier Virtual Port',
     'Kaspersky Security Data Escort Adapter'
 )
+$badFiles = @(
+    'C:\Windows\system32\SppExtComObjHook.dll'
+)
 $builds = @(
     '10240',
     '10586',
@@ -373,13 +376,20 @@ function getBadThings {
         }
     }
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
-    foreach ($adapter in $badAdapters) { 
+    ForEach ($adapter in $badAdapters) { 
         If ($cAdapters.IfDesc -Like $adapter) { 
             $13 = "VPN is connected"
         }
     }
+    $14 = @()
+    ForEach ($file in $badFiles) {
+        If (Test-Path $file) {
+            $14 += "Bad file found $file"
+        }
+    }
+
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
 }
 function getLicensing {
     Write-Host 'Getting license information...'
