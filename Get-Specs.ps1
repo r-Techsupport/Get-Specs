@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.1'
+$version = '1.3.3'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -23,7 +23,8 @@ $badSoftware = @(
     'Malwarebytes',
     'Wallpaper Engine',
     'Voxal Voice Changer',
-    'Clownfish Voice Changer'
+    'Clownfish Voice Changer',
+    'Voicemod'
 )
 $badStartup = @(
     'AutoKMS',
@@ -39,7 +40,8 @@ $badProcesses = @(
     'Wallpaper Engine Service',
     'Service_KMS.exe',
     'iTopVPN',
-    'wallpaper32'
+    'wallpaper32',
+    'TaskbarX'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
@@ -75,14 +77,20 @@ $badHostnames = @(
     'Revision-PC'
 )
 $badAdapters = @(
-    'LogMeIn Hamachi Virtual Ethernet Adapter',
-    'TAP-Windows Adapter V9',
+    '*TAP*',
+    '*TUN*',
+    '*VPN*',
+    '*Hamachi*',
+    '*Tunnel*',
+    '*Nord*',
+    '*SurfShark*',
     'TunnelBear Adapter V9',
-    'Windscribe VPN',
-    'VPN Client Adapter - VPN',
-    'NordLynx Tunnel',
-    'TAP-NordVPN Windows Adapter V9',
-    'Private Internet Access Network Adapter'
+    'Private Internet Access Network Adapter',
+    'ZeroTier Virtual Port',
+    'Kaspersky Security Data Escort Adapter'
+)
+$badFiles = @(
+    'C:\Windows\system32\SppExtComObjHook.dll'
 )
 $builds = @(
     '10240',
@@ -369,13 +377,23 @@ function getBadThings {
         }
     }
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
-    foreach ($adapter in $badAdapters) { 
-        If ($cAdapters.IfDesc -contains $adapter) { 
-            $13 += "VPN $adapter is connected"
+    ForEach ($adapter in $badAdapters) { 
+        If ($cAdapters.IfDesc -Like $adapter) { 
+            $13 = "VPN is connected"
         }
     }
+    $14 = @()
+    ForEach ($file in $badFiles) {
+        If (Test-Path $file) {
+            $14 += "Bad file found $file"
+        }
+    }
+    If ($bcdedit -ne $NULL) {
+        $15 = "Static core number is set in msconfig"
+    }
+
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -477,15 +495,24 @@ function getHardware {
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
     $hwArray += $moboObject
 
-    $i = 0
-    foreach ($g in $gpu) {
+    If (Get-Member -inputobject $gpu -name "Count" -Membertype Properties) {
+        $i = 0
+        foreach ($g in $gpu) {
+            $gpuObject = New-Object PSObject
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+            $hwArray += $gpuObject
+            $i = $i + 1
+        }
+    } Else {
         $gpuObject = New-Object PSObject
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
-        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
-        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu.AdapterCompatibility
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu.Name
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
         $hwArray += $gpuObject
-        $i = $i + 1
     }
 
     $2 = $hwArray | ConvertTo-Html -Fragment
@@ -769,6 +796,9 @@ $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
 $netAdapters = Get-NetADapter
+
+# janky check for msconfig core setting
+$bcdedit = bcdedit | Select-String numproc
 
 ## Build info
 $i = 0
