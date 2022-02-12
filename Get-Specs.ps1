@@ -388,9 +388,12 @@ function getBadThings {
             $14 += "Bad file found $file"
         }
     }
+    If ($bcdedit -ne $NULL) {
+        $15 = "Static core number is set in msconfig"
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -793,6 +796,9 @@ $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
 $netAdapters = Get-NetADapter
+
+# janky check for msconfig core setting
+$bcdedit = bcdedit | Select-String numproc
 
 ## Build info
 $i = 0
