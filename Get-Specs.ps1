@@ -40,7 +40,8 @@ $badProcesses = @(
     'Wallpaper Engine Service',
     'Service_KMS.exe',
     'iTopVPN',
-    'wallpaper32'
+    'wallpaper32',
+    'TaskbarX'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
