@@ -687,8 +687,9 @@ function getAudio {
 function getDisks {
     Write-Host 'Getting disk layouts...'
     $1 = "<h2 id='Disks'>Disk layouts</h2>"
-    $2 = $(Get-Partition| Select OperationalStatus,DiskNumber,PartitionNumber,Size,IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment) 
-    $3 = $volumes | Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,SizeRemaining,Size |ConvertTo-Html -Fragment
+    $disks = Get-Partition | Select DiskNumber -Unique
+    $2 = $($disks | % { Get-Partition -DiskNumber $_.DiskNumber | Select OperationalStatus,DiskNumber,PartitionNumber,@{Name="Size (GB)";Expression={[math]::round($_.Size/1GB,4)}},IsActive,IsBoot,IsReadOnly | ConvertTo-Html -Fragment })
+    $3 = $volumes | Select HealthStatus,DriveType,FileSystem,FileSystemLabel,DedupMode,AllocationUnitSize,DriveLetter,@{Name="Size Remaining (GB)";Expression={[math]::round($_.SizeRemaining/1GB,4)}}, @{Name="Size Total (GB)";Expression={[math]::round($_.Size/1GB,4)}} |ConvertTo-Html -Fragment
     Write-Host 'Got disk layouts' -ForegroundColor Green
     Return $1,$2,$3
 }
