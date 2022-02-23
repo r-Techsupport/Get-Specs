@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.3'
+$version = '1.3.4'
 
 # source our other ps1 files
 . files\wpf.ps1
