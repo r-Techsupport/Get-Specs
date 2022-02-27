@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.3'
+$version = '1.3.4'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -310,7 +310,7 @@ function getBadThings {
     }
     # bad startups
     foreach ($start in $badStartup) { 
-        if ($cimStart.Caption -contains $start) { 
+        if ($startUps -contains $start) { 
             $3 += $start 
         }
     }
@@ -559,7 +559,7 @@ function getUpdates {
 function getStartup {
     Write-Host 'Getting startup tasks...'
     $1 = "<h2 id='StartupTasks'>Startup Tasks for user</h2>"
-    $2 = $cimStart.Caption
+    $2 = $startUps
     Write-Host 'Got startup tasks' -ForegroundColor Green
     Return $1,$2
 }
@@ -780,6 +780,8 @@ Write-Host 'Gathering main data...'
 ## CIM sources
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
+$taskStart = Get-ScheduledTask -TaskName * | ? { $_.Triggers -Like "MSFT_TaskBootTrigger" -Or $_.Triggers -Like "MSFT_TaskLogonTrigger" } | ? { $_.State -eq "Ready" -Or $_.State -eq "Running" } | ? { $_.Author -NotLike "Microsof*" } | Select TaskName
+$startUps = $cimStart.caption + $taskStart.TaskName
 $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
 $cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
 $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
