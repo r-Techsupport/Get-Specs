@@ -381,18 +381,21 @@ function getBadThings {
             $13 += "C: is on an HDD"
         }
     }
+    # check for VPNs being connected
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
     ForEach ($adapter in $badAdapters) { 
         If ($cAdapters.IfDesc -Like $adapter) { 
             $14 = "VPN is connected"
         }
     }
+    # check for specific files in the FS
     $15 = @()
     ForEach ($file in $badFiles) {
         If (Test-Path $file) {
             $14 += "Bad file found $file"
         }
     }
+    # check if the user configured a static number of cores in msconfig
     If ($bcdedit -ne $NULL) {
         $16 = "Static core number is set in msconfig"
     }
