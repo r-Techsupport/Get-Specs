@@ -660,16 +660,16 @@ function getNets {
     $netArray = @()
     ForEach ($int in $netAdapters) {
         $intObject = New-Object PSObject 
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc -ErrorAction SilentlyContinue
 
         $i = 0
         $ips = $(Get-NetIPAddress -InterfaceIndex $int.IfIndex)
         ForEach ($ip in $ips) {
-            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress
-            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress -ErrorAction SilentlyContinue
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin -ErrorAction SilentlyContinue
             $i++
         }
 
@@ -677,7 +677,7 @@ function getNets {
         ForEach ($dns in $dnsS) {
             $i = 0
             ForEach ($d in $dns.ServerAddresses) {
-                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d
+                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d -ErrorAction SilentlyContinue
                 $i++
             }
         }
