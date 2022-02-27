@@ -399,9 +399,18 @@ function getBadThings {
     If ($bcdedit -ne $NULL) {
         $16 = "Static core number is set in msconfig"
     }
+    # ram checks
+    If ($ramSticks.count -eq 2) {
+        If ($ramSticks[0].Devicelocator -eq 'DIMM1' -And $ramSticks[1].Devicelocator -eq 'DIMM2') {
+            $17 = "RAM is in DIMM1 and DIMM2"
+        }
+        If ($ramSticks[0].Devicelocator -eq 'DIMM3' -And $ramSticks[1].Devicelocator -eq 'DIMM4') {
+            $17 = "RAM is in DIMM3 and DIMM4"
+        }
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -534,7 +543,7 @@ function getRAM {
     Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "RAM" -Value "GB"
     $1 = $ramObject | ConvertTo-Html -Fragment
 
-    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
+    $2 = $($ramSticks | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
@@ -802,6 +811,7 @@ $cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialP
 $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
+$ramSticks = Get-WmiObject win32_physicalmemory
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
