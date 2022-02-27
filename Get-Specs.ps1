@@ -24,7 +24,8 @@ $badSoftware = @(
     'Wallpaper Engine',
     'Voxal Voice Changer',
     'Clownfish Voice Changer',
-    'Voicemod'
+    'Voicemod',
+    'Microsoft Office Enterprise 2007'
 )
 $badStartup = @(
     'AutoKMS',
