@@ -24,7 +24,8 @@ $badSoftware = @(
     'Wallpaper Engine',
     'Voxal Voice Changer',
     'Clownfish Voice Changer',
-    'Voicemod'
+    'Voicemod',
+    'Microsoft Office Enterprise 2007'
 )
 $badStartup = @(
     'AutoKMS',
@@ -222,6 +223,7 @@ $1 = '<a name="top"></a>
 <p><a href="#Services">Services</a></p>
 <p><a href="#InstalledApps">Installed Applications</a></p>
 <p><a href="#NetConfig">Network Configuration</a></p>
+<p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>
 <p><a href="#Audio">Audio Devices</a></p>
 <p><a href="#Disks">Disk Layouts</a></p>
@@ -310,7 +312,7 @@ function getBadThings {
     }
     # bad startups
     foreach ($start in $badStartup) { 
-        if ($cimStart.Caption -contains $start) { 
+        if ($startUps -contains $start) { 
             $3 += $start 
         }
     }
@@ -375,25 +377,40 @@ function getBadThings {
         If ($disk.'Reported Uncorrectable Errors' -gt 0) {
             $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
         }
+        If ($disk.'Rotation Rate' -NotLike '---- (SSD)' -And $disk.'Drive Letter' -eq 'C:') {
+            $13 += "C: is on an HDD"
+        }
     }
+    # check for VPNs being connected
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
     ForEach ($adapter in $badAdapters) { 
         If ($cAdapters.IfDesc -Like $adapter) { 
-            $13 = "VPN is connected"
+            $14 = "VPN is connected"
         }
     }
-    $14 = @()
+    # check for specific files in the FS
+    $15 = @()
     ForEach ($file in $badFiles) {
         If (Test-Path $file) {
             $14 += "Bad file found $file"
         }
     }
+    # check if the user configured a static number of cores in msconfig
     If ($bcdedit -ne $NULL) {
-        $15 = "Static core number is set in msconfig"
+        $16 = "Static core number is set in msconfig"
+    }
+    # ram checks
+    If ($ramSticks.count -eq 2) {
+        If ($ramSticks[0].Devicelocator -eq 'DIMM1' -And $ramSticks[1].Devicelocator -eq 'DIMM2') {
+            $17 = "RAM is in DIMM1 and DIMM2"
+        }
+        If ($ramSticks[0].Devicelocator -eq 'DIMM3' -And $ramSticks[1].Devicelocator -eq 'DIMM4') {
+            $17 = "RAM is in DIMM3 and DIMM4"
+        }
     }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -526,7 +543,7 @@ function getRAM {
     Add-Member -InputObject $ramObject -MemberType NoteProperty -Name "RAM" -Value "GB"
     $1 = $ramObject | ConvertTo-Html -Fragment
 
-    $2 = $(Get-WmiObject win32_physicalmemory | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
+    $2 = $($ramSticks | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
@@ -559,7 +576,7 @@ function getUpdates {
 function getStartup {
     Write-Host 'Getting startup tasks...'
     $1 = "<h2 id='StartupTasks'>Startup Tasks for user</h2>"
-    $2 = $cimStart.Caption
+    $2 = $startUps
     Write-Host 'Got startup tasks' -ForegroundColor Green
     Return $1,$2
 }
@@ -643,16 +660,16 @@ function getNets {
     $netArray = @()
     ForEach ($int in $netAdapters) {
         $intObject = New-Object PSObject 
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress
-        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc -ErrorAction SilentlyContinue
 
         $i = 0
         $ips = $(Get-NetIPAddress -InterfaceIndex $int.IfIndex)
         ForEach ($ip in $ips) {
-            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress
-            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name $ip.AddressFamily -Value $ip.IPAddress -ErrorAction SilentlyContinue
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Lease$i" -Value $ip.PrefixOrigin -ErrorAction SilentlyContinue
             $i++
         }
 
@@ -660,7 +677,7 @@ function getNets {
         ForEach ($dns in $dnsS) {
             $i = 0
             ForEach ($d in $dns.ServerAddresses) {
-                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d
+                Add-Member -InputObject $intObject -MemberType NoteProperty -Name "DNS$i" -Value $d -ErrorAction SilentlyContinue
                 $i++
             }
         }
@@ -668,6 +685,13 @@ function getNets {
     }
     $2 = $netArray | ConvertTo-Html -Fragment -As List
     Write-Host 'Got network configurations' -ForegroundColor Green
+    Return $1,$2
+}
+function getNetConnections {
+    Write-Host 'Getting network connections...'
+    $1 = "<h2 id='NetConnections'>Network Connections</h2>"
+    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}} | ConvertTo-Html -Fragment
+    Write-Host 'Got network connections' -ForegroundColor Green
     Return $1,$2
 }
 function getDrivers {
@@ -780,11 +804,14 @@ Write-Host 'Gathering main data...'
 ## CIM sources
 $cimOs = Get-CimInstance -ClassName Win32_OperatingSystem
 $cimStart = Get-CimInstance Win32_StartupCommand
+$taskStart = Get-ScheduledTask -TaskName * | ? { $_.Triggers -Like "MSFT_TaskBootTrigger" -Or $_.Triggers -Like "MSFT_TaskLogonTrigger" } | ? { $_.State -eq "Ready" -Or $_.State -eq "Running" } | ? { $_.Author -NotLike "Microsof*" } | Select TaskName
+$startUps = $cimStart.caption + $taskStart.TaskName
 $cimAudio= Get-CimInstance win32_sounddevice | Select Name,ProductName
 $cimLics = Get-CimInstance -ClassName SoftwareLicensingProduct | ? { $_.PartialProductKey -ne $null } | Select Name,ProductKeyChannel,LicenseFamily,LicenseStatus,PartialProductKey
 $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
+$ramSticks = Get-WmiObject win32_physicalmemory
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
@@ -844,6 +871,7 @@ getProcesses | Out-File -Append -Encoding ascii $file
 getServices | Out-File -Append -Encoding ascii $file
 getInstalledApps | Out-File -Append -Encoding ascii $file
 getNets | Out-File -Append -Encoding ascii $file
+getNetConnections | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
