@@ -222,6 +222,7 @@ $1 = '<a name="top"></a>
 <p><a href="#Services">Services</a></p>
 <p><a href="#InstalledApps">Installed Applications</a></p>
 <p><a href="#NetConfig">Network Configuration</a></p>
+<p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>
 <p><a href="#Audio">Audio Devices</a></p>
 <p><a href="#Disks">Disk Layouts</a></p>
@@ -670,6 +671,13 @@ function getNets {
     Write-Host 'Got network configurations' -ForegroundColor Green
     Return $1,$2
 }
+function getNetConnections {
+    Write-Host 'Getting network connections...'
+    $1 = "<h2 id='NetConnections'>Network Connections</h2>"
+    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}} | ConvertTo-Html -Fragment
+    Write-Host 'Got network connections' -ForegroundColor Green
+    Return $1,$2
+}
 function getDrivers {
     Write-Host 'Getting driver information...'
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
@@ -846,6 +854,7 @@ getProcesses | Out-File -Append -Encoding ascii $file
 getServices | Out-File -Append -Encoding ascii $file
 getInstalledApps | Out-File -Append -Encoding ascii $file
 getNets | Out-File -Append -Encoding ascii $file
+getNetConnections | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
