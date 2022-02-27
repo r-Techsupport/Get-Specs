@@ -377,25 +377,28 @@ function getBadThings {
         If ($disk.'Reported Uncorrectable Errors' -gt 0) {
             $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
         }
+        If ($disk.'Rotation Rate' -NotLike '---- (SSD)' -And $disk.'Drive Letter' -eq 'C:') {
+            $13 += "C: is on an HDD"
+        }
     }
     $cAdapters = $netAdapters | Where {$_.MediaConnectionState -eq 'Connected'}
     ForEach ($adapter in $badAdapters) { 
         If ($cAdapters.IfDesc -Like $adapter) { 
-            $13 = "VPN is connected"
+            $14 = "VPN is connected"
         }
     }
-    $14 = @()
+    $15 = @()
     ForEach ($file in $badFiles) {
         If (Test-Path $file) {
             $14 += "Bad file found $file"
         }
     }
     If ($bcdedit -ne $NULL) {
-        $15 = "Static core number is set in msconfig"
+        $16 = "Static core number is set in msconfig"
     }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16
 }
 function getLicensing {
     Write-Host 'Getting license information...'
