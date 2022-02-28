@@ -15,6 +15,7 @@ $version = '1.3.6'
 # Declarations
 ## files we use
 $file = 'TechSupport_Specs.html'
+$today = Get-Date
 
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
@@ -240,8 +241,8 @@ Return $1
 }
 
 function getDate {
-    $1 = "Local: " + $(Get-Date)
-    $2 = "UTC: " + $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), 'Greenwich Standard Time'))
+    $1 = "Local: " + $today
+    $2 = "UTC: " + $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId(($today), 'Greenwich Standard Time'))
     $3 = "Version: " + $version
     Return $1,$2,$3
 }
@@ -249,7 +250,7 @@ function getbasicInfo {
     Write-Host 'Getting basic information...'
     $1 = '<h2>System Information</h2>'
     $bootuptime = $cimOs.LastBootUpTime
-    $uptime = $(Get-Date) - $bootuptime
+    $uptime = $today - $bootuptime
     $2 = 'Edition: ' + $cimOs.Caption 
     $3 = $osBuild
     $4 = 'Install date: ' + $cimOs.InstallDate
@@ -427,9 +428,21 @@ function getBadThings {
             $20 = "spybot has edited hosts"
         }
     }
+    # check for dumps
+    $dmpFiles = Get-ChildItem 'C:\Windows\Minidump'
+    $lastWeek = $today.AddDays(-7)
+    $count = 0
+    ForEach ($dmp in $dmpFiles) {
+        If ($dmp.LastWriteTime -gt $lastWeek) {
+            $count++
+        }
+    }
+    If ($count -gt 0) {
+        $21 = "Found $count dumps"
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -855,7 +868,7 @@ $osBuild = 'Version is unknown. Build: ' + $cimOS.BuildNumber
 foreach ($b in $builds) {
     if ($cimOS.BuildNumber -eq $builds[$i]) {
         $osBuild = 'Version: ' + $versions[$i]
-        if ((Get-Date $eolDates[$i]) -lt (Get-Date)) {
+        if ((Get-Date $eolDates[$i]) -lt $today) {
             $eol = $true
             $eolOn = $eolDates[$i]
         }
