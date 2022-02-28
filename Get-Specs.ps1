@@ -709,7 +709,7 @@ function getNets {
 function getNetConnections {
     Write-Host 'Getting network connections...'
     $1 = "<h2 id='NetConnections'>Network Connections</h2>"
-    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}} | ConvertTo-Html -Fragment
+    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},@{Name="Path";Expression={(Get-Process -Id $_.OwningProcess).Path}} | ConvertTo-Html -Fragment
     Write-Host 'Got network connections' -ForegroundColor Green
     Return $1,$2
 }
