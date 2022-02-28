@@ -40,10 +40,12 @@ This script gathers:
 * Running processes with statistics
 * Services
 * Installed applications
+* Integrity of Hosts file
 
 ### Networking
 * Network adapters
 * IPconfig
+* Active network connections
 
 ### Devices
 * Device manager
