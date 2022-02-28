@@ -7,13 +7,20 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.3.5'
+$version = '1.3.6'
 
 # source our other ps1 files
 . files\wpf.ps1
 
 # Declarations
+## files we use
 $file = 'TechSupport_Specs.html'
+
+## hosts related
+$hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
+$hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
+
+## bad things
 $badSoftware = @(
     'Driver Booster*',
     'iTop*',
@@ -408,9 +415,21 @@ function getBadThings {
             $17 = "RAM is in DIMM3 and DIMM4"
         }
     }
+    # hosts checks
+    $hostsSum = $(Get-FileHash $hostsFile).hash
+    $hostsContent = Get-Content $hostsFile
+    If ($hostsSum -ne $hostsHash) {
+        $18 = "Hosts sum mismatch"
+        If ($hostsContent -Like "*license.piriform.com*") {
+            $19 = "piriform license server redirection"
+        }
+        If ($hostsContent -Like "*Spybot*") {
+            $20 = "spybot has edited hosts"
+        }
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -690,7 +709,7 @@ function getNets {
 function getNetConnections {
     Write-Host 'Getting network connections...'
     $1 = "<h2 id='NetConnections'>Network Connections</h2>"
-    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}} | ConvertTo-Html -Fragment
+    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},@{Name="Path";Expression={(Get-Process -Id $_.OwningProcess).Path}} | ConvertTo-Html -Fragment
     Write-Host 'Got network connections' -ForegroundColor Green
     Return $1,$2
 }
