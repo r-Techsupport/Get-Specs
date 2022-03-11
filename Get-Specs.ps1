@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.4.1'
+$version = '1.4.2'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -99,7 +99,12 @@ $badAdapters = @(
     'Kaspersky Security Data Escort Adapter'
 )
 $badFiles = @(
-    'C:\Windows\system32\SppExtComObjHook.dll'
+    'C:\Windows\system32\SppExtComObjHook.dll',
+    'HKCU:\Software\azurite'
+)
+$microCode = @(
+    'C:\Windows\System32\mcupdate_genuineintel.dll',
+    'C:\WindowsSystem32\mcupdate_authenticamd.dll'
 )
 $builds = @(
     '10240',
@@ -233,6 +238,7 @@ $1 = '<a name="top"></a>
 <p><a href="#NetConfig">Network Configuration</a></p>
 <p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>
+<p><a href="#issueDevices">Devices with issues</a></p>
 <p><a href="#Audio">Audio Devices</a></p>
 <p><a href="#Disks">Disk Layouts</a></p>
 <p><a href="#SMART">SMART</a></p>
@@ -443,9 +449,17 @@ function getBadThings {
     If ($count -gt 0) {
         $21 = "Found $count dumps"
     }
+    # check for missing files in FS
+    If (!(Test-Path $microCode[0]) -And !(Test-Path $microCode[1])) {
+        $22 += "Microcode fixes are missing or were removed by malicious 'fixers'"
+    }
+    # count and report issue devices
+    If ($issueDevices.Status.Count -gt 0) {
+        $23 = "Devices have issues: " + $issueDevices.Status.Count
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -733,8 +747,10 @@ function getDrivers {
     Write-Host 'Getting driver information...'
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
+    $3 = "<h2 id='issueDevices'>Devices with issues</h2>"
+    $4 = $issueDevices | Select Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
-    Return $1,$2
+    Return $1,$2,$3,$4
 }
 function getAudio {
     Write-Host 'Getting audio devices...'
@@ -859,6 +875,7 @@ $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
 $netAdapters = Get-NetADapter
+$issueDevices = Get-PnpDevice -PresentOnly -Status ERROR,DEGRADED,UNKNOWN -ErrorAction SilentlyContinue
 
 # janky check for msconfig core setting
 $bcdedit = bcdedit | Select-String numproc
@@ -918,8 +935,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqxll3oByPo+nNH7quTj473G7
-# 3OGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtgo41BuVgvFfYBs+2jSGm+NI
+# wBOgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1019,17 +1036,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT5
-# bkY7FfCDslyer4molHc38DRvEjANBgkqhkiG9w0BAQEFAASCAgAvvFE49z+AZjwo
-# Qoq8HsvcBvg82MNYQM3C54PByn80fGddjJZcTss3gerq4onewCUhZBLZrFp2ECit
-# atOAZYGaeGVN+A8wMw/JVT8fDeN9Sq8ejU6cJVBVqLJf0+Q8+YvMStHmGQIKbg8u
-# bn+5Ew7i6dw6XFtVfmKkMZKq6cAd/veTvIkxlU8F261H9/Tzsl5uUrzaQRYOxuSH
-# fj4kmrNEaFfJq3dZrPJ7Fr0ZUg3BOmHHY5klFGBOs/awU8WoOnVM6uKqBCFcCRtZ
-# yWRSudTrTu9b0/b3HQ9o92ka/KpqWUAFRJ+7aXcScQXgiyaK1LRwHb3iXpvVEZT/
-# fKyD75A1AGb0iGkCeNZQewc4ktAacC3bbX37LkWhZ1ItolDNwpOUc7+t4fCugOTV
-# IRs7g3ckgXzQhjZSk/wfg0mCRirgOC4S13EEYOHKrCBYJO6Aa88azoFAhzXGgP1r
-# 0pIxLamj2tJjfQsLq9aSAV1XA+pi+otXNFtoIu17hrOWjA6l2FGGde4Rq085au4T
-# ML87H4YTEDn0BJ9n3ZjG9Nan4rPqRGGdQVN3bIXTmoEo0hlKpCrv/xZE0WKKpK56
-# kKnd/ey4Q+uDWs6ewqy+F1pcRtavDtC5RDP7DPHPDHnFK13T+Uoy8ZMqnnZ+COkE
-# rTSedSZtsxeiuHI7zC9JXKG3eXQnYA==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRB
+# ftldB4f9hTCyQsjEECZ6EXlAYTANBgkqhkiG9w0BAQEFAASCAgB0jPolUMLgdSuq
+# mcpg75oynG+IzOFdyonZzBHhLo9IRmDZrtgr28Z+Fz0FmpI5Ili3qMivOS3/MnUS
+# fRCXlCDbuF6dPj5aNxUqdG4PAvP78ESusD0WHWlATrezq8FPIJBSdUJMue8V+qgg
+# MG8lcw4xJR1TldlsDndeD14UYBpUB+KjI17fHo2yGnY4ii8lJGjtlaIM+DH8gxPD
+# HqGjvYmJDljDWnqYGoQv+uqPbsv/eXNUxetMoVzoPvPmXQ2bozlWKzIuFMmM2Av/
+# sO+Mp7KHpkTdSFDD4mRhLvY6urtF5Z1lPvuv7sKpc7N9eiCSjymU0y+qbSNGjtpX
+# H8trmYRwWDGSj8QNQKXq/xcyzdxGtHPHLfmlBkOA3Mag+HuzXfln95kmbcIPfvCF
+# Z8L8gj7Uah3ER2OVRltz/kuQA6OPZ6k9nPX1+TA0boZwXslAMZVJF1JcXU5pMDhh
+# abzmVlj1zuC5dHffEFeE8chHsXS7/JvEH/dNffruJbw2cux8sjb0ONxGbbhW9LcX
+# AXxxIyxltW3pFycajknHMCGIvkB4Twdkra/n+s1bX2bS17xNZ0BH8AUuwcVDKrK5
+# +s7lQieL5hv9Md39lvfJlMpuS5Hs8++EFBHyj3I5juSr0NdwC2jo1/EzKBUxaBdD
+# uIaj/ZjBZyq2xD3ufpAUPuKHK1rJQg==
 # SIG # End signature block
