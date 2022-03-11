@@ -99,8 +99,13 @@ $badAdapters = @(
     'Kaspersky Security Data Escort Adapter'
 )
 $badFiles = @(
-    'C:\Windows\system32\SppExtComObjHook.dll'
+    'C:\Windows\system32\SppExtComObjHook.dll',
+    'HKCU:\Software\azurite'
 )
+$badMissing = @(
+    'C:\Windows\System32\mcupdate_genuineintel.dll',
+    'C:\WindowsSystem32\mcupdate_authenticamd.dll'
+}
 $builds = @(
     '10240',
     '10586',
@@ -443,9 +448,16 @@ function getBadThings {
     If ($count -gt 0) {
         $21 = "Found $count dumps"
     }
+    # check for missing files in FS
+    $22 = @()
+    ForEach ($file in $badMissing) {
+        If (-Not Test-Path $file) {
+            $22 += "Missing file $file"
+        }
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22
 }
 function getLicensing {
     Write-Host 'Getting license information...'
