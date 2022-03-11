@@ -105,7 +105,7 @@ $badFiles = @(
 $badMissing = @(
     'C:\Windows\System32\mcupdate_genuineintel.dll',
     'C:\WindowsSystem32\mcupdate_authenticamd.dll'
-}
+)
 $builds = @(
     '10240',
     '10586',
@@ -451,7 +451,7 @@ function getBadThings {
     # check for missing files in FS
     $22 = @()
     ForEach ($file in $badMissing) {
-        If (-Not Test-Path $file) {
+        If (-Not (Test-Path $file)) {
             $22 += "Missing file $file"
         }
     }
@@ -932,8 +932,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqxll3oByPo+nNH7quTj473G7
-# 3OGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsjCHuPVmr6UUX18H7cmnRIO8
+# G++gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1033,17 +1033,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT5
-# bkY7FfCDslyer4molHc38DRvEjANBgkqhkiG9w0BAQEFAASCAgAvvFE49z+AZjwo
-# Qoq8HsvcBvg82MNYQM3C54PByn80fGddjJZcTss3gerq4onewCUhZBLZrFp2ECit
-# atOAZYGaeGVN+A8wMw/JVT8fDeN9Sq8ejU6cJVBVqLJf0+Q8+YvMStHmGQIKbg8u
-# bn+5Ew7i6dw6XFtVfmKkMZKq6cAd/veTvIkxlU8F261H9/Tzsl5uUrzaQRYOxuSH
-# fj4kmrNEaFfJq3dZrPJ7Fr0ZUg3BOmHHY5klFGBOs/awU8WoOnVM6uKqBCFcCRtZ
-# yWRSudTrTu9b0/b3HQ9o92ka/KpqWUAFRJ+7aXcScQXgiyaK1LRwHb3iXpvVEZT/
-# fKyD75A1AGb0iGkCeNZQewc4ktAacC3bbX37LkWhZ1ItolDNwpOUc7+t4fCugOTV
-# IRs7g3ckgXzQhjZSk/wfg0mCRirgOC4S13EEYOHKrCBYJO6Aa88azoFAhzXGgP1r
-# 0pIxLamj2tJjfQsLq9aSAV1XA+pi+otXNFtoIu17hrOWjA6l2FGGde4Rq085au4T
-# ML87H4YTEDn0BJ9n3ZjG9Nan4rPqRGGdQVN3bIXTmoEo0hlKpCrv/xZE0WKKpK56
-# kKnd/ey4Q+uDWs6ewqy+F1pcRtavDtC5RDP7DPHPDHnFK13T+Uoy8ZMqnnZ+COkE
-# rTSedSZtsxeiuHI7zC9JXKG3eXQnYA==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRp
+# ZL2o5LJnirLHV+8mwFW4bzJ1XTANBgkqhkiG9w0BAQEFAASCAgC5gL7g+KYGoFIy
+# 0StuhRo+aieNhTw6vbrR8FpA0iJ3gKEkU2vo+qer0k6KfpXlr/SzfvZgtB6Mzp9I
+# Np5d134O/nuNWzL1EKPz88v+PXv5uDp3Owp/ehXGHdcwnw3pB8pHSOXbfwwYaEdW
+# 32zti470jZLhpMsv7qkDeIAQsh/Uw1D1MOt+PZpsq6wAWJtLokdfXRCAwv15pRbQ
+# WoGz0lALny07KdLyWazuGRPyro5webnAcVVZr0URfs7cfcstjACBLKgpTvRUnS4z
+# txzz957gLe/KCTR6hgXi6ZGsrMX0+8LypLMZDrWN/n4SZi3G6cI4nAld+xInURz0
+# ulYTlAiMjznaLOTukGYih8npU4vU35jMz9BxupGgRgpUYX3WfRo0BxGkHQRnW1jt
+# dDDNfRsijaEOGG9qH+NhsmEzujDZGuKMN61Dbvfi9t1UUdoW7/VLyKPa8uLnH9P0
+# HFiOEfU2u1EbdzVEgOBzuXWlcyuWek+iUt50cjVJt9orzPBxz+UCvzOtADQqKa0p
+# VjThO5y4IyuUVV719va/RpFMsS9e5SlWLU/fiWetDrOIBcXALdHjZgRaxJKL69Sk
+# jhihWCRV39eqBI7u90+KhF84WvRjVAK0hGfqJ4zsrEif+WpEfOh5YMNwE28s9r70
+# hht0O+S5mompGP/8cEAicbV6/+PAHA==
 # SIG # End signature block
