@@ -238,6 +238,7 @@ $1 = '<a name="top"></a>
 <p><a href="#NetConfig">Network Configuration</a></p>
 <p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>
+<p><a href="#issueDevices">Devices with issues</a></p>
 <p><a href="#Audio">Audio Devices</a></p>
 <p><a href="#Disks">Disk Layouts</a></p>
 <p><a href="#SMART">SMART</a></p>
@@ -452,9 +453,13 @@ function getBadThings {
     If (!(Test-Path $microCode[0]) -And !(Test-Path $microCode[1])) {
         $22 += "Microcode fixes are missing or were removed by malicious 'fixers'"
     }
+    # count and report issue devices
+    If ($issueDevices.Status.Count -gt 0) {
+        $23 = "Devices have issues: " + $issueDevices.Status.Count
+    }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
 }
 function getLicensing {
     Write-Host 'Getting license information...'
@@ -742,8 +747,8 @@ function getDrivers {
     Write-Host 'Getting driver information...'
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
-    $3 = "<h2>Devices with issues</h2>"
-    $4 = Get-PnpDevice -PresentOnly -Status ERROR,DEGRADED,UNKNOWN -ErrorAction SilentlyContinue | ConvertTo-HTML -Fragment
+    $3 = "<h2 id='issueDevices'>Devices with issues</h2>"
+    $4 = $issueDevices | Select Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
     Return $1,$2,$3,$4
 }
@@ -870,6 +875,7 @@ $runningProcesses = Get-Process
 $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
 $netAdapters = Get-NetADapter
+$issueDevices = Get-PnpDevice -PresentOnly -Status ERROR,DEGRADED,UNKNOWN -ErrorAction SilentlyContinue
 
 # janky check for msconfig core setting
 $bcdedit = bcdedit | Select-String numproc
@@ -929,8 +935,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtsRClnSB0OPOAsCWw2OqLuD0
-# vOqgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVDGMkgzUR4Luw7V+O5hHn6m1
+# eoqgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1030,17 +1036,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTq
-# qHnfefdBfy5mKhnigcQ/Pt1hXzANBgkqhkiG9w0BAQEFAASCAgAf8d1aRikEltB8
-# bR3VdqWcoRekN+rNK9GBT8MCidZq1fFZ3/WZLhkauvZV1OXQ+h7Z1/U6iR6/BhcM
-# DXA2j23jj/nG0ZoIsAt32HB7xkpnApVEPj8L2++nthHl2Y1DvBdXT2oPS/DLuHIJ
-# acVo0UQqH4RwBm+aOh5rJCEY+wNQhHFOnaAofaf5cOR9RS5MVuU7pHrQKSN7hdQ3
-# y+Ge4IjbXcC6h0JQKvcqox74eeAUgQk+oMu3k5RnRatkF7JEy6a7Fs+Q0BqrKXNm
-# +MUfJiI8cVMo68gHtZEVRmR/H/1Cxzit7qZzts431Y+ccoD2zClFv2bmAymSmcwW
-# PCZqWGS/n9eauR4J3onhJB8gyQ/vb/hXImTF7uMIBrsxKmFLdNW0zeBFnYPKJN4K
-# uh+VyQ7Ns3WA/eoQtAnaX//jB2CLG7Re4D4qcJ0ZncAbB4Qfn+FPMHxmABr7aDZS
-# 96UGRoE88BJVGA6sg23JRuZnnl4pBZpgfa03CkoOtSlZv0PiTrBU6gSYpzkUMMMY
-# lo4nRqNSaRzjHHdPmNIfny/amfeA1iLzp7e6Qiw7RYDLZFDGeyYl88x4S2uPXf14
-# KOHFVOL6LDyBtC2WZT3a04k2903ah4nReN8XZ4ya69QVpRp4B0Stds1coo/pvO2H
-# NXaAlaJ+eTj8Prt5U0PXODkhH67ESQ==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTc
+# fKC1pEr02RyJH3BEwkCR8K/a3TANBgkqhkiG9w0BAQEFAASCAgC8ZGU9oqekKfph
+# Y6YjL84WMIuM281BU/yYnqnghynN9WZB7rLRGsirWnAAW0GeTHtDVUrXzSTugX5t
+# K1IzLfHzP2Z4G9y66K6Bs+ufeDSsJt727IIAZnME4CF3roj4cHZl24QYJW7l6ulK
+# vak1fAgTy2+x8sYY5JRJKUO+ZZj2oPbOTH5OESODNa085oIO2/5qxQ8fJgsoLohs
+# UTsIENzTmfYEVJCwfsQnM5iVXVrVJTiIkXubZBsj8RWJ+CY5KuGkMjjgI+SjHsRP
+# yjOVBONIZ9KwnXKz3KO5IPLNUVngsRLixHfoEYIcE6mqQpAy2NAFntfsTufmgx5v
+# afiZP22CpCgS8gjFQ2i4dgNcLyhpN27QfofpOqdvC6iFJwOocbw1tAhxd106KWay
+# sDR3ZvXNRc/arc1pVPeEzG3hW2AKmK8MYoOYIvicnDbxUkjAIMR4VKDnxwY0egvX
+# FxQr5JGGFG3rNH1UXjJ9pWh6jAHJwER244yqAdMwCWq5eYgNafkmzV6XxEseRKwF
+# iVS2JV0/pMjRjMug9UkhONT/cNpRs2XHYed4ATZFwgkfzdmw1g0c3EO5wWJkLeyY
+# O5bAN/akRYjTp0NYxcH2jMvr7RdCt073MXcQhhq92kpSDr3/l65n5KU6/9Xk6OTP
+# cjUf53kTISI8k5U/EaQN+uTGYECZ0A==
 # SIG # End signature block
