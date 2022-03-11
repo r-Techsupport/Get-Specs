@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.4.0'
+$version = '1.4.1'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -384,6 +384,9 @@ function getBadThings {
         }
         If ($disk.'Reported Uncorrectable Errors' -gt 0) {
             $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+        }
+        If ($disk.'CRC Error Count' -gt 0) {
+            $12 += "CRC Error Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'CRC Error Count'
         }
         If ($disk.'Rotation Rate' -NotLike '---- (SSD)' -And $disk.'Drive Letter' -eq 'C:') {
             $13 += "C: is on an HDD"
@@ -915,8 +918,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUo5OjFUj5lbYcBmLLZbJAd9qG
-# 6QugghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqxll3oByPo+nNH7quTj473G7
+# 3OGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1016,17 +1019,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTn
-# I7bT52R+NGQ6dRdVmxvAWr69sDANBgkqhkiG9w0BAQEFAASCAgCRzAZ2ROTNvb9N
-# jNFN0hJv5P1H91+aai+l3QEEn+5KUQTpLhOuLj129z09r1oy5BQ4ezq8I4mUUNGN
-# NXyl3QQubo6MvbbXfONC21+8b20rPcKhgWglPJqb08D8d2UMDeIBlut+lpJYVHVQ
-# nJBlG+NN4+bvK7fEQ6uqQoQ6pwwB4ERg5xoBdTKTRmO/Lj4j1YcvmYFFxi/pT0Wg
-# CBdt1L+27IV7rHYmdnqIJDJA3RArTfdDR78TFMRQI4QbLP4IDEaVZBDX5GQQuFI2
-# 5hbzDpsN+5q0kR2l/fZfnQngnteMhyROnAW/ZDxxjVk+tposaFZ0XqrYVCtkA7Ew
-# PvVRjzMsy/jFzLMZ+XChE1Mai200sMNlJb1URjia1xR5cpT1im5hASTMVFAhr62j
-# xFlr0diExvw++MtHszhLl8y5zeMq419ZyTiT3kSjcjOq7758A8H++78o4WorS8z0
-# jwF5HeGWjdNJ5qwbZbGrbvJ2oP7ZnpJ1GvSA2BkfOoZI7hgwEIVqUOkwh8tM5yPS
-# qfCc3Gs2kEN4f7WIlhty8azIpHxx+mwPgDb0QF4O+aZX7Sg14kE4NcTXtBMga4Zl
-# 5nzZy0HVD5XlaaEBW6hFcqW+H3OsvR2R98sQ6nuAacR9KVV69ywULEmyExXMnAFE
-# e/1x/6t5RDX32F9caVO32FePI2W6EA==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT5
+# bkY7FfCDslyer4molHc38DRvEjANBgkqhkiG9w0BAQEFAASCAgAvvFE49z+AZjwo
+# Qoq8HsvcBvg82MNYQM3C54PByn80fGddjJZcTss3gerq4onewCUhZBLZrFp2ECit
+# atOAZYGaeGVN+A8wMw/JVT8fDeN9Sq8ejU6cJVBVqLJf0+Q8+YvMStHmGQIKbg8u
+# bn+5Ew7i6dw6XFtVfmKkMZKq6cAd/veTvIkxlU8F261H9/Tzsl5uUrzaQRYOxuSH
+# fj4kmrNEaFfJq3dZrPJ7Fr0ZUg3BOmHHY5klFGBOs/awU8WoOnVM6uKqBCFcCRtZ
+# yWRSudTrTu9b0/b3HQ9o92ka/KpqWUAFRJ+7aXcScQXgiyaK1LRwHb3iXpvVEZT/
+# fKyD75A1AGb0iGkCeNZQewc4ktAacC3bbX37LkWhZ1ItolDNwpOUc7+t4fCugOTV
+# IRs7g3ckgXzQhjZSk/wfg0mCRirgOC4S13EEYOHKrCBYJO6Aa88azoFAhzXGgP1r
+# 0pIxLamj2tJjfQsLq9aSAV1XA+pi+otXNFtoIu17hrOWjA6l2FGGde4Rq085au4T
+# ML87H4YTEDn0BJ9n3ZjG9Nan4rPqRGGdQVN3bIXTmoEo0hlKpCrv/xZE0WKKpK56
+# kKnd/ey4Q+uDWs6ewqy+F1pcRtavDtC5RDP7DPHPDHnFK13T+Uoy8ZMqnnZ+COkE
+# rTSedSZtsxeiuHI7zC9JXKG3eXQnYA==
 # SIG # End signature block
