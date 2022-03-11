@@ -102,7 +102,7 @@ $badFiles = @(
     'C:\Windows\system32\SppExtComObjHook.dll',
     'HKCU:\Software\azurite'
 )
-$badMissing = @(
+$microCode = @(
     'C:\Windows\System32\mcupdate_genuineintel.dll',
     'C:\WindowsSystem32\mcupdate_authenticamd.dll'
 )
@@ -449,11 +449,8 @@ function getBadThings {
         $21 = "Found $count dumps"
     }
     # check for missing files in FS
-    $22 = @()
-    ForEach ($file in $badMissing) {
-        If (-Not (Test-Path $file)) {
-            $22 += "Missing file $file"
-        }
+    If (!(Test-Path $microCode[0]) -And !(Test-Path $microCode[1])) {
+        $22 += "Microcode fixes are missing or were removed by malicious 'fixers'"
     }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
@@ -932,8 +929,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsjCHuPVmr6UUX18H7cmnRIO8
-# G++gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtsRClnSB0OPOAsCWw2OqLuD0
+# vOqgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1033,17 +1030,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRp
-# ZL2o5LJnirLHV+8mwFW4bzJ1XTANBgkqhkiG9w0BAQEFAASCAgC5gL7g+KYGoFIy
-# 0StuhRo+aieNhTw6vbrR8FpA0iJ3gKEkU2vo+qer0k6KfpXlr/SzfvZgtB6Mzp9I
-# Np5d134O/nuNWzL1EKPz88v+PXv5uDp3Owp/ehXGHdcwnw3pB8pHSOXbfwwYaEdW
-# 32zti470jZLhpMsv7qkDeIAQsh/Uw1D1MOt+PZpsq6wAWJtLokdfXRCAwv15pRbQ
-# WoGz0lALny07KdLyWazuGRPyro5webnAcVVZr0URfs7cfcstjACBLKgpTvRUnS4z
-# txzz957gLe/KCTR6hgXi6ZGsrMX0+8LypLMZDrWN/n4SZi3G6cI4nAld+xInURz0
-# ulYTlAiMjznaLOTukGYih8npU4vU35jMz9BxupGgRgpUYX3WfRo0BxGkHQRnW1jt
-# dDDNfRsijaEOGG9qH+NhsmEzujDZGuKMN61Dbvfi9t1UUdoW7/VLyKPa8uLnH9P0
-# HFiOEfU2u1EbdzVEgOBzuXWlcyuWek+iUt50cjVJt9orzPBxz+UCvzOtADQqKa0p
-# VjThO5y4IyuUVV719va/RpFMsS9e5SlWLU/fiWetDrOIBcXALdHjZgRaxJKL69Sk
-# jhihWCRV39eqBI7u90+KhF84WvRjVAK0hGfqJ4zsrEif+WpEfOh5YMNwE28s9r70
-# hht0O+S5mompGP/8cEAicbV6/+PAHA==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTq
+# qHnfefdBfy5mKhnigcQ/Pt1hXzANBgkqhkiG9w0BAQEFAASCAgAf8d1aRikEltB8
+# bR3VdqWcoRekN+rNK9GBT8MCidZq1fFZ3/WZLhkauvZV1OXQ+h7Z1/U6iR6/BhcM
+# DXA2j23jj/nG0ZoIsAt32HB7xkpnApVEPj8L2++nthHl2Y1DvBdXT2oPS/DLuHIJ
+# acVo0UQqH4RwBm+aOh5rJCEY+wNQhHFOnaAofaf5cOR9RS5MVuU7pHrQKSN7hdQ3
+# y+Ge4IjbXcC6h0JQKvcqox74eeAUgQk+oMu3k5RnRatkF7JEy6a7Fs+Q0BqrKXNm
+# +MUfJiI8cVMo68gHtZEVRmR/H/1Cxzit7qZzts431Y+ccoD2zClFv2bmAymSmcwW
+# PCZqWGS/n9eauR4J3onhJB8gyQ/vb/hXImTF7uMIBrsxKmFLdNW0zeBFnYPKJN4K
+# uh+VyQ7Ns3WA/eoQtAnaX//jB2CLG7Re4D4qcJ0ZncAbB4Qfn+FPMHxmABr7aDZS
+# 96UGRoE88BJVGA6sg23JRuZnnl4pBZpgfa03CkoOtSlZv0PiTrBU6gSYpzkUMMMY
+# lo4nRqNSaRzjHHdPmNIfny/amfeA1iLzp7e6Qiw7RYDLZFDGeyYl88x4S2uPXf14
+# KOHFVOL6LDyBtC2WZT3a04k2903ah4nReN8XZ4ya69QVpRp4B0Stds1coo/pvO2H
+# NXaAlaJ+eTj8Prt5U0PXODkhH67ESQ==
 # SIG # End signature block
