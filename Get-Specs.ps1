@@ -745,8 +745,10 @@ function getDrivers {
     Write-Host 'Getting driver information...'
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
+    $3 = "<h2>Devices with issues</h2>"
+    $4 = Get-PnpDevice -PresentOnly -Status ERROR,DEGRADED,UNKNOWN -ErrorAction SilentlyContinue | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
-    Return $1,$2
+    Return $1,$2,$3,$4
 }
 function getAudio {
     Write-Host 'Getting audio devices...'
