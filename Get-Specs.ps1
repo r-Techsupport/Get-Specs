@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.4.2'
+$version = '1.5.0'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -60,28 +60,32 @@ $badKeys = @(
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
-    'HKLM:\SYSTEM\Setup\Status\'
+    'HKLM:\SYSTEM\Setup\Status\',
+    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
 )
 $badValues = @(
     'AllowBuildPreview',
     'BypassTPMCheck',
     'BypassSecureBootCheck',
     'NoAutoUpdate',
-    'AuditBoot'
+    'AuditBoot',
+    'HwSchMode'
 )
 $badData = @(
     '1',
     '1',
     '1',
     '1',
-    '1'
+    '1',
+    '2'
 )
 $badRegExp = @(
     'Insider builds are set to: ',
     'Windows 11 TPM bypass set to: ',
     'Windows 11 SecureBoot bypass set to: ',
     'Windows auto update is set to: ',
-    'Audit Boot is set to: '
+    'Audit Boot is set to: ',
+    '(HAGS) HwSchMode is set to: '
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
@@ -229,6 +233,7 @@ $1 = '<a name="top"></a>
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
 <p><a href="#hw">Hardware Basics</a></p>
+<p><a href="#bios">BIOS</a></p>
 <p><a href="#SysVar">System Variables</a></p>
 <p><a href="#UserVar">User Variables</a></p>
 <p><a href="#hotfixes">Installed updates</a></p>
@@ -610,6 +615,11 @@ function getRAM {
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
+function getBIOS {
+    $1 = "<h2 id='bios'>BIOS</h2>"
+    $2 = $cimBios | Select Manufacturer,SMBIOSBIOSVersion,Name,Version | ConvertTo-Html -Fragment
+    Return $1,$2
+}
 function getVars {
     Write-Host 'Getting variables...'
     $1 = "<h2 id='SysVar'>System Variables</h2>"
@@ -877,6 +887,7 @@ $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduc
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 $ramSticks = Get-WmiObject win32_physicalmemory
+$cimBios = Get-CimInstance Win32_bios
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
@@ -928,6 +939,7 @@ getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
+getBIOS | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
 getStartup | Out-File -Append -Encoding ascii $file
@@ -949,8 +961,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMYDGNYm3TBKvUj0h42ZKf8pT
-# woSgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUau9NpbiFk4oMLBCZ+iEuaBsr
+# URygghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1050,17 +1062,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZ
-# BuhnFt9NZYk4Kl21LntrXGgkRDANBgkqhkiG9w0BAQEFAASCAgB8hi7QzRiwpwsZ
-# Zvnf4YK6l/GZ5+RlCh0Cs1a+UxknyOwOaVlB/f7CzEvKHjtfaraEeLXMhR5MPQ64
-# cfVOl6rIR2PVB5gztSsJkIy8vFN2EckUKzcI6X1C/vsBvvo4A5jBoZVriqWp2ULT
-# tmSY+nuPYFAQ9Z5fHyik2c1sGLOV596V8cjwhu4G9RbVLvZYQBAUs/j3tweVuYtw
-# 91nJQXEwtlU2E77w62+F2Robb9nIK1j+YyEozdkbacrUw3VduOemNB/JMSJO9EAT
-# OZ72JciRawsCFsSQPEQY4ViM3EV6sDOGFJPRwHj0toiPqcBb2mcn07WIHN5BztkS
-# 6a81/IPT6WnE7eNmtDWyhG82xNyGhixNttBjcD0iuCVAidqQhE8k8NuABOwjOrma
-# QQTigAHuVRNzoXA01B+OKgOhgjg0uqjHdVrnIXzLcA2Fam+tO7rjMcUdYGXeflKA
-# bSu2zqNXk+nuEUHE0+vL+SertTdOHPfZjbs+Sub/OsXYYPIhzewUT0OvIFr9PDk3
-# Umg/Ug1BNu6q7lbvmGwkqChS8Bx9yAJCMHegl3rTk0m8bpfxN2LUxmuVYbhmo6X8
-# Kzd/025aQlVi3tgzTu9Rhckasq3edTzEdNWrbgFMwRN3ej8MeB0a6xHss0wS7Fz8
-# xivzchUAFTidKi77QnC8QxmKQ4iymw==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ0
+# n5i7s8KkI2WPvWgZ/do1XxTTkDANBgkqhkiG9w0BAQEFAASCAgB2QvQ5Z/Xd8rIt
+# JD/o+pFlISmUqSi6lvYtQKkShw+6uR8qmgzlh17QEFl1ZBMRzmn4wYuFkimDtWem
+# 3Yxzr8hDLh82d3wBnMYhehdvUBFSsufNEbhMMqMJWpfPQGCZqyHP4iiEYMYlIgF1
+# QogeF/4uhkURP74xeyAAA3B30M/Mvjmm9E0/ZQd5OYoRtT/45uJkei+hq9gW6e6c
+# syYZKTikGisLSnJMUsyxwB8GjtkkymS9zqzfvs9wnEi8xEeTPGVmF+NCUtDXj8VI
+# VsoIYvIgZoX9+4A2dztY1YTSY/mIsYJ+fnNWe/9A3cIIP0MLnWhNsW4sJdju5kdC
+# CBhRNQQk0JLNOyQvrfEjWl/UAOD5bfe3Wn45HoCMf6icj7XI4320CuXv5RX2JD5h
+# 8cIfbj8GLKi/VTAoCISn+lXuCehQbnf69aE8YJVaTsdzFousOVkZhGHmxiTZy5TF
+# vCexlOW1h2A4Q9HezBUQsuxdn5N2cWT7iT3Uvea08rmYd/9/F2otvQeKpYFueJen
+# 9u44FidlQexwUGBFPjD/Xt/UM9MQSfd48grPEmbvyyt6pvAodBafHpOgpVSmhUO7
+# is8vPJRgK5yfpVAYwHqXgfJlwB0jdI8K7cM8w5mYjp2JJmR8HK3uzN+iHBIZv79Z
+# Mt1zxUveKBE8sWQWlsUMYVhJ1hoGUg==
 # SIG # End signature block
