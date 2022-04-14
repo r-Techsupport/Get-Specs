@@ -60,28 +60,32 @@ $badKeys = @(
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
-    'HKLM:\SYSTEM\Setup\Status\'
+    'HKLM:\SYSTEM\Setup\Status\',
+    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
 )
 $badValues = @(
     'AllowBuildPreview',
     'BypassTPMCheck',
     'BypassSecureBootCheck',
     'NoAutoUpdate',
-    'AuditBoot'
+    'AuditBoot',
+    'HwSchMode'
 )
 $badData = @(
     '1',
     '1',
     '1',
     '1',
-    '1'
+    '1',
+    '2'
 )
 $badRegExp = @(
     'Insider builds are set to: ',
     'Windows 11 TPM bypass set to: ',
     'Windows 11 SecureBoot bypass set to: ',
     'Windows auto update is set to: ',
-    'Audit Boot is set to: '
+    'Audit Boot is set to: ',
+    '(HAGS) HwSchMode is set to: '
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
@@ -957,8 +961,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUP9/WCTfDGWXmNtqVOJI5Jv4p
-# vLqgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUau9NpbiFk4oMLBCZ+iEuaBsr
+# URygghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1058,17 +1062,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSg
-# 8lsmFNwiuBZN6OKgO2lfbBoITTANBgkqhkiG9w0BAQEFAASCAgDQaPaPZGjoLXgX
-# QJW7VEB58XFLbcxRjngCm269F+zU1OrGiIa6dpa08SSHxoIkbuOcB/zkkB4CX+Vm
-# m8O1OlR8JgZYRmwRMncrUZRlmo1XFasKITXjmzbs3Gj32g5POfkqzS/TQS0vItnl
-# it/HgTuwm2viNiMCKZEjvMaJ2DmauU/r986BJ2dEWDZUqdYugl30XbS71qfMVr/x
-# UYiyxN11rT3SLyVY1eAlTjwluwoCFagnnx1E5uo0Euc/1SnNok4O7C4G/teO6b5F
-# E9a62HwkRTddIb6wtfNooutknV9YFcH7AvvOdG4H09FUGCzSPBCB+GHsERBI4cge
-# Xjg8kPlR4Y2v03lFSvAPyw5n07e/cDulHvELTFmhcAri85AnQa99uAMtkBtOu48Z
-# /95PeQgJu7/TLEFFwvJEPZE5sNAjYFDX/JQbMoeLmGoiZrGxoryOBlUroqQs763X
-# PnBILAQ0Q+mOXJSITso3eR9Ra8M0s8mE16BcvqSJ28bkD4J1TVYnKC+J3A0eT1Jl
-# YC3Xl7RI3YcGnNHoEVhiOeSl6fxUdpmIWg7z1LW3hkbbulyam7mlN8/l2G8MRJlo
-# g+WUWdnfyDLOcHGmnOXQerWZuHh6aYHVwSp2kLxRvxqwlV/+ANgCIjaltRhOF01f
-# uLD1Tl2HzhiT0Bgi9E2CH1oNLzmnPg==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ0
+# n5i7s8KkI2WPvWgZ/do1XxTTkDANBgkqhkiG9w0BAQEFAASCAgB2QvQ5Z/Xd8rIt
+# JD/o+pFlISmUqSi6lvYtQKkShw+6uR8qmgzlh17QEFl1ZBMRzmn4wYuFkimDtWem
+# 3Yxzr8hDLh82d3wBnMYhehdvUBFSsufNEbhMMqMJWpfPQGCZqyHP4iiEYMYlIgF1
+# QogeF/4uhkURP74xeyAAA3B30M/Mvjmm9E0/ZQd5OYoRtT/45uJkei+hq9gW6e6c
+# syYZKTikGisLSnJMUsyxwB8GjtkkymS9zqzfvs9wnEi8xEeTPGVmF+NCUtDXj8VI
+# VsoIYvIgZoX9+4A2dztY1YTSY/mIsYJ+fnNWe/9A3cIIP0MLnWhNsW4sJdju5kdC
+# CBhRNQQk0JLNOyQvrfEjWl/UAOD5bfe3Wn45HoCMf6icj7XI4320CuXv5RX2JD5h
+# 8cIfbj8GLKi/VTAoCISn+lXuCehQbnf69aE8YJVaTsdzFousOVkZhGHmxiTZy5TF
+# vCexlOW1h2A4Q9HezBUQsuxdn5N2cWT7iT3Uvea08rmYd/9/F2otvQeKpYFueJen
+# 9u44FidlQexwUGBFPjD/Xt/UM9MQSfd48grPEmbvyyt6pvAodBafHpOgpVSmhUO7
+# is8vPJRgK5yfpVAYwHqXgfJlwB0jdI8K7cM8w5mYjp2JJmR8HK3uzN+iHBIZv79Z
+# Mt1zxUveKBE8sWQWlsUMYVhJ1hoGUg==
 # SIG # End signature block
