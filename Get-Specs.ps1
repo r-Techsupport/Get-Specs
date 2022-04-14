@@ -376,23 +376,35 @@ function getBadThings {
     }
     $12 = @()
     Foreach ($disk in $smart) {
-        If ($disk.'Reallocated Sectors Count' -gt 0) {
-            $12 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
+        If ($disk.'Reallocated Sectors Count') {
+            If ($disk.'Reallocated Sectors Count' -ne '000000000000') {
+                $12 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
+            }
         }
-        If ($disk.'Current Pending Sector Count' -gt 0) {
-            $12 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+        If ($disk.'Current Pending Sector Count') {
+             If ($disk.'Current Pending Sector Count' -ne '000000000000') {
+                 $12 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+            }
         }
-        If ($disk.'Uncorrectable Sector Count' -gt 0) {
-            $12 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
+        If ($disk.'Uncorrectable Sector Count') {
+            If ($disk.'Uncorrectable Sector Count' -ne '000000000000') {
+                $12 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
+            }
         }
-        If ($disk.'Command Timeout' -gt 0) {
-            $12 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
+        If ($disk.'Command Timeout') {
+            If ($disk.'Command Timeout' -ne '000000000000') {
+                $12 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
+            }
         }
-        If ($disk.'Reported Uncorrectable Errors' -gt 0) {
-            $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+        If ($disk.'Reported Uncorrectable Errors') {
+            If ($disk.'Reported Uncorrectable Errors' -ne '000000000000') {
+                $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+            }
         }
-        If ($disk.'CRC Error Count' -gt 0) {
-            $12 += "CRC Error Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'CRC Error Count'
+        If ($disk.'CRC Error Count') {
+            If ($disk.'CRC Error Count' -ne '000000000000') {
+                $12 += "CRC Error Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'CRC Error Count'
+            }
         }
         If ($disk.'Rotation Rate' -NotLike '---- (SSD)' -And $disk.'Drive Letter' -eq 'C:') {
             $13 += "C: is on an HDD"
@@ -935,8 +947,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtgo41BuVgvFfYBs+2jSGm+NI
-# wBOgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsohTDphIV12U3l4GJglZcyDG
+# In6gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1036,17 +1048,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRB
-# ftldB4f9hTCyQsjEECZ6EXlAYTANBgkqhkiG9w0BAQEFAASCAgB0jPolUMLgdSuq
-# mcpg75oynG+IzOFdyonZzBHhLo9IRmDZrtgr28Z+Fz0FmpI5Ili3qMivOS3/MnUS
-# fRCXlCDbuF6dPj5aNxUqdG4PAvP78ESusD0WHWlATrezq8FPIJBSdUJMue8V+qgg
-# MG8lcw4xJR1TldlsDndeD14UYBpUB+KjI17fHo2yGnY4ii8lJGjtlaIM+DH8gxPD
-# HqGjvYmJDljDWnqYGoQv+uqPbsv/eXNUxetMoVzoPvPmXQ2bozlWKzIuFMmM2Av/
-# sO+Mp7KHpkTdSFDD4mRhLvY6urtF5Z1lPvuv7sKpc7N9eiCSjymU0y+qbSNGjtpX
-# H8trmYRwWDGSj8QNQKXq/xcyzdxGtHPHLfmlBkOA3Mag+HuzXfln95kmbcIPfvCF
-# Z8L8gj7Uah3ER2OVRltz/kuQA6OPZ6k9nPX1+TA0boZwXslAMZVJF1JcXU5pMDhh
-# abzmVlj1zuC5dHffEFeE8chHsXS7/JvEH/dNffruJbw2cux8sjb0ONxGbbhW9LcX
-# AXxxIyxltW3pFycajknHMCGIvkB4Twdkra/n+s1bX2bS17xNZ0BH8AUuwcVDKrK5
-# +s7lQieL5hv9Md39lvfJlMpuS5Hs8++EFBHyj3I5juSr0NdwC2jo1/EzKBUxaBdD
-# uIaj/ZjBZyq2xD3ufpAUPuKHK1rJQg==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSF
+# qfTwOZM8YiNKE2SZrV/qAlLYqjANBgkqhkiG9w0BAQEFAASCAgAxcJ+4+vXNxxFz
+# rhDhsfFq5/LXMKYVRgxTpvHiYpiKHPQRLEzeEada6pE5E2bhUSplhTQUeHClpIUG
+# kqy9ePihHKNl5zHILm0h6LfEzjsaX9XbyDAcSBk9gZNdK/aGolA5ByRQbUVwK4jr
+# t9p/99aLdCIrEIt8f2KHrMor58jsmJE1L0PRnVsq8cyichIiVa5oVFkzWyzh2RhQ
+# j8Pc3AlBRJurHHUAnOx+2C19OAfPtNa+x5X4mq0mQTAH748datKrQLFlDEw1K9Mn
+# yZmNS9eQoTHNl+sN2p+r5rrbH3WPfvjNs+LfomCYzPD5ic8Yx7fz905DAVKRfAZS
+# ve74DKvkzs9IhPWiaVwzpDnF5pFVWDhSB9Z1i3RB/l+BZ/RL3e0eEWW/vOCrSGkH
+# wapUvzxFfUutH4ginveT/KCPnetfY1BrSEddKMHqm61D24aSJiUywRZY5BW0qaxN
+# 3TFOmZUiJFkgptDSoArnLNFsJJQOQkiDz8cMFnZdBLHiEFHxNp02Ctvl+VvPzapJ
+# QhBEbKdGNWFcHfGCU3mo3s4hUBLtcUhzwY4TiSszqnZ2RQBiZmH223VWF8SudyJ7
+# tR4Ky9NO8sEH8JP28yxkdtRyr/wjjT+i9avcj02pGMaV8kLMBhrY4YJ52y+XejJr
+# iZTPA3TpnICgogyZs2efO9iGSkcyNQ==
 # SIG # End signature block
