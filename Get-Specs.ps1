@@ -352,7 +352,7 @@ function getBadThings {
     }
     # bad hostnames
     if ($badHostnames -contains $cimOS.CSName) {
-        $6 = "Modified OS: " + $cimOS.CSName
+        $6 = "This may be a malicious distribution of Windows: " + $cimOS.CSName
     }
     # bad diskspace
     $c = $volumes | ? { $_.DriveLetter -eq 'C' }
@@ -367,7 +367,7 @@ function getBadThings {
     # }
     # bad dns suffixes
     If ('utopia.net' -in $dns.SuffixSearchList) {
-        $9 = "Utopia malware, router is infected"
+        $9 = "Utopia malware found, router is infected. This adds a 'utopia.net' suffix to your DNS and can cause issues with shortnames."
     }
     If ($eol) {
         $10 = "OS was EOL on " + $eolOn + " Build is " + $osBuild
@@ -443,12 +443,12 @@ function getBadThings {
     $hostsSum = $(Get-FileHash $hostsFile).hash
     $hostsContent = Get-Content $hostsFile
     If ($hostsSum -ne $hostsHash) {
-        $18 = "Hosts sum mismatch"
+        $18 = "Hosts file has been modified from stock"
         If ($hostsContent -Like "*license.piriform.com*") {
             $19 = "piriform license server redirection"
         }
         If ($hostsContent -Like "*Spybot*") {
-            $20 = "spybot has edited hosts"
+            $20 = "spybot has edited hosts file"
         }
     }
     # check for dumps
@@ -469,7 +469,7 @@ function getBadThings {
     }
     # count and report issue devices
     If ($issueDevices.Status.Count -gt 0) {
-        $23 = "Devices have issues: " + $issueDevices.Status.Count
+        $23 = "Devices have issues: " + $issueDevices.Status.Count + " Check in 'Issue Devices' section"
     }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
@@ -949,8 +949,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsohTDphIV12U3l4GJglZcyDG
-# In6gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMYDGNYm3TBKvUj0h42ZKf8pT
+# woSgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1050,17 +1050,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSF
-# qfTwOZM8YiNKE2SZrV/qAlLYqjANBgkqhkiG9w0BAQEFAASCAgAxcJ+4+vXNxxFz
-# rhDhsfFq5/LXMKYVRgxTpvHiYpiKHPQRLEzeEada6pE5E2bhUSplhTQUeHClpIUG
-# kqy9ePihHKNl5zHILm0h6LfEzjsaX9XbyDAcSBk9gZNdK/aGolA5ByRQbUVwK4jr
-# t9p/99aLdCIrEIt8f2KHrMor58jsmJE1L0PRnVsq8cyichIiVa5oVFkzWyzh2RhQ
-# j8Pc3AlBRJurHHUAnOx+2C19OAfPtNa+x5X4mq0mQTAH748datKrQLFlDEw1K9Mn
-# yZmNS9eQoTHNl+sN2p+r5rrbH3WPfvjNs+LfomCYzPD5ic8Yx7fz905DAVKRfAZS
-# ve74DKvkzs9IhPWiaVwzpDnF5pFVWDhSB9Z1i3RB/l+BZ/RL3e0eEWW/vOCrSGkH
-# wapUvzxFfUutH4ginveT/KCPnetfY1BrSEddKMHqm61D24aSJiUywRZY5BW0qaxN
-# 3TFOmZUiJFkgptDSoArnLNFsJJQOQkiDz8cMFnZdBLHiEFHxNp02Ctvl+VvPzapJ
-# QhBEbKdGNWFcHfGCU3mo3s4hUBLtcUhzwY4TiSszqnZ2RQBiZmH223VWF8SudyJ7
-# tR4Ky9NO8sEH8JP28yxkdtRyr/wjjT+i9avcj02pGMaV8kLMBhrY4YJ52y+XejJr
-# iZTPA3TpnICgogyZs2efO9iGSkcyNQ==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZ
+# BuhnFt9NZYk4Kl21LntrXGgkRDANBgkqhkiG9w0BAQEFAASCAgB8hi7QzRiwpwsZ
+# Zvnf4YK6l/GZ5+RlCh0Cs1a+UxknyOwOaVlB/f7CzEvKHjtfaraEeLXMhR5MPQ64
+# cfVOl6rIR2PVB5gztSsJkIy8vFN2EckUKzcI6X1C/vsBvvo4A5jBoZVriqWp2ULT
+# tmSY+nuPYFAQ9Z5fHyik2c1sGLOV596V8cjwhu4G9RbVLvZYQBAUs/j3tweVuYtw
+# 91nJQXEwtlU2E77w62+F2Robb9nIK1j+YyEozdkbacrUw3VduOemNB/JMSJO9EAT
+# OZ72JciRawsCFsSQPEQY4ViM3EV6sDOGFJPRwHj0toiPqcBb2mcn07WIHN5BztkS
+# 6a81/IPT6WnE7eNmtDWyhG82xNyGhixNttBjcD0iuCVAidqQhE8k8NuABOwjOrma
+# QQTigAHuVRNzoXA01B+OKgOhgjg0uqjHdVrnIXzLcA2Fam+tO7rjMcUdYGXeflKA
+# bSu2zqNXk+nuEUHE0+vL+SertTdOHPfZjbs+Sub/OsXYYPIhzewUT0OvIFr9PDk3
+# Umg/Ug1BNu6q7lbvmGwkqChS8Bx9yAJCMHegl3rTk0m8bpfxN2LUxmuVYbhmo6X8
+# Kzd/025aQlVi3tgzTu9Rhckasq3edTzEdNWrbgFMwRN3ej8MeB0a6xHss0wS7Fz8
+# xivzchUAFTidKi77QnC8QxmKQ4iymw==
 # SIG # End signature block
