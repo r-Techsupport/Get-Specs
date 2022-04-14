@@ -760,7 +760,7 @@ function getDrivers {
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
     $3 = "<h2 id='issueDevices'>Devices with issues</h2>"
-    $4 = $issueDevices | Select Name,InstanceID | ConvertTo-HTML -Fragment
+    $4 = $issueDevices | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
     Return $1,$2,$3,$4
 }
