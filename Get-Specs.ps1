@@ -33,7 +33,9 @@ $badSoftware = @(
     'Voxal Voice Changer',
     'Clownfish Voice Changer',
     'Voicemod',
-    'Microsoft Office Enterprise 2007'
+    'Microsoft Office Enterprise 2007',
+    'Memory Cleaner*',
+    'System Mechanic'
 )
 $badStartup = @(
     'AutoKMS',
@@ -350,7 +352,7 @@ function getBadThings {
     }
     # bad hostnames
     if ($badHostnames -contains $cimOS.CSName) {
-        $6 = "Modified OS: " + $cimOS.CSName
+        $6 = "This may be a malicious distribution of Windows: " + $cimOS.CSName
     }
     # bad diskspace
     $c = $volumes | ? { $_.DriveLetter -eq 'C' }
@@ -365,7 +367,7 @@ function getBadThings {
     # }
     # bad dns suffixes
     If ('utopia.net' -in $dns.SuffixSearchList) {
-        $9 = "Utopia malware, router is infected"
+        $9 = "Utopia malware found, router is infected. This adds a 'utopia.net' suffix to your DNS and can cause issues with shortnames."
     }
     If ($eol) {
         $10 = "OS was EOL on " + $eolOn + " Build is " + $osBuild
@@ -376,23 +378,35 @@ function getBadThings {
     }
     $12 = @()
     Foreach ($disk in $smart) {
-        If ($disk.'Reallocated Sectors Count' -gt 0) {
-            $12 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
+        If ($disk.'Reallocated Sectors Count') {
+            If ($disk.'Reallocated Sectors Count' -ne '000000000000') {
+                $12 += "Reallocated sector on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reallocated Sectors Count'
+            }
         }
-        If ($disk.'Current Pending Sector Count' -gt 0) {
-            $12 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+        If ($disk.'Current Pending Sector Count') {
+             If ($disk.'Current Pending Sector Count' -ne '000000000000') {
+                 $12 += "Current Pending Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Current Pending Sector Count'
+            }
         }
-        If ($disk.'Uncorrectable Sector Count' -gt 0) {
-            $12 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
+        If ($disk.'Uncorrectable Sector Count') {
+            If ($disk.'Uncorrectable Sector Count' -ne '000000000000') {
+                $12 += "Uncorrectable Sector Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Uncorrectable Sector Count'
+            }
         }
-        If ($disk.'Command Timeout' -gt 0) {
-            $12 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
+        If ($disk.'Command Timeout') {
+            If ($disk.'Command Timeout' -ne '000000000000') {
+                $12 += "Command Timeout on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Command Timeout'
+            }
         }
-        If ($disk.'Reported Uncorrectable Errors' -gt 0) {
-            $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+        If ($disk.'Reported Uncorrectable Errors') {
+            If ($disk.'Reported Uncorrectable Errors' -ne '000000000000') {
+                $12 += "Reported Uncorrectable Errors on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'Reported Uncorrectable Errors'
+            }
         }
-        If ($disk.'CRC Error Count' -gt 0) {
-            $12 += "CRC Error Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'CRC Error Count'
+        If ($disk.'CRC Error Count') {
+            If ($disk.'CRC Error Count' -ne '000000000000') {
+                $12 += "CRC Error Count on " + $disk.'Drive Letter' + " " + $disk.Model + " is " + $disk.'CRC Error Count'
+            }
         }
         If ($disk.'Rotation Rate' -NotLike '---- (SSD)' -And $disk.'Drive Letter' -eq 'C:') {
             $13 += "C: is on an HDD"
@@ -429,12 +443,12 @@ function getBadThings {
     $hostsSum = $(Get-FileHash $hostsFile).hash
     $hostsContent = Get-Content $hostsFile
     If ($hostsSum -ne $hostsHash) {
-        $18 = "Hosts sum mismatch"
+        $18 = "Hosts file has been modified from stock"
         If ($hostsContent -Like "*license.piriform.com*") {
             $19 = "piriform license server redirection"
         }
         If ($hostsContent -Like "*Spybot*") {
-            $20 = "spybot has edited hosts"
+            $20 = "spybot has edited hosts file"
         }
     }
     # check for dumps
@@ -455,7 +469,7 @@ function getBadThings {
     }
     # count and report issue devices
     If ($issueDevices.Status.Count -gt 0) {
-        $23 = "Devices have issues: " + $issueDevices.Status.Count
+        $23 = "Devices have issues: " + $issueDevices.Status.Count + " Check in 'Issue Devices' section"
     }
 
     Write-Host 'Checked for issues' -ForegroundColor Green
@@ -748,7 +762,7 @@ function getDrivers {
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
     $3 = "<h2 id='issueDevices'>Devices with issues</h2>"
-    $4 = $issueDevices | Select Name,InstanceID | ConvertTo-HTML -Fragment
+    $4 = $issueDevices | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
     Return $1,$2,$3,$4
 }
@@ -935,8 +949,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtgo41BuVgvFfYBs+2jSGm+NI
-# wBOgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMYDGNYm3TBKvUj0h42ZKf8pT
+# woSgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1036,17 +1050,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRB
-# ftldB4f9hTCyQsjEECZ6EXlAYTANBgkqhkiG9w0BAQEFAASCAgB0jPolUMLgdSuq
-# mcpg75oynG+IzOFdyonZzBHhLo9IRmDZrtgr28Z+Fz0FmpI5Ili3qMivOS3/MnUS
-# fRCXlCDbuF6dPj5aNxUqdG4PAvP78ESusD0WHWlATrezq8FPIJBSdUJMue8V+qgg
-# MG8lcw4xJR1TldlsDndeD14UYBpUB+KjI17fHo2yGnY4ii8lJGjtlaIM+DH8gxPD
-# HqGjvYmJDljDWnqYGoQv+uqPbsv/eXNUxetMoVzoPvPmXQ2bozlWKzIuFMmM2Av/
-# sO+Mp7KHpkTdSFDD4mRhLvY6urtF5Z1lPvuv7sKpc7N9eiCSjymU0y+qbSNGjtpX
-# H8trmYRwWDGSj8QNQKXq/xcyzdxGtHPHLfmlBkOA3Mag+HuzXfln95kmbcIPfvCF
-# Z8L8gj7Uah3ER2OVRltz/kuQA6OPZ6k9nPX1+TA0boZwXslAMZVJF1JcXU5pMDhh
-# abzmVlj1zuC5dHffEFeE8chHsXS7/JvEH/dNffruJbw2cux8sjb0ONxGbbhW9LcX
-# AXxxIyxltW3pFycajknHMCGIvkB4Twdkra/n+s1bX2bS17xNZ0BH8AUuwcVDKrK5
-# +s7lQieL5hv9Md39lvfJlMpuS5Hs8++EFBHyj3I5juSr0NdwC2jo1/EzKBUxaBdD
-# uIaj/ZjBZyq2xD3ufpAUPuKHK1rJQg==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZ
+# BuhnFt9NZYk4Kl21LntrXGgkRDANBgkqhkiG9w0BAQEFAASCAgB8hi7QzRiwpwsZ
+# Zvnf4YK6l/GZ5+RlCh0Cs1a+UxknyOwOaVlB/f7CzEvKHjtfaraEeLXMhR5MPQ64
+# cfVOl6rIR2PVB5gztSsJkIy8vFN2EckUKzcI6X1C/vsBvvo4A5jBoZVriqWp2ULT
+# tmSY+nuPYFAQ9Z5fHyik2c1sGLOV596V8cjwhu4G9RbVLvZYQBAUs/j3tweVuYtw
+# 91nJQXEwtlU2E77w62+F2Robb9nIK1j+YyEozdkbacrUw3VduOemNB/JMSJO9EAT
+# OZ72JciRawsCFsSQPEQY4ViM3EV6sDOGFJPRwHj0toiPqcBb2mcn07WIHN5BztkS
+# 6a81/IPT6WnE7eNmtDWyhG82xNyGhixNttBjcD0iuCVAidqQhE8k8NuABOwjOrma
+# QQTigAHuVRNzoXA01B+OKgOhgjg0uqjHdVrnIXzLcA2Fam+tO7rjMcUdYGXeflKA
+# bSu2zqNXk+nuEUHE0+vL+SertTdOHPfZjbs+Sub/OsXYYPIhzewUT0OvIFr9PDk3
+# Umg/Ug1BNu6q7lbvmGwkqChS8Bx9yAJCMHegl3rTk0m8bpfxN2LUxmuVYbhmo6X8
+# Kzd/025aQlVi3tgzTu9Rhckasq3edTzEdNWrbgFMwRN3ej8MeB0a6xHss0wS7Fz8
+# xivzchUAFTidKi77QnC8QxmKQ4iymw==
 # SIG # End signature block
