@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.4.2'
+$version = '1.5.0'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -229,6 +229,7 @@ $1 = '<a name="top"></a>
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
 <p><a href="#hw">Hardware Basics</a></p>
+<p><a href="#bios">BIOS</a></p>
 <p><a href="#SysVar">System Variables</a></p>
 <p><a href="#UserVar">User Variables</a></p>
 <p><a href="#hotfixes">Installed updates</a></p>
@@ -610,6 +611,11 @@ function getRAM {
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
 }
+function getBIOS {
+    $1 = "<h2 id='bios'>BIOS</h2>"
+    $2 = $cimBios | Select Manufacturer,SMBIOSBIOSVersion,Name,Version | ConvertTo-Html -Fragment
+    Return $1,$2
+}
 function getVars {
     Write-Host 'Getting variables...'
     $1 = "<h2 id='SysVar'>System Variables</h2>"
@@ -877,6 +883,7 @@ $av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduc
 $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 $ramSticks = Get-WmiObject win32_physicalmemory
+$cimBios = Get-CimInstance Win32_bios
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
@@ -928,6 +935,7 @@ getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
+getBIOS | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
 getStartup | Out-File -Append -Encoding ascii $file
@@ -949,8 +957,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMYDGNYm3TBKvUj0h42ZKf8pT
-# woSgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUP9/WCTfDGWXmNtqVOJI5Jv4p
+# vLqgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1050,17 +1058,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZ
-# BuhnFt9NZYk4Kl21LntrXGgkRDANBgkqhkiG9w0BAQEFAASCAgB8hi7QzRiwpwsZ
-# Zvnf4YK6l/GZ5+RlCh0Cs1a+UxknyOwOaVlB/f7CzEvKHjtfaraEeLXMhR5MPQ64
-# cfVOl6rIR2PVB5gztSsJkIy8vFN2EckUKzcI6X1C/vsBvvo4A5jBoZVriqWp2ULT
-# tmSY+nuPYFAQ9Z5fHyik2c1sGLOV596V8cjwhu4G9RbVLvZYQBAUs/j3tweVuYtw
-# 91nJQXEwtlU2E77w62+F2Robb9nIK1j+YyEozdkbacrUw3VduOemNB/JMSJO9EAT
-# OZ72JciRawsCFsSQPEQY4ViM3EV6sDOGFJPRwHj0toiPqcBb2mcn07WIHN5BztkS
-# 6a81/IPT6WnE7eNmtDWyhG82xNyGhixNttBjcD0iuCVAidqQhE8k8NuABOwjOrma
-# QQTigAHuVRNzoXA01B+OKgOhgjg0uqjHdVrnIXzLcA2Fam+tO7rjMcUdYGXeflKA
-# bSu2zqNXk+nuEUHE0+vL+SertTdOHPfZjbs+Sub/OsXYYPIhzewUT0OvIFr9PDk3
-# Umg/Ug1BNu6q7lbvmGwkqChS8Bx9yAJCMHegl3rTk0m8bpfxN2LUxmuVYbhmo6X8
-# Kzd/025aQlVi3tgzTu9Rhckasq3edTzEdNWrbgFMwRN3ej8MeB0a6xHss0wS7Fz8
-# xivzchUAFTidKi77QnC8QxmKQ4iymw==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSg
+# 8lsmFNwiuBZN6OKgO2lfbBoITTANBgkqhkiG9w0BAQEFAASCAgDQaPaPZGjoLXgX
+# QJW7VEB58XFLbcxRjngCm269F+zU1OrGiIa6dpa08SSHxoIkbuOcB/zkkB4CX+Vm
+# m8O1OlR8JgZYRmwRMncrUZRlmo1XFasKITXjmzbs3Gj32g5POfkqzS/TQS0vItnl
+# it/HgTuwm2viNiMCKZEjvMaJ2DmauU/r986BJ2dEWDZUqdYugl30XbS71qfMVr/x
+# UYiyxN11rT3SLyVY1eAlTjwluwoCFagnnx1E5uo0Euc/1SnNok4O7C4G/teO6b5F
+# E9a62HwkRTddIb6wtfNooutknV9YFcH7AvvOdG4H09FUGCzSPBCB+GHsERBI4cge
+# Xjg8kPlR4Y2v03lFSvAPyw5n07e/cDulHvELTFmhcAri85AnQa99uAMtkBtOu48Z
+# /95PeQgJu7/TLEFFwvJEPZE5sNAjYFDX/JQbMoeLmGoiZrGxoryOBlUroqQs763X
+# PnBILAQ0Q+mOXJSITso3eR9Ra8M0s8mE16BcvqSJ28bkD4J1TVYnKC+J3A0eT1Jl
+# YC3Xl7RI3YcGnNHoEVhiOeSl6fxUdpmIWg7z1LW3hkbbulyam7mlN8/l2G8MRJlo
+# g+WUWdnfyDLOcHGmnOXQerWZuHh6aYHVwSp2kLxRvxqwlV/+ANgCIjaltRhOF01f
+# uLD1Tl2HzhiT0Bgi9E2CH1oNLzmnPg==
 # SIG # End signature block
