@@ -67,7 +67,8 @@ $badKeys = @(
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
     'HKLM:\SYSTEM\Setup\Status\',
-    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
+    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers',
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
 )
 $badValues = @(
     'AllowBuildPreview',
@@ -75,7 +76,8 @@ $badValues = @(
     'BypassSecureBootCheck',
     'NoAutoUpdate',
     'AuditBoot',
-    'HwSchMode'
+    'HwSchMode',
+    'UseWUServer'
 )
 $badData = @(
     '1',
@@ -83,7 +85,8 @@ $badData = @(
     '1',
     '1',
     '1',
-    '2'
+    '2',
+    '1'
 )
 $badRegExp = @(
     'Insider builds are set to: ',
