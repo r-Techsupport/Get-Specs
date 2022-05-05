@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.5.0'
+$version = '1.5.1'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -35,7 +35,13 @@ $badSoftware = @(
     'Voicemod',
     'Microsoft Office Enterprise 2007',
     'Memory Cleaner*',
-    'System Mechanic'
+    'System Mechanic',
+    'MyCleanPC',
+    'DriverFix*',
+    'Reimage Repair',
+    'cFosSpeed*',
+    'Browser Assistant',
+    'KMS*'
 )
 $badStartup = @(
     'AutoKMS',
