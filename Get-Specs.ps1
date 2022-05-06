@@ -175,9 +175,12 @@ $eolDates = @(
 ### Functions
 
 function header {
-$1 = "<!DOCTYPE html>
+$1 = '<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
 <style>
 * {
     font-family: verdana !important;
@@ -231,10 +234,10 @@ tr:nth-child(even) {
 </style>
 <body>
 <pre>
-<a href='#top'><div id='topbutton'>
+<a href="#top"><div id="topbutton">
 TOP
 </div></a>
-"
+'
 Return $1
 }
 function table {
