@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.5.0'
+$version = '1.5.1'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -20,6 +20,8 @@ $today = Get-Date
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
 $hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
+$hostsSum = $(Get-FileHash $hostsFile).hash
+$hostsContent = Get-Content $hostsFile
 
 ## bad things
 $badSoftware = @(
@@ -35,7 +37,13 @@ $badSoftware = @(
     'Voicemod',
     'Microsoft Office Enterprise 2007',
     'Memory Cleaner*',
-    'System Mechanic'
+    'System Mechanic',
+    'MyCleanPC',
+    'DriverFix*',
+    'Reimage Repair',
+    'cFosSpeed*',
+    'Browser Assistant',
+    'KMS*'
 )
 $badStartup = @(
     'AutoKMS',
@@ -61,7 +69,8 @@ $badKeys = @(
     'HKLM:\SYSTEM\Setup\LabConfig\',
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
     'HKLM:\SYSTEM\Setup\Status\',
-    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
+    'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers',
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
 )
 $badValues = @(
     'AllowBuildPreview',
@@ -69,7 +78,8 @@ $badValues = @(
     'BypassSecureBootCheck',
     'NoAutoUpdate',
     'AuditBoot',
-    'HwSchMode'
+    'HwSchMode',
+    'UseWUServer'
 )
 $badData = @(
     '1',
@@ -77,7 +87,8 @@ $badData = @(
     '1',
     '1',
     '1',
-    '2'
+    '2',
+    '1'
 )
 $badRegExp = @(
     'Insider builds are set to: ',
@@ -230,9 +241,9 @@ function table {
 $1 = '<a name="top"></a>
 <h2>Sections</h2>
 <div style="line-height:0">
+<p><a href="#hw">Hardware Basics</a></p>
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
-<p><a href="#hw">Hardware Basics</a></p>
 <p><a href="#bios">BIOS</a></p>
 <p><a href="#SysVar">System Variables</a></p>
 <p><a href="#UserVar">User Variables</a></p>
@@ -444,11 +455,9 @@ function getBadThings {
             $17 = "RAM is in DIMM3 and DIMM4"
         }
     }
-    # hosts checks
-    $hostsSum = $(Get-FileHash $hostsFile).hash
-    $hostsContent = Get-Content $hostsFile
+    # hosts checks 
     If ($hostsSum -ne $hostsHash) {
-        $18 = "Hosts file has been modified from stock"
+        $18 = "Hosts file has been modified from stock, it has been appended to bottom of this page"
         If ($hostsContent -Like "*license.piriform.com*") {
             $19 = "piriform license server redirection"
         }
@@ -479,45 +488,6 @@ function getBadThings {
 
     Write-Host 'Checked for issues' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
-}
-function getLicensing {
-    Write-Host 'Getting license information...'
-    $1 = "<h2 id='Lics'>Licensing</h2>"
-    $2 = $cimLics | ConvertTo-Html -Fragment
-    Write-Host 'Got license information' -ForegroundColor Green
-    Return $1,$2
-}
-function getSecureInfo {
-    Write-Host 'Getting security information...'
-    $1 = "<h2 id='SecInfo'>Security Information</h2>"
-
-    $secObject = New-Object PSObject
-    # Add AVs
-    $i = 0
-    ForEach ($a in $av) {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
-        $i++
-    }
-    # Add FW and assume its defender if there is no entry (default)
-    If ($fw.DisplayName -eq $NULL) {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
-        } Else {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
-    }
-    # Add UAC
-    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
-    # Add Secureboot
-    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
-    $2 = $secObject | ConvertTo-Html -Fragment -As List
-
-    $6 = "<h2 id='TPM'>TPM</h2>"
-    If ($tpm -eq $NULL) {
-        $7 = 'TPM not detected'
-        } Else {
-        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
-    }
-    Write-Host 'Got security information' -ForegroundColor Green
-    Return $1,$2,$6,$7
 }
 function getTemps {
     Try {
@@ -572,14 +542,17 @@ function getHardware {
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Driver" -Value ""
     $hwArray += $cpuObject
 
     $moboObject = New-Object PSObject
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Part" -Value "Motherboard"
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Driver" -Value ""
     $hwArray += $moboObject
 
+    $gpuDriver = $(gwmi Win32_PnPSignedDriver | ? { $_.deviceName -eq $gpu.Name }).driverversion
     If (Get-Member -inputobject $gpu -name "Count" -Membertype Properties) {
         $i = 0
         foreach ($g in $gpu) {
@@ -588,6 +561,7 @@ function getHardware {
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Driver" -Value $gpuDriver
             $hwArray += $gpuObject
             $i = $i + 1
         }
@@ -597,6 +571,7 @@ function getHardware {
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu.AdapterCompatibility
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu.Name
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Driver" -Value $gpuDriver
         $hwArray += $gpuObject
     }
 
@@ -614,6 +589,45 @@ function getRAM {
     $2 = $($ramSticks | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
+}
+function getLicensing {
+    Write-Host 'Getting license information...'
+    $1 = "<h2 id='Lics'>Licensing</h2>"
+    $2 = $cimLics | ConvertTo-Html -Fragment
+    Write-Host 'Got license information' -ForegroundColor Green
+    Return $1,$2
+}
+function getSecureInfo {
+    Write-Host 'Getting security information...'
+    $1 = "<h2 id='SecInfo'>Security Information</h2>"
+
+    $secObject = New-Object PSObject
+    # Add AVs
+    $i = 0
+    ForEach ($a in $av) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
+        $i++
+    }
+    # Add FW and assume its defender if there is no entry (default)
+    If ($fw.DisplayName -eq $NULL) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
+        } Else {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
+    }
+    # Add UAC
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
+    # Add Secureboot
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
+    $2 = $secObject | ConvertTo-Html -Fragment -As List
+
+    $6 = "<h2 id='TPM'>TPM</h2>"
+    If ($tpm -eq $NULL) {
+        $7 = 'TPM not detected'
+        } Else {
+        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    }
+    Write-Host 'Got security information' -ForegroundColor Green
+    Return $1,$2,$6,$7
 }
 function getBIOS {
     $1 = "<h2 id='bios'>BIOS</h2>"
@@ -800,6 +814,12 @@ function getSmart {
     }
     Return $1,$2
 }
+function getHosts {
+    If ($hostsSum -ne $hostsHash) {
+        $hostsContent
+        Write-Output ""
+    }
+}
 function getTimer {
     $timer.Stop()
     $1 = 'Runtime'
@@ -935,10 +955,10 @@ getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
 getBadThings | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
-getLicensing | Out-File -Append -Encoding ascii $file
-getSecureInfo | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
+getLicensing | Out-File -Append -Encoding ascii $file
+getSecureInfo | Out-File -Append -Encoding ascii $file
 getBIOS | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
@@ -954,6 +974,7 @@ getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
 getSmart | Out-File -Append -Encoding ascii $file
+getHosts | Out-FIle -Append -Encoding ascii $file
 getTimer | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
@@ -961,8 +982,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUau9NpbiFk4oMLBCZ+iEuaBsr
-# URygghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvTQXKyIc+TE3E9Iwe9YumTPO
+# BmKgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1062,17 +1083,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ0
-# n5i7s8KkI2WPvWgZ/do1XxTTkDANBgkqhkiG9w0BAQEFAASCAgB2QvQ5Z/Xd8rIt
-# JD/o+pFlISmUqSi6lvYtQKkShw+6uR8qmgzlh17QEFl1ZBMRzmn4wYuFkimDtWem
-# 3Yxzr8hDLh82d3wBnMYhehdvUBFSsufNEbhMMqMJWpfPQGCZqyHP4iiEYMYlIgF1
-# QogeF/4uhkURP74xeyAAA3B30M/Mvjmm9E0/ZQd5OYoRtT/45uJkei+hq9gW6e6c
-# syYZKTikGisLSnJMUsyxwB8GjtkkymS9zqzfvs9wnEi8xEeTPGVmF+NCUtDXj8VI
-# VsoIYvIgZoX9+4A2dztY1YTSY/mIsYJ+fnNWe/9A3cIIP0MLnWhNsW4sJdju5kdC
-# CBhRNQQk0JLNOyQvrfEjWl/UAOD5bfe3Wn45HoCMf6icj7XI4320CuXv5RX2JD5h
-# 8cIfbj8GLKi/VTAoCISn+lXuCehQbnf69aE8YJVaTsdzFousOVkZhGHmxiTZy5TF
-# vCexlOW1h2A4Q9HezBUQsuxdn5N2cWT7iT3Uvea08rmYd/9/F2otvQeKpYFueJen
-# 9u44FidlQexwUGBFPjD/Xt/UM9MQSfd48grPEmbvyyt6pvAodBafHpOgpVSmhUO7
-# is8vPJRgK5yfpVAYwHqXgfJlwB0jdI8K7cM8w5mYjp2JJmR8HK3uzN+iHBIZv79Z
-# Mt1zxUveKBE8sWQWlsUMYVhJ1hoGUg==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ+
+# hypbZk4UHEY0La9WrKBXgxw/iTANBgkqhkiG9w0BAQEFAASCAgAhE440KR3bG12J
+# cwc16mjKMB9i1zXUdG0c2EhABy0BZojyML/4a0X6F5VD5c3TJNup9DDfNTp/g3Jq
+# g+Kj+USbOX0szangac6zSdeti7p8+NOsoQQk1POma0TA5Rhjlp6ebsioBkEvcYp1
+# TaMbOH64RIyF3EKAmiMJW0B2eKc4iy5ADBx7A4Gsm63kaI4I3pzhyFi/2h7fGVRS
+# TPFnCmDSc3e4bC6o51ODMQLW0JLvDMmU9klV4jylkXJKY7ADe/gMipyuYI9algLj
+# sH+SsmRf584yxBEWRAQeEA91ndnE2yf+7L/8RltC2k4+ZzRjzFAHVmt7k1wllKWv
+# trHURcA/U4DDtfJvxPHdQYGabsTmKMPqU52PPzAVUK2Ty83SCAI3YF25a2wdw39g
+# YzK1Kab8/EXhxUBlXwy/MCYAo5wFRi7y+41GfaLjrm62oeXPhhaCQK38VoqJYs/K
+# 6PnVxKUoHRRxo26pGEmCheucjXl3qKpSBT88AKsYKD7yT5FFrk+dubxaiHbe5t9c
+# 97HcZwvykzs1faqbSqYqNtk+sd5Tn3s6CVXUwiEDuThwX1NFJPB8zvrACg4fRnZp
+# 4bP+8+5wDi+yeXQfpbw6LfKEWtVIwOE9CWTf9u24rWDcQ5gQCKcxE853s4/VmZ36
+# QH0+t6dONhAkSJZZ2uM7ow4Z+imW6w==
 # SIG # End signature block
