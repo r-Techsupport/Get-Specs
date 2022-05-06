@@ -581,14 +581,17 @@ function getHardware {
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $cpu.Manufacturer
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Product" -Value $cpu.Name
     Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[0]
+    Add-Member -InputObject $cpuObject -MemberType NoteProperty -Name "Driver" -Value ""
     $hwArray += $cpuObject
 
     $moboObject = New-Object PSObject
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Part" -Value "Motherboard"
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Manufacturer" -Value $mobo.Manufacturer
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
+    Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Driver" -Value ""
     $hwArray += $moboObject
 
+    $gpuDriver = $(gwmi Win32_PnPSignedDriver | ? { $_.deviceName -eq $gpu.Name }).driverversion
     If (Get-Member -inputobject $gpu -name "Count" -Membertype Properties) {
         $i = 0
         foreach ($g in $gpu) {
@@ -597,6 +600,7 @@ function getHardware {
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu[$i].Name
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+            Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Driver" -Value $gpuDriver
             $hwArray += $gpuObject
             $i = $i + 1
         }
@@ -606,6 +610,7 @@ function getHardware {
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu.AdapterCompatibility
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Product" -Value $gpu.Name
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Temperature" -Value $temps[1]
+        Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Driver" -Value $gpuDriver
         $hwArray += $gpuObject
     }
 
