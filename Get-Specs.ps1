@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.5.1'
+$version = '1.5.2'
 
 # source our other ps1 files
 . files\wpf.ps1
@@ -175,9 +175,12 @@ $eolDates = @(
 ### Functions
 
 function header {
-$1 = "<!DOCTYPE html>
+$1 = '<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
 <style>
 * {
     font-family: verdana !important;
@@ -231,10 +234,10 @@ tr:nth-child(even) {
 </style>
 <body>
 <pre>
-<a href='#top'><div id='topbutton'>
+<a href="#top"><div id="topbutton">
 TOP
 </div></a>
-"
+'
 Return $1
 }
 function table {
@@ -982,8 +985,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvTQXKyIc+TE3E9Iwe9YumTPO
-# BmKgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZ1CUQ4RUoGGWlj+WojXQSyPv
+# FSKgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1083,17 +1086,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ+
-# hypbZk4UHEY0La9WrKBXgxw/iTANBgkqhkiG9w0BAQEFAASCAgAhE440KR3bG12J
-# cwc16mjKMB9i1zXUdG0c2EhABy0BZojyML/4a0X6F5VD5c3TJNup9DDfNTp/g3Jq
-# g+Kj+USbOX0szangac6zSdeti7p8+NOsoQQk1POma0TA5Rhjlp6ebsioBkEvcYp1
-# TaMbOH64RIyF3EKAmiMJW0B2eKc4iy5ADBx7A4Gsm63kaI4I3pzhyFi/2h7fGVRS
-# TPFnCmDSc3e4bC6o51ODMQLW0JLvDMmU9klV4jylkXJKY7ADe/gMipyuYI9algLj
-# sH+SsmRf584yxBEWRAQeEA91ndnE2yf+7L/8RltC2k4+ZzRjzFAHVmt7k1wllKWv
-# trHURcA/U4DDtfJvxPHdQYGabsTmKMPqU52PPzAVUK2Ty83SCAI3YF25a2wdw39g
-# YzK1Kab8/EXhxUBlXwy/MCYAo5wFRi7y+41GfaLjrm62oeXPhhaCQK38VoqJYs/K
-# 6PnVxKUoHRRxo26pGEmCheucjXl3qKpSBT88AKsYKD7yT5FFrk+dubxaiHbe5t9c
-# 97HcZwvykzs1faqbSqYqNtk+sd5Tn3s6CVXUwiEDuThwX1NFJPB8zvrACg4fRnZp
-# 4bP+8+5wDi+yeXQfpbw6LfKEWtVIwOE9CWTf9u24rWDcQ5gQCKcxE853s4/VmZ36
-# QH0+t6dONhAkSJZZ2uM7ow4Z+imW6w==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTA
+# fQotLkhNRdbshkImiGxU55kxAjANBgkqhkiG9w0BAQEFAASCAgCC/0g9xd3Nxas7
+# CyUW2O3XZgk+oQhlWbn3oghsTowOo1FbScoIKkpOU7b9SOzr4OU7QGm1rXDk5zdA
+# qni0HFF/Ints/wRKq+bF1jmDJ9Nj7yjRTzItU6MsrF/75s7hYcQhE5z2n5tjBr50
+# a40A7k2K/DJi+Io7rIsCwg9vlIzCfInCMlTMgUYSggM5T1gjpOpa5wel/nqVqv6F
+# DBAgt+xMtKd1Y7w/GrWn3Byyh/ct27DiW+4GbjKAEwZTgGkpGbcT6jT9xlciJIjP
+# 7rRO+Ly/wm6JYx8b7QtbkuD2Z6GNRNshyaCA6P2wLwKAquV8RcWVlORkeL5U53p6
+# +YH+MqxXvjsHdZ5h8cyatzozSsJkFIX2QJQtL4PDqxR/ugio709QHHAdvdWbckuA
+# IidW4k+1cmQj3qQI9H5zEEknevXYX3mTK66320nl259mANmxSnc+CZck7hVo0htT
+# 7/d+s4edZ2G6C7eFfFF0pPxr+Zq8Qd5OS0Kw6h5WbaP5LV0xnzS+iyP2g+bUL0pu
+# G5ME3hZ8AnCeklc0lKQp3Vca92MDducKbn6FqLolf/z1q2ec1ctIzyCkYq1Vh2XL
+# Oic/esFY1sUhkFbT3XJYrYlRMQX16ettVq59iSPV6qBQabR0EWanjtt5BUvwoSwZ
+# Pfji2b/6AxDPcD1Ud37Jxu84YIVQlA==
 # SIG # End signature block
