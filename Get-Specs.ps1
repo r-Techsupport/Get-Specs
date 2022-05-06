@@ -20,6 +20,8 @@ $today = Get-Date
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
 $hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
+$hostsSum = $(Get-FileHash $hostsFile).hash
+$hostsContent = Get-Content $hostsFile
 
 ## bad things
 $badSoftware = @(
@@ -453,11 +455,9 @@ function getBadThings {
             $17 = "RAM is in DIMM3 and DIMM4"
         }
     }
-    # hosts checks
-    $hostsSum = $(Get-FileHash $hostsFile).hash
-    $hostsContent = Get-Content $hostsFile
+    # hosts checks 
     If ($hostsSum -ne $hostsHash) {
-        $18 = "Hosts file has been modified from stock"
+        $18 = "Hosts file has been modified from stock, it has been appended to bottom of this page"
         If ($hostsContent -Like "*license.piriform.com*") {
             $19 = "piriform license server redirection"
         }
@@ -814,6 +814,12 @@ function getSmart {
     }
     Return $1,$2
 }
+function getHosts {
+    If ($hostsSum -ne $hostsHash) {
+        $hostsContent
+        Write-Output ""
+    }
+}
 function getTimer {
     $timer.Stop()
     $1 = 'Runtime'
@@ -968,6 +974,7 @@ getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
 getDisks | Out-File -Append -Encoding ascii $file
 getSmart | Out-File -Append -Encoding ascii $file
+getHosts | Out-FIle -Append -Encoding ascii $file
 getTimer | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
