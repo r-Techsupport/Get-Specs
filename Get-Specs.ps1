@@ -239,9 +239,9 @@ function table {
 $1 = '<a name="top"></a>
 <h2>Sections</h2>
 <div style="line-height:0">
+<p><a href="#hw">Hardware Basics</a></p>
 <p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
-<p><a href="#hw">Hardware Basics</a></p>
 <p><a href="#bios">BIOS</a></p>
 <p><a href="#SysVar">System Variables</a></p>
 <p><a href="#UserVar">User Variables</a></p>
@@ -489,45 +489,6 @@ function getBadThings {
     Write-Host 'Checked for issues' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
 }
-function getLicensing {
-    Write-Host 'Getting license information...'
-    $1 = "<h2 id='Lics'>Licensing</h2>"
-    $2 = $cimLics | ConvertTo-Html -Fragment
-    Write-Host 'Got license information' -ForegroundColor Green
-    Return $1,$2
-}
-function getSecureInfo {
-    Write-Host 'Getting security information...'
-    $1 = "<h2 id='SecInfo'>Security Information</h2>"
-
-    $secObject = New-Object PSObject
-    # Add AVs
-    $i = 0
-    ForEach ($a in $av) {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
-        $i++
-    }
-    # Add FW and assume its defender if there is no entry (default)
-    If ($fw.DisplayName -eq $NULL) {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
-        } Else {
-        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
-    }
-    # Add UAC
-    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
-    # Add Secureboot
-    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
-    $2 = $secObject | ConvertTo-Html -Fragment -As List
-
-    $6 = "<h2 id='TPM'>TPM</h2>"
-    If ($tpm -eq $NULL) {
-        $7 = 'TPM not detected'
-        } Else {
-        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
-    }
-    Write-Host 'Got security information' -ForegroundColor Green
-    Return $1,$2,$6,$7
-}
 function getTemps {
     Try {
         Add-Type -Path .\files\OpenHardwareMonitorLib.dll -ErrorAction SilentlyContinue
@@ -628,6 +589,45 @@ function getRAM {
     $2 = $($ramSticks | Select Manufacturer,Configuredclockspeed,Devicelocator,Capacity,Serialnumber,PartNumber | ConvertTo-Html -Fragment)
     Write-Host 'Got hardware information' -ForegroundColor Green
     Return $1,$2
+}
+function getLicensing {
+    Write-Host 'Getting license information...'
+    $1 = "<h2 id='Lics'>Licensing</h2>"
+    $2 = $cimLics | ConvertTo-Html -Fragment
+    Write-Host 'Got license information' -ForegroundColor Green
+    Return $1,$2
+}
+function getSecureInfo {
+    Write-Host 'Getting security information...'
+    $1 = "<h2 id='SecInfo'>Security Information</h2>"
+
+    $secObject = New-Object PSObject
+    # Add AVs
+    $i = 0
+    ForEach ($a in $av) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name "Antivirus$i" -Value $a.DisplayName
+        $i++
+    }
+    # Add FW and assume its defender if there is no entry (default)
+    If ($fw.DisplayName -eq $NULL) {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value "Assume Defender"
+        } Else {
+        Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'Firewall' -Value $fw.DisplayName
+    }
+    # Add UAC
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
+    # Add Secureboot
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
+    $2 = $secObject | ConvertTo-Html -Fragment -As List
+
+    $6 = "<h2 id='TPM'>TPM</h2>"
+    If ($tpm -eq $NULL) {
+        $7 = 'TPM not detected'
+        } Else {
+        $7 = $tpm | Select IsActivated_InitialValue,IsEnabled_InitialValue,IsOwned_InitialValue,PhysicalPresenceVersionInfo,SpecVersion | ConvertTo-Html -Fragment
+    }
+    Write-Host 'Got security information' -ForegroundColor Green
+    Return $1,$2,$6,$7
 }
 function getBIOS {
     $1 = "<h2 id='bios'>BIOS</h2>"
@@ -949,10 +949,10 @@ getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
 getBadThings | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
-getLicensing | Out-File -Append -Encoding ascii $file
-getSecureInfo | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
+getLicensing | Out-File -Append -Encoding ascii $file
+getSecureInfo | Out-File -Append -Encoding ascii $file
 getBIOS | Out-File -Append -Encoding ascii $file
 getVars | Out-File -Append -Encoding ascii $file
 getUpdates | Out-File -Append -Encoding ascii $file
