@@ -331,8 +331,8 @@ function getFullKey {
     }
     return $1
 }
-function getBadThings {
-    Write-Host 'Checking for issues...'
+function getNotes {
+    Write-Host 'Checking for notes...'
     $1 = '<h2>Notes</h2>'
     $2 = @()
     $3 = @()
@@ -486,10 +486,10 @@ function getBadThings {
     }
     # count and report issue devices
     If ($issueDevices.Status.Count -gt 0) {
-        $23 = "Devices have issues: " + $issueDevices.Status.Count + " Check in 'Issue Devices' section"
+        $23 = $issueDevices.Status.Count + " devices have issues, see 'Issue Devices' section"
     }
 
-    Write-Host 'Checked for issues' -ForegroundColor Green
+    Write-Host 'Checked for notes' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
 }
 function getTemps {
@@ -956,7 +956,7 @@ Write-Host 'Got SMART' -ForegroundColor Green
 header | Out-File -Encoding ascii $file
 getDate | Out-File -Append -Encoding ascii $file
 getBasicInfo | Out-File -Append -Encoding ascii $file
-getBadThings | Out-File -Append -Encoding ascii $file
+getNotes | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
