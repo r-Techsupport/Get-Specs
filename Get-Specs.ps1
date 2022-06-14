@@ -819,6 +819,7 @@ function getSmart {
 }
 function getHosts {
     If ($hostsSum -ne $hostsHash) {
+        $hostsSum
         $hostsContent
         Write-Output ""
     }
