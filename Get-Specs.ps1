@@ -486,7 +486,7 @@ function getNotes {
     }
     # count and report issue devices
     If ($issueDevices.Status.Count -gt 0) {
-        $23 = $issueDevices.Status.Count + " devices have issues, see 'Issue Devices' section"
+        $23 = $issueDevices.Status.Count + " devices have issues, see 'Devices with issues' section"
     }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
