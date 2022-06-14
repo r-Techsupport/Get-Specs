@@ -488,9 +488,23 @@ function getNotes {
     If ($issueDevices.Status.Count -gt 0) {
         $23 = $issueDevices.Status.Count + " devices have issues, see 'Issue Devices' section"
     }
+    # Check for TPM and secure boot if on Windows 11
+    If ([System.Environment]::OSVersion.Version.Build -ge 22000) {
+        # Why must SpecVersion be a string :(
+        If ($tpm -eq $NULL) {
+            $24 = "No TPM"
+        }
+        ElseIf ([int][string]($tpm.SpecVersion[0]) -l 2) {
+            $24 = "Windows 11 TPM version not satisfied"
+        }
+
+        If (!(Confirm-SecureBootUEFI)) {
+            $25 = "Secure boot not enabled"
+        }
+    }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25
 }
 function getTemps {
     Try {
