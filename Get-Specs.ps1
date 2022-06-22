@@ -9,9 +9,6 @@
 # VERSION
 $version = '1.6.0'
 
-# source our other ps1 files
-. files\wpf.ps1
-
 # Declarations
 ## files we use
 $file = 'TechSupport_Specs.html'
@@ -876,6 +873,7 @@ function uploadFile {
     Start-Process $linkProper
 }
 function promptStart {
+        . files\wpf.ps1
         $Params = @{
         Content = "&#10;
 This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
@@ -905,6 +903,7 @@ The source code for this application can be found at https://github.com/PipeItTo
     }
 }
 function promptUpload {
+    . files\wpf.ps1
     Write-Host "Completed. Check for another prompt offering to view or upload the results."
     $Params = @{
         Content = "Do you want to view or upload the specs?
@@ -933,6 +932,7 @@ Uploaded results are deleted after 24 hours"
 }
 
 # ------------------ #
+checkExecutableHashes
 promptStart
 $timer = [diagnostics.stopwatch]::StartNew()
 # ------------------ #
