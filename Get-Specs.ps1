@@ -17,6 +17,20 @@ $version = '1.5.2'
 $file = 'TechSupport_Specs.html'
 $today = Get-Date
 
+## hashes for executables
+$hashPaths = @(
+    './files/DiskInfo64.exe',
+    './files/OpenHardwareMonitorLib.dll',
+    './files/wpf.ps1',
+    './files/Get-Smart/Get-SMART.ps1'
+)
+$hashSums = @(
+    '58778361E2DCDA5DEB94D52C071FCEDA48FE7850D2D992939DE2A4210C347246',
+    'D657E857466FE517CB91B4C3742B40DE4566D051D72C7D836921A7D47947EB70',
+    '7D214F840DFB47C1BC900D1EF6700DAF7C7697676452866D765264C0D95927F6',
+    'CB9EAA8903975F23196918EF7DFC1CAE9D4F28046A0955C842D410206DFB7B59'
+)
+
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
 $hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
@@ -265,6 +279,17 @@ $1 = '<a name="top"></a>
 <p><a href="#SMART">SMART</a></p>
 </div>'
 Return $1
+}
+
+function checkExecutableHashes {
+    $i = 0
+    ForEach ($file in $hashPaths) {
+        $currentHash = $(Get-FileHash $file).Hash
+        If ($currentHash -ne $hashSums[$i] {
+            Throw "$file sum mismatch"
+        }
+        $i++
+    }
 }
 
 function getDate {
