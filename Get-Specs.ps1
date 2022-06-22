@@ -17,6 +17,20 @@ $version = '1.5.2'
 $file = 'TechSupport_Specs.html'
 $today = Get-Date
 
+## hashes for executables
+$hashPaths = @(
+    './files/DiskInfo64.exe',
+    './files/OpenHardwareMonitorLib.dll',
+    './files/wpf.ps1',
+    './files/Get-Smart/Get-SMART.ps1'
+)
+$hashSums = @(
+    '58778361E2DCDA5DEB94D52C071FCEDA48FE7850D2D992939DE2A4210C347246',
+    'D657E857466FE517CB91B4C3742B40DE4566D051D72C7D836921A7D47947EB70',
+    '7D214F840DFB47C1BC900D1EF6700DAF7C7697676452866D765264C0D95927F6',
+    'CB9EAA8903975F23196918EF7DFC1CAE9D4F28046A0955C842D410206DFB7B59'
+)
+
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
 $hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
@@ -267,6 +281,17 @@ $1 = '<a name="top"></a>
 Return $1
 }
 
+function checkExecutableHashes {
+    $i = 0
+    ForEach ($file in $hashPaths) {
+        $currentHash = $(Get-FileHash $file).Hash
+        If ($currentHash -ne $hashSums[$i]) {
+            Throw "$file sum mismatch"
+        }
+        $i++
+    }
+}
+
 function getDate {
     $1 = "Local: " + $today
     $2 = "UTC: " + $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId(($today), 'Greenwich Standard Time'))
@@ -492,14 +517,14 @@ function getNotes {
     If ([System.Environment]::OSVersion.Version.Build -ge 22000) {
         # Why must SpecVersion be a string :(
         If ($tpm -eq $NULL) {
-            $24 = "No TPM"
+            $24 = "Windows 11 with no TPM"
         }
-        ElseIf ([int][string]($tpm.SpecVersion[0]) -l 2) {
+        ElseIf ([int][string]($tpm.SpecVersion[0]) -lt 2) {
             $24 = "Windows 11 TPM version not satisfied"
         }
 
         If (!(Confirm-SecureBootUEFI)) {
-            $25 = "Secure boot not enabled"
+            $25 = "Windows 11 with secure boot not enabled"
         }
     }
 
@@ -996,12 +1021,11 @@ getHosts | Out-FIle -Append -Encoding ascii $file
 getTimer | Out-File -Append -Encoding ascii $file
 promptUpload
 # ------------------ #
-
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZ1CUQ4RUoGGWlj+WojXQSyPv
-# FSKgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7tvWS6EqyGlHdFfPv7O1POPz
+# qsWgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1101,17 +1125,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTA
-# fQotLkhNRdbshkImiGxU55kxAjANBgkqhkiG9w0BAQEFAASCAgCC/0g9xd3Nxas7
-# CyUW2O3XZgk+oQhlWbn3oghsTowOo1FbScoIKkpOU7b9SOzr4OU7QGm1rXDk5zdA
-# qni0HFF/Ints/wRKq+bF1jmDJ9Nj7yjRTzItU6MsrF/75s7hYcQhE5z2n5tjBr50
-# a40A7k2K/DJi+Io7rIsCwg9vlIzCfInCMlTMgUYSggM5T1gjpOpa5wel/nqVqv6F
-# DBAgt+xMtKd1Y7w/GrWn3Byyh/ct27DiW+4GbjKAEwZTgGkpGbcT6jT9xlciJIjP
-# 7rRO+Ly/wm6JYx8b7QtbkuD2Z6GNRNshyaCA6P2wLwKAquV8RcWVlORkeL5U53p6
-# +YH+MqxXvjsHdZ5h8cyatzozSsJkFIX2QJQtL4PDqxR/ugio709QHHAdvdWbckuA
-# IidW4k+1cmQj3qQI9H5zEEknevXYX3mTK66320nl259mANmxSnc+CZck7hVo0htT
-# 7/d+s4edZ2G6C7eFfFF0pPxr+Zq8Qd5OS0Kw6h5WbaP5LV0xnzS+iyP2g+bUL0pu
-# G5ME3hZ8AnCeklc0lKQp3Vca92MDducKbn6FqLolf/z1q2ec1ctIzyCkYq1Vh2XL
-# Oic/esFY1sUhkFbT3XJYrYlRMQX16ettVq59iSPV6qBQabR0EWanjtt5BUvwoSwZ
-# Pfji2b/6AxDPcD1Ud37Jxu84YIVQlA==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRC
+# vbcKIFRrJksnCPiI5E+IPkUekzANBgkqhkiG9w0BAQEFAASCAgADgmtcllpmnsv8
+# lqa75Ja+mXQV2Y30VzMIlE2JJqpPL23pxi9saPZ6xKLnL7oZHnfXWcb0rr8H5wd3
+# 2+UY1dZhKBmlQC2dx7CgXkHkR0v+27e9ZgomqhqAbxRqdBVP+vwbbItGKVZzqWtD
+# ykGzYFpdrF4IZIb7OYgIZoH8+k/HlV35DqZKLgOFsupQcVwxe29tbGWVDGUS0FTX
+# tS7z43zoGMv7aoPfIzZqfL/5H2JhZMWjv87BVe9j2fAUWB2kzSD29ayO9rD271Si
+# Jkz4Dk2W7c4YHvpLdaUPGm1SypBUQ1fYX3bobpVrcDkaYUpWpfPdlXiNx2yUaKx1
+# VloHYfciW2hW9LBhu29m/CsyrmrlypAO8toZ5M5m2Z/dLL6pcT9HRdt1gad06yVb
+# 4dPMBJswafdEVSOIe+PhIJfwhLCFNCMSzb4ovFCWg3naGN5RauQkR6XIf5xSedPd
+# vokBc2gRfElnZ9iIj4A6DIhpJDWFqYuZ+xTQafgkv8txdTZ6jTd/IywrMnqGpgVx
+# ftm114mJSaPHEl1blflJ8ulpyohuhlfwpZM5z6lO63vtKqpwslLRBjEdlQ8Nhko/
+# xzwGcjYNuitSu2/DYzaU224CK4+pf7/s7YvMr+VuK6/9CFpMtL/TK7lvYqMIOwfX
+# ZggAzAkOsz85sAmUIV9axGbXITsVoQ==
 # SIG # End signature block
