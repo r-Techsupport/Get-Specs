@@ -7,7 +7,7 @@
   '.\TechSupport_Specs.html'
 #>
 # VERSION
-$version = '1.6.0'
+$version = '1.6.1'
 
 # Declarations
 ## files we use
