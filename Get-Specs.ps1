@@ -490,7 +490,7 @@ function getNotes {
         }
     }
     # check for dumps
-    $dmpFiles = Get-ChildItem 'C:\Windows\Minidump'
+    $dmpFiles = Get-ChildItem 'C:\Windows\Minidump' -ErrorAction SilentlyContinue
     $lastWeek = $today.AddDays(-7)
     $count = 0
     ForEach ($dmp in $dmpFiles) {
@@ -510,7 +510,7 @@ function getNotes {
         $23 = $issueDevices.Status.Count + " devices have issues, see 'Devices with issues' section"
     }
     # Check for TPM and secure boot if on Windows 11
-    If ([System.Environment]::OSVersion.Version.Build -ge 22000) {
+    If ($cimOS.BuildNumber -ge 22000) {
         # Why must SpecVersion be a string :(
         If ($tpm -eq $NULL) {
             $24 = "Windows 11 with no TPM"
@@ -1026,8 +1026,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUovoLvH7U+1rkzcgYoSNZYI4+
-# ucGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURZJWinYrdEEWR4QyvNyuIj1P
+# 2ZGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1127,17 +1127,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRG
-# ToYmaa7GCgdB6Tr2Yz1eoI2MEjANBgkqhkiG9w0BAQEFAASCAgBUPdzx5RGmSizT
-# LZS/KtNfAtQpcwiiwFMV7jemHqB3w6Q9N6B3Lnq3L2tRW3ekW8QaXfKjlHwcrcbO
-# IT9kEvs14/A11SYd8MQF7pP8OZMWyX4CuG4x914UohXqpi+RUJUJuWfY6qj/K97e
-# RTVeKgCBSAvuqOjvszcRxtMHbpZcoDUGxx1+qp2N254DGJ9WCpT4MZMOLnGEbXAk
-# EIbyvIjZ2DDIhhsy0Ms/Prg+EHzpc8FrI4yr/UwXm/pklDTGRdtbzu7MbCnbEpdi
-# 8wT0fK6EAIXz98MY5/CCp795a+DDaDVjrBduuZxfU7cerUmxrI8WFmgiYq8b/5Vv
-# MPFRINI2oQg35ap244+JM9CDESFaM7M0MGuTM861xXGO0MYrPC5vkoeaGLyrAlcU
-# v+PKQqkJv0dIrDEk8S5z0tBzRnaJjnsCbwtQMWmEfNtJHXDhBj+KNG0roLaSLoe7
-# vq/6ODn/mHcNbQIB+AJ1S7psqQf+6HGsrkv4jb1k6RtLJP3pyDDME+SbrkdG/Eww
-# Oy96xyRlGK+fYMJFWkkJR3jKdAOEfCJhimdLPDcIjsTutKCbVOyquOP+KZlsXehY
-# sz5e0vUAuKMzCa/kNCxzcrhp57A6cCGoZLM2eQ31H66kWWfB5PW7w4C8cixGCWgD
-# 30hIcgJZaTTdEY1jpjbvOmOX8JzB6A==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTo
+# MS9wJuCFJw2CMtX14bFqFLZdZzANBgkqhkiG9w0BAQEFAASCAgAdj//7vxgoPu3M
+# n+Ca36fRbQYwG0bie2TPNIDnAoIxI1Nd14Zc4acfRPKmvzx0QxqDhdmNIzKYFOBG
+# XTycl59VtPQltdKWNZ3yKvrwM4cwvbiAu8bqv8kYdC/n4Cf5r2YW+dAwRu8mg9lj
+# 1yv1iJV/GPmJt+ZF+P8HeS9PtVh6Dga9MulW9A3gGwJt479JptgkUVs6Ts4u1Y0C
+# OTw1zLx15oDhU2hsTnkT7yo0gcAmC8HcaROTZLNLNbwxJz9JXcaoIhq1fqNYqgf7
+# pTKcOriWZz7C7cQ8dek2m3bJ47S6SGh8pR036PhbAmSu4JVMf1hW9efMeeD7W3QC
+# rLV6EoO398KqAf4AlPOGP65IfojOuZ0X9tfafCAWDrcm4JJKL1A+BW1/pHFsrocK
+# rQxB3DECvMhY01A4J+IWNOuDw44MUEjW4RPSYtPTcSVRH4k1L5FCy24LvlPRs74L
+# h8PQBl4DnZ1/wajcDQU4YO9c5+kGg39K9pVkAWq1Q7raIxtDt1BEc9gPX6il8uDH
+# ORgbhCONMNl7qpkmHkY49cq3jU6eQt5u7fsJZDAtNiQHBcXXhdiVEL6TGiwqJW6I
+# Ai4VV5wQUAhT4ffIbTftVwXMs6ap6lxFgPQfsdzWyAJSFu/IyQprHyG1oaQdPNEo
+# CM+pPpfv4Jw1iTrnSsDfqRE6OB0kkQ==
 # SIG # End signature block
