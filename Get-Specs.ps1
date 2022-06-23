@@ -520,7 +520,7 @@ function getNotes {
             $24 = "Windows 11 TPM version not satisfied"
         }
 
-        If (!(Confirm-SecureBootUEFI)) {
+        If ($secureBoot -eq $NULL) {
             $25 = "Windows 11 with secure boot not enabled"
         }
     }
@@ -656,7 +656,7 @@ function getSecureInfo {
     # Add UAC
     Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'UAC' -Value $(Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA
     # Add Secureboot
-    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $(Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)
+    Add-Member -InputObject $secObject -MemberType NoteProperty -Name 'SecureBoot' -Value $secureBoot
     $2 = $secObject | ConvertTo-Html -Fragment -As List
 
     $6 = "<h2 id='TPM'>TPM</h2>"
@@ -967,6 +967,9 @@ $issueDevices = Get-PnpDevice -PresentOnly -Status ERROR,DEGRADED,UNKNOWN -Error
 
 # janky check for msconfig core setting
 $bcdedit = bcdedit | Select-String numproc
+
+# secureboot
+$secureBoot = Confirm-SecureBootUEFI -ErrorAction SilentlyContinue
 
 ## Build info
 $i = 0
