@@ -589,11 +589,11 @@ function getHardware {
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Product" -Value $mobo.Product
     Add-Member -InputObject $moboObject -MemberType NoteProperty -Name "Driver" -Value ""
     $hwArray += $moboObject
-
-    $gpuDriver = $(gwmi Win32_PnPSignedDriver | ? { $_.deviceName -eq $gpu.Name }).driverversion
+ 
     If (Get-Member -inputobject $gpu -name "Count" -Membertype Properties) {
         $i = 0
         foreach ($g in $gpu) {
+            $gpuDriver = $(gwmi Win32_PnPSignedDriver | ? { $_.deviceName -eq $gpu[$i].Name }).driverversion
             $gpuObject = New-Object PSObject
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
             Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu[$i].AdapterCompatibility
@@ -604,6 +604,7 @@ function getHardware {
             $i = $i + 1
         }
     } Else {
+        $gpuDriver = $(gwmi Win32_PnPSignedDriver | ? { $_.deviceName -eq $gpu.Name }).driverversion
         $gpuObject = New-Object PSObject
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Part" -Value "Video Card"
         Add-Member -InputObject $gpuObject -MemberType NoteProperty -Name "Manufacturer" -Value $gpu.AdapterCompatibility
@@ -1026,8 +1027,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURZJWinYrdEEWR4QyvNyuIj1P
-# 2ZGgghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPxCKinRJ8pEqUaYr2gvxi1lH
+# 2f2gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1127,17 +1128,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTo
-# MS9wJuCFJw2CMtX14bFqFLZdZzANBgkqhkiG9w0BAQEFAASCAgAdj//7vxgoPu3M
-# n+Ca36fRbQYwG0bie2TPNIDnAoIxI1Nd14Zc4acfRPKmvzx0QxqDhdmNIzKYFOBG
-# XTycl59VtPQltdKWNZ3yKvrwM4cwvbiAu8bqv8kYdC/n4Cf5r2YW+dAwRu8mg9lj
-# 1yv1iJV/GPmJt+ZF+P8HeS9PtVh6Dga9MulW9A3gGwJt479JptgkUVs6Ts4u1Y0C
-# OTw1zLx15oDhU2hsTnkT7yo0gcAmC8HcaROTZLNLNbwxJz9JXcaoIhq1fqNYqgf7
-# pTKcOriWZz7C7cQ8dek2m3bJ47S6SGh8pR036PhbAmSu4JVMf1hW9efMeeD7W3QC
-# rLV6EoO398KqAf4AlPOGP65IfojOuZ0X9tfafCAWDrcm4JJKL1A+BW1/pHFsrocK
-# rQxB3DECvMhY01A4J+IWNOuDw44MUEjW4RPSYtPTcSVRH4k1L5FCy24LvlPRs74L
-# h8PQBl4DnZ1/wajcDQU4YO9c5+kGg39K9pVkAWq1Q7raIxtDt1BEc9gPX6il8uDH
-# ORgbhCONMNl7qpkmHkY49cq3jU6eQt5u7fsJZDAtNiQHBcXXhdiVEL6TGiwqJW6I
-# Ai4VV5wQUAhT4ffIbTftVwXMs6ap6lxFgPQfsdzWyAJSFu/IyQprHyG1oaQdPNEo
-# CM+pPpfv4Jw1iTrnSsDfqRE6OB0kkQ==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSZ
+# a64TqhIAAKFyeL6ZI6RxBAWxPTANBgkqhkiG9w0BAQEFAASCAgB4eH0wshYAAaff
+# XYBkV+/7WtgYzPuwXULsk5AqahHIxEK0+iVj2WuwTzDZzqmHgPG2xTKs1a7ndWFf
+# o5k2EUlMHxRj/lXSzDMGpHdArL/XZAb5niMYJzeN4JuO8t9LQGKFPIv4OQ0qgvlW
+# eDQFGuBG8CkGYluBCq8RMvgcurCd7i8VcmWCiLM1Y6TwcCMpjGrQJPeZ6Z8ec95T
+# zdMgUO6ezChy/uOYHyWNGuZK6bGxfFvJz/6ScqucDTEhq7MwHTvAm7twUZdCWWOp
+# nHQ6mxGZVBpP1k8eKD2vKPApsNiU/BvzplZ0Qg2xb6AdmkajdbchVF7Irdh4DtTV
+# 9ZdZssB/GQtQnbfUO4+HF1eR3C92ixWeHBrbMLo0Vvjm1Z360vOKOvmBiE1YbZyZ
+# rmLS+88e7/5qB2MLnjOd9dcdRea8tVIHSB00UBPdqDiWbPYSbB7lrkKjfM86EIWf
+# 7c9Oj8jJaC++8k/oK/6eToNdbvGxCKo+jOEtyQLVn8VuUKTXYHMZjUDsuBkwiuBQ
+# 7DTLl+Mqv4lGbTfuUt+Absmf6+6xcQFDyfT7ZJHBdUUkT0u0TV5U8/epkgGNoty8
+# 7O19PxkyMw68LMbuytJCp0z8/2q+ZH0h4TK64JaG2I6panfpt7U7p3ESGE3/2mcH
+# 3gUkdCoWty8pFuCQ1jEJiFSWSIg05Q==
 # SIG # End signature block
