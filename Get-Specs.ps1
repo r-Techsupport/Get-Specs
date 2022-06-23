@@ -361,16 +361,15 @@ function getNotes {
     $4 = @()
     $5 = @()
     # bad software 
-    $i = 0
-    $t = $badSoftware.Count
-    while ($i -lt $t) {
-        $2 += $(@($installedBase.DisplayName) -like $badSoftware[$i])
-        $i = $i + 1
+   foreach ($software in $badSoftware) { 
+        if ($installedBase.DisplayName -contains $software) { 
+            $2 += "Installed: " + $software 
+        }
     }
     # bad startups
     foreach ($start in $badStartup) { 
         if ($startUps -contains $start) { 
-            $3 += $start 
+            $3 += "Startup: " + $start 
         }
     }
     # bad processes
