@@ -53,4 +53,4 @@ This script gathers:
 
 ### Disks
 * Disk layout information
-* SMART report from CDI using [Get-Smart](https://git.dev0.sh/piper/Get-Smart)
+* SMART report from CDI using [Get-Smart](https://github.com/r-Techsupport/Get-SMART)
