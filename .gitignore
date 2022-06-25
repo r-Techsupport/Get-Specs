@@ -2,3 +2,4 @@
 *.zip
 *.html
 *.swp
+.DS_Store
