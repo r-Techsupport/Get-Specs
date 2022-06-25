@@ -6,8 +6,16 @@
 .OUTPUTS Specs
   '.\TechSupport_Specs.html'
 #>
+
+
+param (
+    [Switch]$run,
+    [Switch]$view,
+    [Switch]$upload
+)
+
 # VERSION
-$version = '1.6.1'
+$version = '1.7.0'
 
 # Declarations
 ## files we use
@@ -872,19 +880,20 @@ function uploadFile {
     set-clipboard $linkProper
     Start-Process $linkProper
 }
-function promptStart {
+function promptStart {  
+    If (!($run.IsPresent)) {
         . files\wpf.ps1
         $Params = @{
         Content = "&#10;
-This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
+    This tool will gather specifications and configurations from your machine. After running this application will ask if you want to upload your results for sharing.
         &#10; 
         &#10;
-Would you like to continue?
+    Would you like to continue?
         &#10;
         &#10;
         &#10;
         &#10;
-The source code for this application can be found at https://github.com/PipeItToDevNull/Get-Specs"
+    The source code for this application can be found at https://github.com/PipeItToDevNull/Get-Specs"
         Title = "rTechsupport Specs Tool"
         TitleBackground = "DodgerBlue"
         TitleFontSize = 16
@@ -896,38 +905,46 @@ The source code for this application can be found at https://github.com/PipeItTo
         ContentBackground = "White"
         ButtonType = "none"
         CustomButtons = "Start","Exit"
-    }
-    New-WPFMessageBox @Params
-    If ($WPFMessageBoxOutput -eq "Exit") {
-        Exit
+        }
+        New-WPFMessageBox @Params
+        If ($WPFMessageBoxOutput -eq "Exit") {
+            Exit
+        }
     }
 }
 function promptUpload {
-    . files\wpf.ps1
-    Write-Host "Completed. Check for another prompt offering to view or upload the results."
-    $Params = @{
-        Content = "Do you want to view or upload the specs?
-        &#10;
-Uploaded results are deleted after 24 hours"
-        Title = "rTechsupport Specs Tool"
-        TitleBackground = "DodgerBlue"
-        TitleFontSize = 16
-        TitleFontWeight = "Bold"
-        TitleTextForeground = "White"
-        ContentFontSize = 12
-        ContentFontWeight = "Medium"
-        ContentTextForeground = "Black"
-        ContentBackground = "White"
-        ButtonType = "none"
-        CustomButtons = "View","Upload"
-    }
-    New-WPFMessageBox @Params
-    If ($WPFMessageBoxOutput -eq "View") {
-        Invoke-Item $file
-    }
-    ElseIf ($WPFMessageBoxOutput -eq "Upload") {
+    If (!($upload.IsPresent) -and !($view.IsPresent)) {
+        . files\wpf.ps1
+        Write-Host "Completed. Check for another prompt offering to view or upload the results."
+        $Params = @{
+            Content = "Do you want to view or upload the specs?
+            &#10;
+    Uploaded results are deleted after 24 hours"
+            Title = "rTechsupport Specs Tool"
+            TitleBackground = "DodgerBlue"
+            TitleFontSize = 16
+            TitleFontWeight = "Bold"
+            TitleTextForeground = "White"
+            ContentFontSize = 12
+            ContentFontWeight = "Medium"
+            ContentTextForeground = "Black"
+            ContentBackground = "White"
+            ButtonType = "none"
+            CustomButtons = "View","Upload"
+        }
+        New-WPFMessageBox @Params
+        If ($WPFMessageBoxOutput -eq "View") {
+            Invoke-Item $file
+        }
+        ElseIf ($WPFMessageBoxOutput -eq "Upload") {
+            uploadFile
+            New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
+        }
+    } ElseIf ($upload.IsPresent) {
         uploadFile
-        New-WPFMessageBox -Content "Link has been copied to your clipboard. Paste into chat to share." -Title "Upload Success" -TitleBackground Coral -WindowHost $Window
+        Write-Host "Link has been copied to your clipboard."
+    } ElseIf ($view.IsPresent) {
+        Invoke-Item $file
     }
 }
 
