@@ -5,11 +5,12 @@ This repo contains the PS1 and files needed to run the Get-Specs application mad
 
 `Loader.ps1` is used to call `Get-Specs.ps1` and is compiled into an .exe using `compile.ps1`
 
-The PS1 or EXE must be run as admin to gather SMART, and to gather temperatures. 
+The PS1 or EXE must be run as admin to gather SMART, and to gather temperatures.
 
-This script gathers:
+## CLI
+You can execute `Get-Specs.ps1` from the command line. `./get-specs.ps1 -run [ -view | -upload ]`. 
 
-
+## What is reported
 ### Basics
 
 * Windows edition
