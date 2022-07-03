@@ -15,7 +15,7 @@ param (
 )
 
 # VERSION
-$version = '1.7.0'
+$version = '1.7.1'
 
 # Declarations
 ## files we use
@@ -48,20 +48,20 @@ $badSoftware = @(
     'iTop*',
     'Driver Easy*',
     'Roblox*',
-    'ccleaner',
-    'Malwarebytes',
-    'Wallpaper Engine',
-    'Voxal Voice Changer',
-    'Clownfish Voice Changer',
-    'Voicemod',
-    'Microsoft Office Enterprise 2007',
+    'ccleaner*',
+    'Malwarebytes*',
+    'Wallpaper Engine*',
+    'Voxal Voice Changer*',
+    'Clownfish Voice Changer*',
+    'Voicemod*',
+    'Microsoft Office Enterprise 2007*',
     'Memory Cleaner*',
-    'System Mechanic',
-    'MyCleanPC',
+    'System Mechanic*',
+    'MyCleanPC*',
     'DriverFix*',
-    'Reimage Repair',
+    'Reimage Repair*',
     'cFosSpeed*',
-    'Browser Assistant',
+    'Browser Assistant*',
     'KMS*'
 )
 $badStartup = @(
@@ -893,7 +893,7 @@ function promptStart {
         &#10;
         &#10;
         &#10;
-    The source code for this application can be found at https://github.com/PipeItToDevNull/Get-Specs"
+    The source code for this application can be found at https://github.com/r-techsupport/Get-Specs"
         Title = "rTechsupport Specs Tool"
         TitleBackground = "DodgerBlue"
         TitleFontSize = 16
