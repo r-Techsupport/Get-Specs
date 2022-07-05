@@ -519,7 +519,7 @@ function getNotes {
         $23 = $issueDevices.Status.Count + " devices have issues, see 'Devices with issues' section"
     }
     # Check for TPM and secure boot if on Windows 11
-    If ($cimOS.BuildNumber -ge 22000) {
+    If ($cimOS.Caption -Like "Microsoft Windows 11*") {
         # Why must SpecVersion be a string :(
         If ($tpm -eq $NULL) {
             $24 = "Windows 11 with no TPM"
