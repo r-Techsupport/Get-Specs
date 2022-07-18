@@ -119,7 +119,8 @@ $badRegExp = @(
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
-    'Revision-PC'
+    'Revision-PC',
+    'NEXUSLITE-PC'
 )
 $badAdapters = @(
     '*TAP*',
