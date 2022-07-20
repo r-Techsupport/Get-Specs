@@ -7,7 +7,6 @@
   '.\TechSupport_Specs.html'
 #>
 
-
 param (
     [Switch]$run,
     [Switch]$view,
@@ -768,7 +767,7 @@ function getProcesses {
         }
     )
     $1 = "`n"
-    $2 = $runningProcesses | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment
+    $2 = $runningProcesses | Select -Unique | Select $properties | Sort-Object -Property name | ConvertTo-Html -Fragment
     Write-Host 'Got processes' -ForegroundColor Green
     return $1,$2
 }
