@@ -531,9 +531,13 @@ function getNotes {
             $25 = "Windows 11 with secure boot not enabled"
         }
     }
+    # Verify C and the ESP are on the same disk
+    If ($(Get-Partition | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"}).DiskNumber -ne $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber) {
+        $26 = "C and the ESP are not on the same disk"
+    }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25,$26
 }
 function getTemps {
     Try {
