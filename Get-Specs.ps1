@@ -7,7 +7,6 @@
   '.\TechSupport_Specs.html'
 #>
 
-
 param (
     [Switch]$run,
     [Switch]$view,
@@ -15,7 +14,7 @@ param (
 )
 
 # VERSION
-$version = '1.7.0'
+$version = '1.7.1'
 
 # Declarations
 ## files we use
@@ -48,20 +47,20 @@ $badSoftware = @(
     'iTop*',
     'Driver Easy*',
     'Roblox*',
-    'ccleaner',
-    'Malwarebytes',
-    'Wallpaper Engine',
-    'Voxal Voice Changer',
-    'Clownfish Voice Changer',
-    'Voicemod',
-    'Microsoft Office Enterprise 2007',
+    'ccleaner*',
+    'Malwarebytes*',
+    'Wallpaper Engine*',
+    'Voxal Voice Changer*',
+    'Clownfish Voice Changer*',
+    'Voicemod*',
+    'Microsoft Office Enterprise 2007*',
     'Memory Cleaner*',
-    'System Mechanic',
-    'MyCleanPC',
+    'System Mechanic*',
+    'MyCleanPC*',
     'DriverFix*',
-    'Reimage Repair',
+    'Reimage Repair*',
     'cFosSpeed*',
-    'Browser Assistant',
+    'Browser Assistant*',
     'KMS*'
 )
 $badStartup = @(
@@ -119,7 +118,8 @@ $badRegExp = @(
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
-    'Revision-PC'
+    'Revision-PC',
+    'NEXUSLITE-PC'
 )
 $badAdapters = @(
     '*TAP*',
@@ -518,7 +518,7 @@ function getNotes {
         $23 = $issueDevices.Status.Count + " devices have issues, see 'Devices with issues' section"
     }
     # Check for TPM and secure boot if on Windows 11
-    If ($cimOS.BuildNumber -ge 22000) {
+    If ($cimOS.Caption -Like "Microsoft Windows 11*") {
         # Why must SpecVersion be a string :(
         If ($tpm -eq $NULL) {
             $24 = "Windows 11 with no TPM"
@@ -531,9 +531,13 @@ function getNotes {
             $25 = "Windows 11 with secure boot not enabled"
         }
     }
+    # Verify C and the ESP are on the same disk
+    If ($(Get-Partition | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"}).DiskNumber -ne $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber) {
+        $26 = "C and the ESP are not on the same disk"
+    }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25,$26
 }
 function getTemps {
     Try {
@@ -767,7 +771,7 @@ function getProcesses {
         }
     )
     $1 = "`n"
-    $2 = $runningProcesses | Select -Unique | Select $properties | Sort-Object "Mem (M)" -desc | ConvertTo-Html -Fragment
+    $2 = $runningProcesses | Select -Unique | Select $properties | Sort-Object -Property name | ConvertTo-Html -Fragment
     Write-Host 'Got processes' -ForegroundColor Green
     return $1,$2
 }
@@ -819,6 +823,11 @@ function getNets {
     }
     $2 = $netArray | ConvertTo-Html -Fragment -As List
     Write-Host 'Got network configurations' -ForegroundColor Green
+    Return $1,$2
+}
+function getTcpSettings {
+    $1 = Get-NetOffloadGlobalSetting | ConvertTo-Html ReceiveSideScaling -Fragment
+    $2 = Get-NetTCPSetting | Select SettingName,Autotuninglevellocal | ConvertTo-Html -Fragment
     Return $1,$2
 }
 function getNetConnections {
@@ -893,7 +902,7 @@ function promptStart {
         &#10;
         &#10;
         &#10;
-    The source code for this application can be found at https://github.com/PipeItToDevNull/Get-Specs"
+    The source code for this application can be found at https://github.com/r-techsupport/Get-Specs"
         Title = "rTechsupport Specs Tool"
         TitleBackground = "DodgerBlue"
         TitleFontSize = 16
@@ -1032,6 +1041,7 @@ getProcesses | Out-File -Append -Encoding ascii $file
 getServices | Out-File -Append -Encoding ascii $file
 getInstalledApps | Out-File -Append -Encoding ascii $file
 getNets | Out-File -Append -Encoding ascii $file
+getTcpSettings | Out-File -Append -Encoding ascii $file
 getNetConnections | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
@@ -1044,8 +1054,8 @@ promptUpload
 # SIG # Begin signature block
 # MIIVogYJKoZIhvcNAQcCoIIVkzCCFY8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU3zDqp44kjh02C/Jd+7eXeX+2
-# lb6gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9QLSw7Mhue9P668EOQ8onznx
+# YZ+gghICMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -1145,17 +1155,17 @@ promptUpload
 # ZWN0aWdvIExpbWl0ZWQxKzApBgNVBAMTIlNlY3RpZ28gUHVibGljIENvZGUgU2ln
 # bmluZyBDQSBSMzYCEQCB2QfhrYa8+BpPeZLGEyZpMAkGBSsOAwIaBQCgeDAYBgor
 # BgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEE
-# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTP
-# 2Sgb3b04+9BVA7jpLAfRvgWnADANBgkqhkiG9w0BAQEFAASCAgAi1iegqqLpMDC3
-# tWpJfVX5aHgW+yZC4QbjwbVqSaaAjwOGFiz08kT2a8kXUdxwiap4Mou04Gc0RXHM
-# UNrXqbVvghFgoLCJjE3HroYqnbgLUQhGJ0zKtD0MmLW1197KqIk9/VCDBCZEBY3u
-# zN0zq/ZcCUg2IMRNeZLY5p/rQjVO1wZWNdTTkRc4unMFNtkgrMB+53lNejtimu4C
-# 8M5T/Fzc5wjnE1OUGXuEH8iqJN8w0UHR051qv1QiQlomMNY3WlfxjGvbmPBakqc/
-# egCpnT2WF2zHBnjEYI+DxVJ8KqWCZXDvC+TxAy9NrT2ZHD5e5q9nIR6JP8nQ3q6R
-# 8U/6BMwiAwbFl1U6NOvuELu99TDpA1jzRZjZ26jyVAzP5HJQbFdBesPhZ0k4eewM
-# mUY797NImoNEg7nbQSmKTpOzwL9XPVdHkJdDyHY8C0rxCysAs2yB2+3Jt5L7QJgN
-# qDY2ibh2VFtNcudX3B1j/IoJWpZNuQQNY7eSCWTzQyv3npxtuHPEBdcZR48XmZMR
-# JO1Q49/z9L/o/ZxBmjMS2adA0KJgnQjc/UatEFGRGdCOkdDy4zlVqiqSZ1POKxX5
-# LPHt0P6Bjs9RtznZrEsDs/F0RzzoOQhe5Ce4JHl6HFyfTN50xvx+LCPyj/puF3lE
-# Pn0NmJAIXiQ4qVZTcbxyerQaCRg6Xw==
+# MBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ/
+# QOE+WHpWaI5Qqhp2whzPmqY/gzANBgkqhkiG9w0BAQEFAASCAgBoGndlHxpY9V7l
+# 6DwGBHLe2cbtsf6LS+QkkWPFU/+H+lHKdzw+x74QTfpfEFFg1KKpeBjyr49caswd
+# jEDX8wZ4ev9ciFOILcD9o4zUrjd02W466CXK3WTncYb8FKp06etS15deOscv6bnU
+# MpGvCpZ/J2QWQUy0FcMuVsdnrn2zQQMklmHD6zwpU66Fx6w+X6igabovThYJp18M
+# ue2342TsrGrY9LqGQ64EFu6rtck0oQhJM9HqnmdAnBUfYPkAsY+v6g4qylaGyuVB
+# 3mq1t0KvSBYeDh4WHZT3ebb+90yCirv+t1oEbUpUpsFlke3Q2I2MA+rTRJuF/y92
+# XXZS4mlCDhSCgB4lHjXsu/QaU+v6/qlrTDSKAx+SZtYSksx2T393gxHd4WaLyMb7
+# SXmkxUlodtlN+5pEXv3lXpdncvqKk8+6wIpEeXylhyleYxKcX60u9BYUJBO2j+s+
+# oHzZPG7DYjsEnv7IWTI7WKEKBVJ5+5dicLRJ9GKBeO9pl50xUd3PfTo/9sRK2BY5
+# 62ZxLjvfeo+/b4sOY/Vdacotc1lXz0v66iRVXzdEM5UTE550HlemUd0qrLDZvUDW
+# +wmmE1Zi7h/6Qfken+mEAud1C+OLwPqaprri60zuB7zlkJ1L9Sg8UY9PJuWw8l/B
+# w90zRMws9U2j20KGASI44la6IlXLbg==
 # SIG # End signature block
