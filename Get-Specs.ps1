@@ -825,6 +825,11 @@ function getNets {
     Write-Host 'Got network configurations' -ForegroundColor Green
     Return $1,$2
 }
+function getTcpSettings {
+    $1 = Get-NetOffloadGlobalSetting | ConvertTo-Html ReceiveSideScaling -Fragment
+    $2 = Get-NetTCPSetting | Select SettingName,Autotuninglevellocal | ConvertTo-Html -Fragment
+    Return $1,$2
+}
 function getNetConnections {
     Write-Host 'Getting network connections...'
     $1 = "<h2 id='NetConnections'>Network Connections</h2>"
@@ -1036,6 +1041,7 @@ getProcesses | Out-File -Append -Encoding ascii $file
 getServices | Out-File -Append -Encoding ascii $file
 getInstalledApps | Out-File -Append -Encoding ascii $file
 getNets | Out-File -Append -Encoding ascii $file
+getTcpSettings | Out-File -Append -Encoding ascii $file
 getNetConnections | Out-File -Append -Encoding ascii $file
 getDrivers | Out-File -Append -Encoding ascii $file
 getAudio | Out-File -Append -Encoding ascii $file
