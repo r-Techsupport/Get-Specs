@@ -370,19 +370,19 @@ function getNotes {
     $5 = @()
     # bad software 
    foreach ($software in $badSoftware) { 
-        if ($installedBase.DisplayName -contains $software) { 
+        if ($installedBase.DisplayName -Like $software) { 
             $2 += "Installed: " + $software 
         }
     }
     # bad startups
     foreach ($start in $badStartup) { 
-        if ($startUps -contains $start) { 
+        if ($startUps -Like $start) { 
             $3 += "Startup: " + $start 
         }
     }
     # bad processes
     foreach ($running in $badProcesses) {
-        if ($runningProcesses.Name -contains $running) {
+        if ($runningProcesses.Name -Like $running) {
             $4 += "Process: " + $running 
         } 
     }
