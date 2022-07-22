@@ -14,7 +14,7 @@ param (
 )
 
 # VERSION
-$version = '1.7.1'
+$version = '1.7.2'
 
 # Declarations
 ## files we use
