@@ -138,6 +138,11 @@ $badFiles = @(
     'C:\Windows\system32\SppExtComObjHook.dll',
     'HKCU:\Software\azurite'
 )
+$badPower = @(
+    'KernelOS*',
+    'NixOS*',
+    'amit*'
+)
 $microCode = @(
     'C:\Windows\System32\mcupdate_genuineintel.dll',
     'C:\WindowsSystem32\mcupdate_authenticamd.dll'
@@ -535,9 +540,16 @@ function getNotes {
     If ($(Get-Partition | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"}).DiskNumber -ne $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber) {
         $26 = "C and the ESP are not on the same disk"
     }
+    # check for power profiles that indicate 'custom' OS
+    $27 = @()
+    foreach ($profile in $badPower) { 
+        if ($powerProfiles.ElementName -Like $profile) { 
+            $27 += "Power Profile: " + $profile
+        }
+    }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25,$26
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$22,$23,$24,$25,$26,$27
 }
 function getTemps {
     Try {
@@ -721,7 +733,7 @@ function getStartup {
 function getPower {
     Write-Host 'Getting power profiles...'
     $1 = "<h2 id='Power'>Powerprofiles</h2>"
-    $2 = powercfg /l
+    $2 = $powerProfiles | select ElementName,IsActive
     Write-Host 'Got power profiles' -ForegroundColor Green
     Return $1,$2
 }
@@ -977,6 +989,7 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 $ramSticks = Get-WmiObject win32_physicalmemory
 $cimBios = Get-CimInstance Win32_bios
+$powerProfiles = Get-CimInstance -N root\cimv2\power -Class win32_PowerPlan 
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
