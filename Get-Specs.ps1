@@ -19,7 +19,6 @@ $version = '1.7.2'
 # Declarations
 ## files we use
 $file = 'TechSupport_Specs.html'
-$today = Get-Date
 
 ## hashes for executables
 $hashPaths = @(
@@ -38,8 +37,6 @@ $hashSums = @(
 ## hosts related
 $hostsFile = 'C:\Windows\System32\drivers\etc\hosts'
 $hostsHash = '2D6BDFB341BE3A6234B24742377F93AA7C7CFB0D9FD64EFA9282C87852E57085'
-$hostsSum = $(Get-FileHash $hostsFile).hash
-$hostsContent = Get-Content $hostsFile
 
 ## bad things
 $badSoftware = @(
@@ -974,6 +971,12 @@ function promptUpload {
 checkExecutableHashes
 promptStart
 $timer = [diagnostics.stopwatch]::StartNew()
+# ------------------ #
+
+# ------------------ #
+$today = Get-Date
+$hostsSum = $(Get-FileHash $hostsFile).hash
+$hostsContent = Get-Content $hostsFile
 # ------------------ #
 
 # Bulk data gathering
