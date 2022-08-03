@@ -61,7 +61,8 @@ $badSoftware = @(
     'Reimage Repair*',
     'cFosSpeed*',
     'Browser Assistant*',
-    'KMS*'
+    'KMS*',
+    'Advanced SystemCare'
 )
 $badStartup = @(
     'AutoKMS',
