@@ -518,7 +518,8 @@ function getNotes {
     }
     # count and report issue devices
     If ($issueDevices.Status.Count -gt 0) {
-        $23 = $issueDevices.Status.Count + " devices have issues, see 'Devices with issues' section"
+        $issueDeviceCount = $issueDevices.Status.Count
+        $23 = "$issueDeviceCount devices have issues, see 'Devices with issues' section"
     }
     # Check for TPM and secure boot if on Windows 11
     If ($cimOS.Caption -Like "Microsoft Windows 11*") {
