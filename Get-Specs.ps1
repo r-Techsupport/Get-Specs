@@ -844,9 +844,13 @@ function getTcpSettings {
 function getNetConnections {
     Write-Host 'Getting network connections...'
     $1 = "<h2 id='NetConnections'>Network Connections</h2>"
-    $2 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},@{Name="Path";Expression={(Get-Process -Id $_.OwningProcess).Path}} | ConvertTo-Html -Fragment
+    $2 = "<h3>TCP</h3>"
+    $3 = Get-NetTCPConnection | Select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},@{Name="Path";Expression={(Get-Process -Id $_.OwningProcess).Path}} | Sort-Object -Property Process,RemotePort | ConvertTo-Html -Fragment
+    $4 = "<h3>UDP</h3>"
+    $5 = Get-NetUDPEndpoint | Select LocalAddress,LocalPort,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},@{Name="Path";Expression={(Get-Process -Id $_.OwningProcess).Path}} | Sort-Object -Property Process,LocalPort | ConvertTo-Html -Fragment
+
     Write-Host 'Got network connections' -ForegroundColor Green
-    Return $1,$2
+    Return $1,$2,$3,$4,$5
 }
 function getDrivers {
     Write-Host 'Getting driver information...'
