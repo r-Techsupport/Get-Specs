@@ -732,7 +732,7 @@ function getStartup {
 function getPower {
     Write-Host 'Getting power profiles...'
     $1 = "<h2 id='Power'>Powerprofiles</h2>"
-    $2 = $powerProfiles | select ElementName,IsActive
+    $2 = $powerProfiles | select ElementName,IsActive | ConvertTo-Html -Fragment
     Write-Host 'Got power profiles' -ForegroundColor Green
     Return $1,$2
 }
