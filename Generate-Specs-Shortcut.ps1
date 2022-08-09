@@ -13,7 +13,7 @@
 $poshPath = '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
 
 # Set the Command Arguments for the above PowerShell Target command. It's golf-y because my initial plan was to get this shortened to less than 260 characters before I discovered a method to generate shortcuts without the 260 character limitation.
-$argCmdVars = '-Comm "$nvg = @{Sco = ''Global''; Opt = ''AllScope''}; nv -Name gsDir -val $pwd @nvg; nv -Name gsArg -val ""-NoPro -Exec Bypass -NoEx -Comm "cd $gsDir; .\Get-Specs.ps1"""; start PowerShell -Verb RunAs -Work $gsDir -Arg $gsArg"'
+$argCmdVars = '-Comm "$nvg = @{Sco = ''Global''; Opt = ''AllScope''}; nv -Name gsDir -val $pwd @nvg; nv -Name gsArg -val ""-NoPro -Exec Bypass -Comm "cd $gsDir; .\Get-Specs.ps1"""; start PowerShell -Verb RunAs -Work $gsDir -Arg $gsArg"'
 
 # Defines a new WScript Object and stores in $WObj
 $WObj = New-Object -ComObject WScript.Shell
