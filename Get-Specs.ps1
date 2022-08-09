@@ -787,6 +787,7 @@ function getNets {
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Name" -Value $int.Name -ErrorAction SilentlyContinue
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "State" -Value $int.MediaConnectionState -ErrorAction SilentlyContinue
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Mac" -Value $int.MacAddress -ErrorAction SilentlyContinue
+        Add-Member -InputObject $intObject -MemberType NoteProperty -Name "LinkSpeed" -Value $int.LinkSpeed -ErrorAction SilentlyContinue
         Add-Member -InputObject $intObject -MemberType NoteProperty -Name "Description" -Value $int.ifDesc -ErrorAction SilentlyContinue
 
         $i = 0
