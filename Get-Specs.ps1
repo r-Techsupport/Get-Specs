@@ -349,6 +349,7 @@ function getNotes {
     # bad software 
    foreach ($software in $badSoftware) { 
         if ($installedBase.DisplayName -Like $software) { 
+            $software = $software.Replace('*','')
             $2 += "Installed: " + $software 
         }
     }
