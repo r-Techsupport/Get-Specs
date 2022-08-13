@@ -3,10 +3,10 @@
 
 This repo contains the PS1 and files needed to run the Get-Specs application made for rTechsupport
 
-Running `Specs.lnk` will execute the script interactively as admin.
+Running `Specs.cmd` (the `.cmd` extension may not show up on all systems) will execute the script interactively as admin.
 
 ## CLI
-You can execute `Get-Specs.ps1` from the command line. `./get-specs.ps1 -run [ -view | -upload ]`. 
+You can also execute `Get-Specs.ps1` from the command line. `./get-specs.ps1 -run [ -view | -upload ]`. 
 
 ## What is reported
 ### Basics
