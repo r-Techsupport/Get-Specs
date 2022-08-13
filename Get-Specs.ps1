@@ -45,7 +45,11 @@ $badSoftware = @(
     'cFosSpeed*',
     'Browser Assistant*',
     'KMS*',
-    'Advanced SystemCare'
+    'Advanced SystemCare',
+    'AVG*',
+    'Avast*',
+    'salad*',
+    'McAfee*'
 )
 $badStartup = @(
     'AutoKMS',
