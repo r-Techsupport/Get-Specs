@@ -516,9 +516,10 @@ function getNotes {
         }
     }
     # Verify C and the ESP are on the same disk
-    If ($(Get-Partition | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"}).DiskNumber -ne $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber) {
+    If ($NULL -eq $(Get-Partition -DiskNumber $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"})) {
         $26 = "C and the ESP are not on the same disk"
     }
+
     # check for power profiles that indicate 'custom' OS
     $27 = @()
     foreach ($profile in $badPower) { 
