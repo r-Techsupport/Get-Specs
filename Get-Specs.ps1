@@ -13,6 +13,8 @@ param (
     [Switch]$upload
 )
 
+Get-ExecutionPolicy
+
 # VERSION
 $version = '2.1.0'
 
