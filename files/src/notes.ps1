@@ -173,19 +173,24 @@ function getNotes {
         }
     }
     # Verify C and the ESP are on the same disk
-    If ($NULL -eq $(Get-Partition -DiskNumber $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"})) {
+    If ($bootMode -eq "UEFI" -and ($NULL -eq $(Get-Partition -DiskNumber $(Get-Partition | ? {$_.DriveLetter -eq "C" }).DiskNumber | ? {$_.GptType -eq "{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}"}))) {
         $26 = "C and the ESP are not on the same disk"
     }
 
-    # check for power profiles that indicate 'custom' OS
+    # Check for MBR disk, for Arc
     $27 = @()
+    Get-Disk | Select-Object PartitionStyle, FriendlyName | ? PartitionStyle -eq "MBR" | %{ $27 += "$($_.FriendlyName) is MBR" }
+
+
+    # check for power profiles that indicate 'custom' OS
+    $28 = @()
     foreach ($profile in $badPower) { 
         if ($powerProfiles.ElementName -Like $profile) { 
-            $27 += "Power Profile: " + $profile
+            $28 += "Power Profile: " + $profile
         }
     }
 
     Write-Host 'Checked for notes' -ForegroundColor Green
-    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27
+    Return $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28
 }
 
