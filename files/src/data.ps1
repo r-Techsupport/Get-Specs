@@ -45,6 +45,9 @@ $bcdedit = bcdedit | Select-String numproc
 # secureboot
 $secureBoot = Confirm-SecureBootUEFI -ErrorAction SilentlyContinue
 
+# legacy/uefi
+$bootMode = $env:firmware_type
+
 ## Build info
 $i = 0
 $eol = $false

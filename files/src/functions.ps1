@@ -15,7 +15,7 @@ function getbasicInfo {
     $5 = 'Uptime: ' + $uptime.Days + " Days " + $uptime.Hours + " Hours " +  $uptime.Minutes + " Minutes"
     $6 = 'Hostname: ' + $cimOs.CSName
     $7 = 'Domain: ' + $env:USERDOMAIN
-    $8 = 'Boot mode: ' + $env:firmware_type
+    $8 = 'Boot mode: ' + $bootMode
     $9 = 'Boot state: ' + $bootupState
     Write-Host 'Got basic information' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6,$7,$8,$9
