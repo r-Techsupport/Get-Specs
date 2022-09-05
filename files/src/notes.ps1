@@ -147,7 +147,7 @@ function getNotes {
         }
     }
     If ($count -gt 0) {
-        $21 = "Found $count dumps"
+        $21 = "Found $count dumps in the last week"
     }
     # check for missing files in FS
     If (!(Test-Path $microCode[0]) -And !(Test-Path $microCode[1])) {
