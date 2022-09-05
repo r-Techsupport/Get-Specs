@@ -22,7 +22,6 @@ $badSoftware = @(
     'Clownfish Voice Changer*',
     'Voicemod*',
     'Microsoft Office Enterprise 2007*',
-    'Memory Cleaner*',
     'System Mechanic*',
     'MyCleanPC*',
     'DriverFix*',
@@ -34,7 +33,10 @@ $badSoftware = @(
     'AVG*',
     'Avast*',
     'salad*',
-    'McAfee*'
+    'McAfee*',
+    'Citrix*',
+    'Norton*',
+    '*Cleaner*'
 )
 $badStartup = @(
     'AutoKMS',
