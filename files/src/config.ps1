@@ -36,7 +36,8 @@ $badSoftware = @(
     'McAfee*',
     'Citrix*',
     'Norton*',
-    '*Cleaner*'
+    '*Cleaner*',
+    'Kaspersky*'
 )
 $badStartup = @(
     'AutoKMS',
