@@ -127,7 +127,7 @@ function promptStart {
         }
         New-WPFMessageBox @Params
         If ($WPFMessageBoxOutput -eq "Exit") {
-            Exit
+            Break
         }
     }
 }
