@@ -54,7 +54,8 @@ $badProcesses = @(
     'Service_KMS.exe',
     'iTopVPN',
     'wallpaper32',
-    'TaskbarX'
+    'TaskbarX',
+    'Process Lasso Core (Process Governor)'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
