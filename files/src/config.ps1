@@ -65,7 +65,8 @@ $badKeys = @(
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
     'HKLM:\SYSTEM\Setup\Status\',
     'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers',
-    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU',
+    'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'
 )
 $badValues = @(
     'AllowBuildPreview',
@@ -74,7 +75,8 @@ $badValues = @(
     'NoAutoUpdate',
     'AuditBoot',
     'HwSchMode',
-    'UseWUServer'
+    'UseWUServer',
+    'HiberbootEnabled'
 )
 $badData = @(
     '1',
@@ -83,6 +85,7 @@ $badData = @(
     '1',
     '1',
     '2',
+    '1',
     '1'
 )
 $badRegExp = @(
@@ -91,7 +94,9 @@ $badRegExp = @(
     'Windows 11 SecureBoot bypass set to: ',
     'Windows auto update is set to: ',
     'Audit Boot is set to: ',
-    '(HAGS) HwSchMode is set to: '
+    '(HAGS) HwSchMode is set to: ',
+    'Use WSUS is: ',
+    'Fastboot is set to: '
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
