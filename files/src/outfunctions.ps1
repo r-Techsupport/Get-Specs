@@ -70,7 +70,6 @@ $1 = '<a name="top"></a>
 <h2>Sections</h2>
 <div style="line-height:0">
 <p><a href="#hw">Hardware Basics</a></p>
-<p><a href="#Lics">Licensing</a></p>
 <p><a href="#SecInfo">Security Information</a></p>
 <p><a href="#bios">BIOS</a></p>
 <p><a href="#SysVar">System Variables</a></p>
