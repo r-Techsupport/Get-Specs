@@ -369,10 +369,12 @@ function getDrivers {
     Write-Host 'Getting driver information...'
     $1 = "<h2 id='Drivers'>Drivers and device versions</h2>"
     $2 = $(gwmi Win32_PnPSignedDriver | Select devicename,driverversion | ConvertTo-Html -Fragment)
-    $3 = "<h2 id='issueDevices'>Devices with issues</h2>"
-    $4 = $issueDevices | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
+    $3 = "<h2 id='usbDevices'>USB Devices</h2>"
+    $4 = $pnpDevices | ? { $_.InstanceId -match '^USB' } | Select FriendlyName,Description,Class,InstanceID,Status,Service | ConvertTo-Html -Fragment
+    $5 = "<h2 id='issueDevices'>Devices with issues</h2>"
+    $6 = $pnpDevices | ? { $_.Status -Match "Error|Warning|Degraded|Unknown" } | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
-    Return $1,$2,$3,$4
+    Return $1,$2,$3,$4,$5,$6
 }
 function getAudio {
     Write-Host 'Getting audio devices...'
