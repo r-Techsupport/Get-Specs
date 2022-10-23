@@ -1,5 +1,5 @@
 # VERSION
-$version = '2.3.0'
+$version = '2.3.1'
 
 # Declarations
 ## from the perspective of Get-Specs.ps1, so we use ..
@@ -65,7 +65,8 @@ $badKeys = @(
     'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\',
     'HKLM:\SYSTEM\Setup\Status\',
     'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers',
-    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
+    'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU',
+    'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'
 )
 $badValues = @(
     'AllowBuildPreview',
@@ -74,7 +75,8 @@ $badValues = @(
     'NoAutoUpdate',
     'AuditBoot',
     'HwSchMode',
-    'UseWUServer'
+    'UseWUServer',
+    'HiberbootEnabled'
 )
 $badData = @(
     '1',
@@ -83,6 +85,7 @@ $badData = @(
     '1',
     '1',
     '2',
+    '1',
     '1'
 )
 $badRegExp = @(
@@ -91,7 +94,9 @@ $badRegExp = @(
     'Windows 11 SecureBoot bypass set to: ',
     'Windows auto update is set to: ',
     'Audit Boot is set to: ',
-    '(HAGS) HwSchMode is set to: '
+    '(HAGS) HwSchMode is set to: ',
+    'Use WSUS is: ',
+    'Fastboot is set to: '
 )
 $badHostnames = @(
     'ATLASOS-DESKTOP',
@@ -138,7 +143,9 @@ $builds = @(
     '19042',
     '19043',
     '19044',
-    '22000'
+    '19045',
+    '22000',
+    '22621'
 )
 $versions = @(
     '1507',
@@ -154,7 +161,9 @@ $versions = @(
     '20H2',
     '21H1',
     '21H2',
-    '21H2'
+    '22H2',
+    '21H2',
+    '22H2'
 )
 $eolDates = @(
     '2017-05-17',
@@ -170,5 +179,6 @@ $eolDates = @(
     '2022-05-10',
     '2022-12-13',
     '2023-10-10',
-    '2023-10-10'
+    '2023-10-10',
+    '2024-10-14'
 )
