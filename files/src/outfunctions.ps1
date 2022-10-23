@@ -84,6 +84,7 @@ $1 = '<a name="top"></a>
 <p><a href="#NetConfig">Network Configuration</a></p>
 <p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>
+<p><a href="#usbDevices">USB Devices</a></p>
 <p><a href="#issueDevices">Devices with issues</a></p>
 <p><a href="#Audio">Audio Devices</a></p>
 <p><a href="#Disks">Disk Layouts</a></p>
