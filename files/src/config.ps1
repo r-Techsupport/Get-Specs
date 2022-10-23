@@ -1,5 +1,5 @@
 # VERSION
-$version = '2.3.1'
+$version = '2.3.2'
 
 # Declarations
 ## from the perspective of Get-Specs.ps1, so we use ..
