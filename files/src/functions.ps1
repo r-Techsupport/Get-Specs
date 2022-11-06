@@ -372,7 +372,7 @@ function getDrivers {
     $3 = "<h2 id='usbDevices'>USB Devices</h2>"
     $4 = $pnpDevices | ? { $_.InstanceId -match '^USB' } | Select FriendlyName,Description,Class,InstanceID,Status,Service | ConvertTo-Html -Fragment
     $5 = "<h2 id='issueDevices'>Devices with issues</h2>"
-    $6 = $pnpDevices | ? { $_.Status -Match "Error|Warning|Degraded|Unknown" } | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
+    $6 = $issueDevices | Select Status,Name,InstanceID | ConvertTo-HTML -Fragment
     Write-Host 'Got driver information' -ForegroundColor Green
     Return $1,$2,$3,$4,$5,$6
 }
