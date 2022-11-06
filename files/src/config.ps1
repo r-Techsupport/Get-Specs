@@ -37,7 +37,9 @@ $badSoftware = @(
     'Citrix*',
     'Norton*',
     '*Cleaner*',
-    'Kaspersky*'
+    'Kaspersky*',
+    'Speedify',
+    'UltraUXThemePatcher'
 )
 $badStartup = @(
     'AutoKMS',
@@ -55,7 +57,8 @@ $badProcesses = @(
     'iTopVPN',
     'wallpaper32',
     'TaskbarX',
-    'Process Lasso Core (Process Governor)'
+    'Process Lasso Core (Process Governor)',
+    'Speedify'
 )
 # YOU MUST MATCH THE KEY AND VALUE BELOW TO THE SAME ARRAY VALUE
 $badKeys = @(
