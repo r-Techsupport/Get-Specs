@@ -38,6 +38,7 @@ $volumes = Get-Volume
 $dns = Get-DnsClientGlobalSetting
 $netAdapters = Get-NetADapter
 $pnpDevices = Get-PnpDevice -PresentOnly -ErrorAction SilentlyContinue
+$issueDevices = $pnpDevices | ? { $_.Status -Match "Error|Warning|Degraded|Unknown" }
 
 # janky check for msconfig core setting
 $bcdedit = bcdedit | Select-String numproc
