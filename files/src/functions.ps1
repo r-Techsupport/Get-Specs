@@ -343,6 +343,11 @@ function getNets {
                 $i++
             }
         }
+        
+        $netProfiles = $(Get-NetConnectionProfile -InterfaceIndex $int.IfIndex).NetworkCategory
+        ForEach ($netProfile in $netProfiles) {
+            Add-Member -InputObject $intObject -MemberType NoteProperty -Name "NetProfile" -Value $netProfile -ErrorAction SilentlyContinue
+        }
         $netArray += $intObject
     }
     $2 = $netArray | ConvertTo-Html -Fragment -As List
