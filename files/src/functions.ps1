@@ -153,6 +153,28 @@ function getHardware {
 
     Return $1,$2
 }
+function getMonitors {
+    ForEach ($card in $cimVids) {
+        $cards = $card | Invoke-CimMethod -MethodName GetDeviceProperties | select -ExpandProperty deviceproperties |
+            where {$_.KeyName -eq 'DEVPKEY_Device_Children' -or $_.keyname -eq 'DEVPKEY_NAME'} | select-object @{N='Display'; E = {[string]$_.data.ForEach({ ($_ -split ',')})}}
+    }
+    $cleanCards = $cards[1] -Split (' ')
+    $pattern = '(?<=\\).+?(?=\\)'
+    $cleanCards = [regex]::Matches($cleanCards, $pattern).Value
+
+    $1 = ForEach-Object {
+        [pscustomobject]@{
+            'GPU Name' =$2[0].Display
+            'Display Name'=$1[$i]
+            'Display Type' =$3[$i*2] 
+            Height=$_.bounds.height
+            Width=$_.bounds.width
+            Primary=$_.Primary
+        } 
+        $i++
+    }
+    Return $1
+}
 function getRAM {
     $totalRam = $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})
     $ramObject = New-Object PSObject
