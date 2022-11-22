@@ -70,3 +70,10 @@ Write-Host 'Got main data' -ForegroundColor Green
 Write-Host 'Getting SMART data...'
 $smart = .\Get-Smart\Get-Smart.ps1 -cdiPath '.\DiskInfo64.exe'
 Write-Host 'Got SMART' -ForegroundColor Green
+
+# chrome extensions
+$chromeExtensions = @()
+$rawChromeExt = Get-ChildItem -Recurse "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Default\Extensions" | ? {$_.Name -Like "manifest.json" }
+ForEach ($ext in $rawChromeext) { 
+    $chromeExtensions += Get-Content $ext.FullName | ConvertFrom-Json 
+}
