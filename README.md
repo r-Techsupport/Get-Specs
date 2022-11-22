@@ -39,6 +39,7 @@ You can also execute `Get-Specs.ps1` from the command line. `./get-specs.ps1 -ru
 * Running processes with statistics
 * Services
 * Installed applications
+* Installed Chrome extensions
 * Integrity of Hosts file
 
 ### Networking
