@@ -314,6 +314,13 @@ function getInstalledApps {
     Write-Host 'Got installed apps' -ForegroundColor Green
     Return $1,$2
 }
+function getBrowserExtensions {
+    Write-Host 'Getting browser extensions...'
+    $1 = "<h2 id='Browser Extensions'>Browser Extensions</h2>"
+    $2 = $chromeExtensions | Select Author,Name | ConvertTo-Html -Fragment
+    Write-Host 'Got browser extensions' -Foreground Green
+    Return $1,$2
+}
 function getNets {
     Write-Host 'Getting network configurations...'
     $1 = "<h2 id='NetConfig'>Network Configuration</h2>"

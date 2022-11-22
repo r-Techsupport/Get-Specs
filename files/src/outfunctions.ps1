@@ -80,6 +80,7 @@ $1 = '<a name="top"></a>
 <p><a href="#RunningProcs">Running Processes</a></p>
 <p><a href="#Services">Services</a></p>
 <p><a href="#InstalledApps">Installed Applications</a></p>
+<p><a href="#Browser Extensions">Browser Extensions</a></p>
 <p><a href="#NetConfig">Network Configuration</a></p>
 <p><a href="#NetConnections">Network Connections</a></p>
 <p><a href="#Drivers">Drivers and device versions</a></p>

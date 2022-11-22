@@ -40,6 +40,7 @@ getRamUsage | Out-File -Append -Encoding ascii $file
 getProcesses | Out-File -Append -Encoding ascii $file
 getServices | Out-File -Append -Encoding ascii $file
 getInstalledApps | Out-File -Append -Encoding ascii $file
+getBrowserExtensions | Out-File -Append -Encoding ascii $file
 getNets | Out-File -Append -Encoding ascii $file
 getTcpSettings | Out-File -Append -Encoding ascii $file
 getNetConnections | Out-File -Append -Encoding ascii $file
