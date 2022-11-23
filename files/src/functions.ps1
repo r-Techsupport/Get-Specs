@@ -164,9 +164,9 @@ function getMonitors {
 
     $1 = ForEach-Object {
         [pscustomobject]@{
-            'GPU Name' =$2[0].Display
-            'Display Name'=$1[$i]
-            'Display Type' =$3[$i*2] 
+            'GPU Name' =$cards[0].Display
+            'Display Name'=$monitors[$i]
+            'Display Type' =$cleanCards[$i*2] 
             Height=$_.bounds.height
             Width=$_.bounds.width
             Primary=$_.Primary
