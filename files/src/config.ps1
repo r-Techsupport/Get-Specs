@@ -41,6 +41,10 @@ $badSoftware = @(
     'Speedify',
     'UltraUXThemePatcher'
 )
+$badExtensionID = @(
+    'blddohgncmehcepnokognejaaahehncd',
+    'ccjalhebkdogpobnbdhfpincfeohonni'
+)
 $badStartup = @(
     'AutoKMS',
     'kmspico',
