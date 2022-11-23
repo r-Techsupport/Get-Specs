@@ -162,10 +162,14 @@ function getMonitors {
     $pattern = '(?<=\\).+?(?=\\)'
     $cleanCards = [regex]::Matches($cleanCards, $pattern).Value
 
-    $1 = ForEach-Object {
+    $cleanMonitors = $monitors | ForEach-Object {($_.UserFriendlyName -ne 0 | foreach {[char]$_}) -join ""}
+
+    Add-Type -AssemblyName System.Windows.Forms
+    $i = 0
+    $1 = [System.Windows.Forms.Screen]::AllScreens | ForEach-Object {
         [pscustomobject]@{
             'GPU Name' =$cards[0].Display
-            'Display Name'=$monitors[$i]
+            'Display Name'=$cleanMonitors[$i]
             'Display Type' =$cleanCards[$i*2] 
             Height=$_.bounds.height
             Width=$_.bounds.width
