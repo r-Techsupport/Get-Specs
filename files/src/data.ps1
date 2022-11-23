@@ -75,5 +75,7 @@ Write-Host 'Got SMART' -ForegroundColor Green
 $chromeExtensions = @()
 $rawChromeExt = Get-ChildItem -Recurse "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Default\Extensions" | ? {$_.Name -Like "manifest.json" }
 ForEach ($ext in $rawChromeext) { 
-    $chromeExtensions += Get-Content $ext.FullName | ConvertFrom-Json 
+    $chromeExtension = Get-Content $ext.FullName | ConvertFrom-Json
+    $chromeExtension | Add-Member -Name ID -Type NoteProperty -Value $($ext.FullName -split ('\\'))[10]
+    $chromeExtensions += $chromeExtension
 }
