@@ -301,7 +301,7 @@ function getProcesses {
 function getServices {
     Write-Host 'Getting services...'
     $1 = "<h2 id='Services'>Services</h2>"
-    $servicesTable = $services | Select Status,DisplayName | Sort -Property DisplayName | ConvertTo-Html -Fragment
+    $servicesTable = $services | Select Status,StartType,DisplayName | Sort -Property DisplayName | ConvertTo-Html -Fragment
     $2 = $servicesTable -replace "<td>Stopped</td>", "<td style='color:#ab6387'>Stopped</td>" -replace "<td>Running</td>", "<td style='color:#87ab63'>Running</td>"
     Write-Host 'Got services' -ForegroundColor Green
     Return $1,$2
