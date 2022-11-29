@@ -28,6 +28,7 @@ getBasicInfo | Out-File -Append -Encoding ascii $file
 getNotes | Out-File -Append -Encoding ascii $file
 table | Out-File -Append -Encoding ascii $file
 getHardware | Out-File -Append -Encoding ascii $file
+getMonitors | Out-File -Append -Encoding ascii $file
 getRAM | Out-File -Append -Encoding ascii $file
 #getLicensing | Out-File -Append -Encoding ascii $file
 getSecureInfo | Out-File -Append -Encoding ascii $file
