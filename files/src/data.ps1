@@ -25,7 +25,7 @@ $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName wi
 $ramSticks = Get-WmiObject win32_physicalmemory
 $cimBios = Get-CimInstance Win32_bios
 $powerProfiles = Get-CimInstance -N root\cimv2\power -Class win32_PowerPlan 
-$monitors = Get-WmiObject WmiMonitorID -Namespace root\wmi
+$monitors = Get-WmiObject WmiMonitorID -Namespace root\wmi -ErrorAction SilentlyContinue
 $cimVids = Get-CimInstance -Class win32_PnpEntity -Filter "PNPClass = 'Display'"
 
 ## Other

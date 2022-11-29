@@ -154,6 +154,10 @@ function getHardware {
     Return $1,$2
 }
 function getMonitors {
+    If ($monitors -eq $NULL) {
+        $1 = "<h3>Monitor WMI Failure</h3>"
+        Return $1
+    }
     ForEach ($card in $cimVids) {
         $cards = $card | Invoke-CimMethod -MethodName GetDeviceProperties | select -ExpandProperty deviceproperties |
             where {$_.KeyName -eq 'DEVPKEY_Device_Children' -or $_.keyname -eq 'DEVPKEY_NAME'} | select-object @{N='Display'; E = {[string]$_.data.ForEach({ ($_ -split ',')})}}
@@ -161,7 +165,6 @@ function getMonitors {
     $cleanCards = $cards[1] -Split (' ')
     $pattern = '(?<=\\).+?(?=\\)'
     $cleanCards = [regex]::Matches($cleanCards, $pattern).Value
-
     $cleanMonitors = $monitors | ForEach-Object {($_.UserFriendlyName -ne 0 | foreach {[char]$_}) -join ""}
 
     Add-Type -AssemblyName System.Windows.Forms
@@ -177,6 +180,7 @@ function getMonitors {
         } 
         $i++
     }
+    $1 = $1 | ConvertTo-Html -Fragment
     Return $1
 }
 function getRAM {
