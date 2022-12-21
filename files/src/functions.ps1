@@ -347,7 +347,7 @@ function getInstalledApps {
 function getBrowserExtensions {
     Write-Host 'Getting browser extensions...'
     $1 = "<h2 id='Browser Extensions'>Browser Extensions</h2>"
-    $2 = $chromeExtensions | Select Author,Name,ID | ConvertTo-Html -Fragment
+    $2 = $chromeExtensions | Select Author,Name, Description,Version,ID | ConvertTo-Html -Fragment
     Write-Host 'Got browser extensions' -Foreground Green
     Return $1,$2
 }
