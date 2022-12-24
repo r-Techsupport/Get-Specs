@@ -172,6 +172,29 @@ function getMonitors {
 	del dxoutput.xml
 	Return $1
 }
+function getBattery{
+	if($BatteryInfo -eq '2'){
+		powercfg /batteryreport /output '.\Battery_Info.xml' /xml
+		[xml]$b = Get-Content $file1
+		$1 = $b.BatteryReport.Batteries |
+			ForEach-Object{
+				# if there are multiple batteries you'll get an array for each property (one entry for each battery)
+				[PSCustomObject]@{
+					Name = $_.Battery.Id
+					Manaufacturer = $_.Battery.Manufacturer
+					Chemistry = $_.Battery.Chemistry
+					'Design Capacity' = $_.Battery.DesignCapacity
+					'Full Charge Capacity' = $_.Battery.FullChargeCapacity
+					'Remaining Life Percentage' = if ($_.Battery.DesignCapacity -eq $null){'0'}else
+						{($_.Battery.FullChargeCapacity / $_.Battery.DesignCapacity) * 100}
+				   
+				}
+			}
+		del $file1
+	}
+	$1 | ConvertTo-Html
+	return $1
+}
 function getRAM {
     $totalRam = $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})
     $ramObject = New-Object PSObject
