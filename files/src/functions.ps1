@@ -160,12 +160,12 @@ function getMonitors {
     $1 = $xmldata.DxDiag.DisplayDevices.DisplayDevice| % {
         [pscustomobject]@{
             'GPU Name'=$_.CardName | Out-String
-		    'MonitorModel'=if ($_.MonitorModel -eq 'unknown') {''} else{$_.MonitorModel | Out-String} 
-		    'Monitor Id'=$_.MonitorID | Out-String
-		    'Out Type'=$_.OutputType | Out-String
-		    'HDR Support'=if ($_.HDRSupport -eq 'unknown') {''} else{$_.HDRSupport | Out-String} 
-		    'Native Mode'=$_.NativeMode | Out-String
-		    'Current Mode'=if ($_.CurrentMode -eq 'unknown') {'Not in Use'} else{$_.CurrentMode | Out-String}
+            'MonitorModel'=if ($_.MonitorModel -eq 'unknown') {''} else{$_.MonitorModel | Out-String} 
+            'Monitor Id'=$_.MonitorID | Out-String
+            'Out Type'=$_.OutputType | Out-String
+            'HDR Support'=if ($_.HDRSupport -eq 'unknown') {''} else{$_.HDRSupport | Out-String} 
+            'Native Mode'=$_.NativeMode | Out-String
+            'Current Mode'=if ($_.CurrentMode -eq 'unknown') {'Not in Use'} else{$_.CurrentMode | Out-String}
         }
     }
     $1 = $1 | ConvertTo-Html -Fragment
