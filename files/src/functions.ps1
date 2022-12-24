@@ -192,7 +192,7 @@ function getBattery {
         Remove-Item .\batteryInfo.xml -ErrorAction SilentlyContinue
         $1 = $1 | ConvertTo-Html -Fragment
     } Else {
-        $1 = "This is not a laptop"
+        $1 = $null
     }
     return $1
 }
