@@ -25,8 +25,7 @@ $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName wi
 $ramSticks = Get-WmiObject win32_physicalmemory
 $cimBios = Get-CimInstance Win32_bios
 $powerProfiles = Get-CimInstance -N root\cimv2\power -Class win32_PowerPlan
-$BatteryInfo = (Get-CimInstance -Class Win32_ComputerSystem -Property PCSystemType).PCSystemType
-$file1 = '.\Battery_Info.xml'
+$batteryInfo = (Get-CimInstance -Class Win32_ComputerSystem -Property PCSystemType).PCSystemType
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState
