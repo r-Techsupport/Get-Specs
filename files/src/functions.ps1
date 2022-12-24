@@ -174,8 +174,8 @@ function getMonitors {
 }
 function getBattery {
     if($batteryInfo -eq '2'){
-        powercfg /batteryreport /output '.\batteryInfo.xml' /xml
-        [xml]$b = Get-Content .\Battery_Info.xml
+        powercfg /batteryreport /output '.\batteryInfo.xml' /xml | out-null
+        [xml]$b = Get-Content .\batteryInfo.xml
         $1 = $b.BatteryReport.Batteries |
             ForEach-Object{
                 # if there are multiple batteries you'll get an array for each property (one entry for each battery)
