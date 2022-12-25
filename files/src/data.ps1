@@ -24,7 +24,8 @@ $fw = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName FirewallProduct
 $tpm = Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName win32_tpm
 $ramSticks = Get-WmiObject win32_physicalmemory
 $cimBios = Get-CimInstance Win32_bios
-$powerProfiles = Get-CimInstance -N root\cimv2\power -Class win32_PowerPlan 
+$powerProfiles = Get-CimInstance -N root\cimv2\power -Class win32_PowerPlan
+$batteryInfo = (Get-CimInstance -Class Win32_ComputerSystem -Property PCSystemType).PCSystemType
 
 ## Other
 $bootupState = $(gwmi win32_computersystem -Property BootupState).BootupState

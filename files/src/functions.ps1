@@ -155,22 +155,46 @@ function getHardware {
 }
 function getMonitors {
     dxdiag /x dxoutput.xml | Out-Null  #Out-Null here ensures the process here has been created before proceeding
-	[xml]$xmldata = get-content "dxoutput.xml"
+    [xml]$xmldata = get-content "dxoutput.xml"
 
-	$1 = $xmldata.DxDiag.DisplayDevices.DisplayDevice| % {
-		[pscustomobject]@{
-			'GPU Name'=$_.CardName | Out-String
-			'MonitorModel'=$_.MonitorModel | Out-String
-			'Monitor Id'=$_.MonitorID | Out-String
-			'Out Type'=$_.OutputType | Out-String
-			'HDR Support'=$_.HDRSupport | Out-String
-			'Native Mode'=$_.NativeMode | Out-String
-			'Current Mode'=$_.CurrentMode | Out-String
-		}
-	}
-	$1 = $1 | ConvertTo-Html -Fragment
-	del dxoutput.xml
-	Return $1
+    $1 = $xmldata.DxDiag.DisplayDevices.DisplayDevice| % {
+        [pscustomobject]@{
+            'GPU Name'=$_.CardName | Out-String
+            'MonitorModel'=if ($_.MonitorModel -eq 'unknown') {''} else{$_.MonitorModel | Out-String} 
+            'Monitor Id'=$_.MonitorID | Out-String
+            'Out Type'=$_.OutputType | Out-String
+            'HDR Support'=if ($_.HDRSupport -eq 'unknown') {''} else{$_.HDRSupport | Out-String} 
+            'Native Mode'=$_.NativeMode | Out-String
+            'Current Mode'=if ($_.CurrentMode -eq 'unknown') {'Not in Use'} else{$_.CurrentMode | Out-String}
+        }
+    }
+    $1 = $1 | ConvertTo-Html -Fragment
+    del dxoutput.xml
+    Return $1
+}
+function getBattery {
+    if($batteryInfo -eq '2'){
+        powercfg /batteryreport /output '.\batteryInfo.xml' /xml | out-null
+        [xml]$b = Get-Content .\batteryInfo.xml
+        $1 = $b.BatteryReport.Batteries |
+            ForEach-Object{
+                # if there are multiple batteries you'll get an array for each property (one entry for each battery)
+                [PSCustomObject]@{
+                    Name = $_.Battery.Id
+                    Manaufacturer = $_.Battery.Manufacturer
+                    Chemistry = $_.Battery.Chemistry
+                    'Design Capacity' = $_.Battery.DesignCapacity
+                    'Full Charge Capacity' = $_.Battery.FullChargeCapacity
+                    'Remaining Life Percentage' = if ($_.Battery.DesignCapacity -eq $null){'0'}else
+                        {($_.Battery.FullChargeCapacity / $_.Battery.DesignCapacity) * 100}
+                }
+            }
+        Remove-Item .\batteryInfo.xml -ErrorAction SilentlyContinue
+        $1 = $1 | ConvertTo-Html -Fragment
+    } Else {
+        $1 = $null
+    }
+    return $1
 }
 function getRAM {
     $totalRam = $(Get-WMIObject -class Win32_PhysicalMemory | Measure-Object -Property capacity -Sum | % {[Math]::Round(($_.sum / 1GB),2)})
