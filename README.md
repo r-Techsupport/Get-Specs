@@ -1,4 +1,9 @@
 # Get-Specs Script
+
+## This repo has been archived. It has been superseeded by [Specify](https://github.com/Spec-ify), another r/TS affiliated project.
+
+This was used for 5 years in the r/Techsupport live chat and during that time I learned a great deal about PowerShell and how it can be ~~used~~ abused. I leave this up for anyone looking to reference the methods used to gather Windows specifications and the creation of valid HTML reports in PowerShell.
+
 ## Get Windows Specifications
 
 This repo contains the PS1 and files needed to run the Get-Specs application made for rTechsupport
